@@ -2,7 +2,7 @@
 <html lang="ch">
 <head>
         <meta charset="utf-8" />
-        <title>aaapei的博客</title>
+        <title>luajava性能优化分析</title>
         <link rel="stylesheet" href="/theme/css/main.css" />
 
         <!--[if IE]>
@@ -14,14 +14,19 @@
         <header id="banner" class="body">
                 <h1><a href="/">aaapei的博客 </a></h1>
                 <nav><ul>
-                    <li><a href="/category/android.html">Android</a></li>
+                    <li class="active"><a href="/category/android.html">Android</a></li>
                     <li><a href="/category/python.html">Python</a></li>
                 </ul></nav>
         </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="/luajavaxing-neng-you-hua-fen-xi.html" rel="bookmark"
+           title="Permalink to luajava性能优化分析">luajava性能优化分析</a></h1>
+    </header>
 
-            <aside id="featured" class="body">
-                <article>
-                    <h1 class="entry-title"><a href="/luajavaxing-neng-you-hua-fen-xi.html">luajava性能优化分析</a></h1>
+    <div class="entry-content">
 <footer class="post-info">
         <abbr class="published" title="2013-12-02T20:20:00">
                 一 02 十二月 2013
@@ -32,7 +37,7 @@
         </address>
 <p>In <a href="/category/android.html">Android</a>. </p>
 
-</footer><!-- /.post-info --><p>最近在做一个lua的android项目,项目时间仓促,加上对lua完全陌生,于是选了个文档资料最全的lua bridge:luajava</p>
+</footer><!-- /.post-info -->      <p>最近在做一个lua的android项目,项目时间仓促,加上对lua完全陌生,于是选了个文档资料最全的lua bridge:luajava</p>
 <p>luajava目前只支持到5.1,不过升级到5.2困难不大,主要是一些宏开关以及静态变量;</p>
 <p>结果通过lua开始操作android ui时候,频繁掉祯,profile后发现90%+的cpu耗时在luajava中;</p>
 <p>掉坑了</p>
@@ -127,39 +132,11 @@ public static int objectIndex(int luaState, Object obj, String methodName) throw
 <p>纯jni实现,原理上性能应该会比luajava高一头</p>
 <p>jnlua分两个版本,0.9支持lua 5.2,1.0支持lua5.2</p>
 <p>0.9已经移植到android平台,1.0暂无(作者在wiki中说明未来会移植)</p>
-<p>缺点是文档很少,下篇我再说说jnlua</p>                </article>
-            </aside><!-- /#featured -->
-                <section id="content" class="body">
-                    <h1>Other articles</h1>
-                    <hr />
-                    <ol id="posts-list" class="hfeed">
+<p>缺点是文档很少,下篇我再说说jnlua</p>
+    </div><!-- /.entry-content -->
 
-            <li><article class="hentry">
-                <header>
-                    <h1><a href="/my-super-post.html" rel="bookmark"
-                           title="Permalink to My super title">My super title</a></h1>
-                </header>
-
-                <div class="entry-content">
-<footer class="post-info">
-        <abbr class="published" title="2010-12-03T10:20:00">
-                五 03 十二月 2010
-        </abbr>
-
-        <address class="vcard author">
-                By <a class="url fn" href="/author/alexis-metaireau.html">Alexis Metaireau</a>
-        </address>
-<p>In <a href="/category/python.html">Python</a>. </p>
-<p>tags: <a href="/tag/pelican.html">pelican</a><a href="/tag/publishing.html">publishing</a></p>
-</footer><!-- /.post-info -->                <p>Short version for index and feeds</p>
-                <a class="readmore" href="/my-super-post.html">read more</a>
-                </div><!-- /.entry-content -->
-            </article></li>
-            </ol><!-- /#posts-list -->
-<p class="paginator">
-    Page 1 / 1
-</p>
-            </section><!-- /#content -->
+  </article>
+</section>
         <section id="extras" class="body">
                 <div class="blogroll">
                         <h2>blogroll</h2>
