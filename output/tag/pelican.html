@@ -1,71 +1,109 @@
 <!DOCTYPE html>
-<html lang="ch">
+<html>
 <head>
+        <title>zhengwen的博客 - pelican | zhengwen的博客</title>
         <meta charset="utf-8" />
-        <title>aaapei的博客 - pelican</title>
-        <link rel="stylesheet" href="/theme/css/main.css" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-        <!--[if IE]>
-            <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-        <![endif]-->
+        <link rel="stylesheet" href="/theme/css/bootstrap.min.css" type="text/css" />
+        <link rel="stylesheet" href="/theme/css/bootstrap-responsive.min.css" type="text/css" />
+
+        <link rel="stylesheet" href="/theme/css/main.css" type="text/css" />
+
+        <script type="text/javascript">var switchTo5x=true;</script>
+        <script type="text/javascript" src="http://w.sharethis.com/button/buttons.js"></script>
+        <script type="text/javascript">
+            stLight.options({
+                publisher: "",
+                doNotHash: false,
+                doNotCopy: false,
+                hashAddressBar: false
+            });
+        </script>
 </head>
 
-<body id="index" class="home">
-        <header id="banner" class="body">
-                <h1><a href="/">aaapei的博客 </a></h1>
-                <nav><ul>
-                    <li><a href="/category/android.html">Android</a></li>
-                    <li><a href="/category/python.html">Python</a></li>
-                </ul></nav>
-        </header><!-- /#banner -->
-
-            <aside id="featured" class="body">
-                <article>
-                    <h1 class="entry-title"><a href="/my-super-post.html">My super title</a></h1>
-<footer class="post-info">
-        <abbr class="published" title="2010-12-03T10:20:00">
-                五 03 十二月 2010
-        </abbr>
-
-        <address class="vcard author">
-                By <a class="url fn" href="/author/alexis-metaireau.html">Alexis Metaireau</a>
-        </address>
-<p>In <a href="/category/python.html">Python</a>. </p>
-<p>tags: <a href="/tag/pelican.html">pelican</a><a href="/tag/publishing.html">publishing</a></p>
-</footer><!-- /.post-info --><p>This is the content of my super blog post.</p>                </article>
-<p class="paginator">
-    Page 1 / 1
-</p>
-            </aside><!-- /#featured -->
-            </ol><!-- /#posts-list -->
-            </section><!-- /#content -->
-        <section id="extras" class="body">
-                <div class="blogroll">
-                        <h2>blogroll</h2>
-                        <ul>
-                            <li><a href="http://getpelican.com/">Pelican</a></li>
-                            <li><a href="http://python.org/">Python.org</a></li>
-                            <li><a href="http://jinja.pocoo.org/">Jinja2</a></li>
-                            <li><a href="#">You can modify those links in your config file</a></li>
+<body id="index">
+    <div class="row-fluid">
+        <div class="span10 offset1">
+            <header id="banner" >
+                <h1>
+                    <a href="/">zhengwen的博客 </a>
+                </h1>
+                <nav class="navbar">
+                    <div class="navbar-inner">
+                        <ul class="nav">
+                            <li ><a href="/category/android.html">Android</a></li>
+                            <li ><a href="/category/python.html">Python</a></li>
                         </ul>
-                </div><!-- /.blogroll -->
-                <div class="social">
-                        <h2>social</h2>
-                        <ul>
 
-                            <li><a href="#">You can add links in your config file</a></li>
-                            <li><a href="#">Another social link</a></li>
-                        </ul>
-                </div><!-- /.social -->
-        </section><!-- /#extras -->
+                    </div>
+                </nav>
+            </header><!-- /#banner -->
+        </div>
+    </div>
 
-        <footer id="contentinfo" class="body">
-                <address id="about" class="vcard body">
-                Proudly powered by <a href="http://getpelican.com/">Pelican</a>, which takes great advantage of <a href="http://python.org">Python</a>.
-                </address><!-- /#about -->
+    <div class="row-fluid">
+        <div class="span10 offset1">
+            <div class="row-fluid">
+                <div class="span10">
+<section >
+<h1>Articles tagged with "pelican"</h1>
 
-                <p>The theme is by <a href="http://coding.smashingmagazine.com/2009/08/04/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
-        </footer><!-- /#contentinfo -->
+<dl>
+    <dt>2010-12-03</dt>
+    <dd><a href="/my-super-post.html">My super title</a></dd>
+</dl>
+</section>
+                </div>
+                <div class="span2">
+                    <section id="sidebar">
+                            <div>
+                                <h2>Links</h2>
+                                <ul>
+                                    <li><a href="http://weibo.com/a2pei">Weibo</a></li>
+                                    <li><a href="mailto:aaapei@gmail.com">Gmail</a></li>
+                                </ul>
+                            </div><!-- /.Links -->
+                            <div>
+                                <h2>Tags</h2>
+                                <ul id="cloud">
+                                     <li class="tag-4"><a href="/tag/pelican.html">pelican</a></li>
+                                     <li class="tag-4"><a href="/tag/publishing.html">publishing</a></li>
+                                </ul>
+                             </div>
+<!-- /.Tags -->
+                    </section><!-- /#sidebar -->
+                </div>
+            </div>
+        </div>
+    </div>
 
+    <footer id="site-footer">
+        <div class="row-fluid">
+            <div class="span10 offset1">
+                <address>
+                    <p>
+                        This blog is proudly powered by <a href="http://getpelican.com/">Pelican</a>, which takes great advantage of <a href="http://python.org">Python</a>.
+                    </p>
+                    <p>
+                        <a href="http://github.com/jsliang/pelican-fresh/">Fresh</a> is a responsive theme designed by <a href="http://jsliang.com/">jsliang</a>.
+                        Special thanks to <a href="http://coding.smashingmagazine.com/2009/08/04/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a> and <a href="http://twitter.github.com/bootstrap">Twitter Bootstrap</a>.
+                    </p>
+                </address>
+            </div>
+        </div>
+    </footer>
+
+<script type="text/javascript">
+    var disqus_shortname = 'aaapeigithub';
+    (function () {
+        var s = document.createElement('script'); s.async = true;
+        s.type = 'text/javascript';
+        s.src = 'http://' + disqus_shortname + '.disqus.com/count.js';
+        (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+    }());
+</script>
+    <script src="http://code.jquery.com/jquery.min.js"></script>
+    <script src="/theme/js/bootstrap.min.js"></script>
 </body>
 </html>

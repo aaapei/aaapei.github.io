@@ -1,166 +1,107 @@
 <!DOCTYPE html>
-<html lang="ch">
+<html>
 <head>
+        <title>zhengwen的博客 - Android | zhengwen的博客</title>
         <meta charset="utf-8" />
-        <title>aaapei的博客 - Android</title>
-        <link rel="stylesheet" href="/theme/css/main.css" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-        <!--[if IE]>
-            <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-        <![endif]-->
+        <link rel="stylesheet" href="/theme/css/bootstrap.min.css" type="text/css" />
+        <link rel="stylesheet" href="/theme/css/bootstrap-responsive.min.css" type="text/css" />
+
+        <link rel="stylesheet" href="/theme/css/main.css" type="text/css" />
+
+        <script type="text/javascript">var switchTo5x=true;</script>
+        <script type="text/javascript" src="http://w.sharethis.com/button/buttons.js"></script>
+        <script type="text/javascript">
+            stLight.options({
+                publisher: "",
+                doNotHash: false,
+                doNotCopy: false,
+                hashAddressBar: false
+            });
+        </script>
 </head>
 
-<body id="index" class="home">
-        <header id="banner" class="body">
-                <h1><a href="/">aaapei的博客 </a></h1>
-                <nav><ul>
-                    <li class="active"><a href="/category/android.html">Android</a></li>
-                    <li><a href="/category/python.html">Python</a></li>
-                </ul></nav>
-        </header><!-- /#banner -->
-
-            <aside id="featured" class="body">
-                <article>
-                    <h1 class="entry-title"><a href="/luajavaxing-neng-you-hua-fen-xi.html">luajava性能优化分析</a></h1>
-<footer class="post-info">
-        <abbr class="published" title="2013-12-02T20:20:00">
-                一 02 十二月 2013
-        </abbr>
-
-        <address class="vcard author">
-                By <a class="url fn" href="/author/zhengwen.html">zhengwen</a>
-        </address>
-<p>In <a href="/category/android.html">Android</a>. </p>
-
-</footer><!-- /.post-info --><p>最近在做一个lua的android项目,项目时间仓促,加上对lua完全陌生,于是选了个文档资料最全的lua bridge:luajava</p>
-<p>luajava目前只支持到5.1,不过升级到5.2困难不大,主要是一些宏开关以及静态变量;</p>
-<p>结果通过lua开始操作android ui时候,频繁掉祯,profile后发现90%+的cpu耗时在luajava中;</p>
-<p>掉坑了</p>
-<p>看了一下luajava本身代码其实不大;native层就一个luajava.c,java层,除了LuaJavaApi.java,其他java类都是Value Object</p>
-<h1>lua逻辑分析</h1>
-<p _="%" endhighlight="endhighlight">先看lua创建java object的代码,luajava.c中
-{% highlight sh %}
-int javaNewInstance( lua_State * L )
-{   <br />
-    //some code …..
-    method  = ( <em>javaEnv )-&gt;GetStaticMethodID( javaEnv , luajava_api_class , "javaNewInstance" ,"(ILjava/lang/String;)I" );
-     //先调用java层创建javaobject
-    javaClassName = ( </em>javaEnv )-&gt;NewStringUTF( javaEnv , className );
-    ret = ( *javaEnv )-&gt;CallStaticIntMethod( javaEnv , luajava_api_class , method, (jint)stateIndex , javaClassName );
-}</p>
-<p _="%" endhighlight="endhighlight">然后是:
-{% highlight sh %}
-public static int javaNewInstance(int luaState, String className) throws LuaException {
-     LuaState L = LuaStateFactory.getExistingState(luaState);
-    synchronized (L) {
-            Class clazz;
-            try {
-                clazz = Class.forName(className);
-             } catch (ClassNotFoundException e) {
-                 throw new LuaException(e);}
-            bject ret = getObjInstance(L, clazz);
-            L.pushJavaObject(ret);
-            return 1;
-    }
-}</p>
-<p _="%" endhighlight="endhighlight">getObjInstance的逻辑暂时不论,先看L.pushjavaObject; 最终通过jni调用luajava.c中的 pushJavaObject,没错,是luajava.c中!!!
-{% highlight sh %}
-int pushJavaObject( lua_State * L , jobject javaObject ){
-    //创建userdata略
-    /<em> pushes the __index metamethod </em>/
-    lua_pushstring( L , "__index" );
-    lua_pushcfunction( L , &amp;objectIndex );   lua_rawset( L , -3 );
-    lua_rawset( L , -3 );
-}</p>
-<p>这儿看明白了,luajava创建的javaobject,对应的userdata的__index元方法是objectIndex,
-任何方法的调用统一到objectIndex</p>
-<p>继续翻代码,最终找到了LuaJavaApi.java中的objectIndex… 是不是特别绕..</p>
-<p>luajava为了提高效率,将类创建\方法查找的逻辑全部放在java层,但是类创建/方法查找又需要将结果通过jni放回lua stack中!!</p>
-<p _="%" endhighlight="endhighlight">profile中显示70%的耗时在objectIndex,再看一下java层中的objectIndex代码
-{% highlight sh %}
-public static int objectIndex(int luaState, Object obj, String methodName) throws LuaException {
-     //some code
-     Method[] methods = clazz.getMethods();
-     Method method = null;
-    // gets method and arguments
-    for (int i = 0; i &lt; methods.length; i++) {
-        if (!methods[i].getName().equals(methodName))
-            continue;
-         Class[] parameters = methods[i].getParameterTypes();
-         if (parameters.length != top - 1)
-            continue;
-         boolean okMethod = true;
-        for (int j = 0; j &lt; parameters.length; j++) {
-            try {
-                 objs[j] = compareTypes(L, parameters[j], j + 2);
-            } catch (Exception e) {
-                okMethod = false;
-                break;
-            }
-        }
-    if (okMethod) {
-        method = methods[i];
-    }
- }</p>
-<p>由于c和lua的stack中没有传递参数个数,加上java和lua的对象类型没有一一对应;</p>
-<p>luajava的做法是先通过getmethods获取所有同名方法, 然后compareTypes将method的参数类型逐个取出与lua stack中的参数比较(又是一堆jni操作);</p>
-<h1>性能优化</h1>
-<p>确定原因后,就可以进行性能优化, </p>
-<div class="highlight"><pre><span class="mf">1.</span> <span class="err">首先</span><span class="p">,</span><span class="err">在</span><span class="n">jni</span><span class="err">层将常用的</span><span class="n">method</span> <span class="k">static</span><span class="err">化</span>
-<span class="mf">2.</span> <span class="err">其次</span><span class="p">,</span><span class="n">compareTypes</span><span class="err">之前先确定是否有同名方法</span><span class="p">,</span><span class="n">java</span><span class="err">方法无重载时候跳过</span><span class="n">compareTypes</span><span class="err">逻辑</span>
-</pre></div>
-
-
-<p>优化之后测试,效率还是远远不能达到产品化的需求;getmethods的cpu耗时还是很高,因此必须做cache;</p>
-<p>但是由于前面提到的参数问题,在objectIndex中不能唯一确定方法签名;这儿有两个方法:</p>
-<div class="highlight"><pre><span class="mf">1.</span> <span class="err">牺牲编码效率</span><span class="p">,</span><span class="n">lua</span><span class="err">中调用</span><span class="n">java</span> <span class="n">method</span><span class="p">,</span><span class="err">通过类似</span><span class="n">jni</span><span class="err">调用方式</span><span class="p">,</span><span class="err">将方法签名一并带进来</span><span class="p">,</span><span class="n">objectIndex</span><span class="err">解析形成正确的方法签名</span>
-
-<span class="mf">2.</span> <span class="err">牺牲</span><span class="n">java</span><span class="err">的方法重载</span><span class="p">,</span><span class="err">约定</span><span class="n">java</span> <span class="n">class</span><span class="err">不做重载方法</span>
-</pre></div>
-
-
-<p>博主选的是方法2..原因是项目中交互很多,但是调用的class有限..</p>
-<p>做cache的逻辑基本上同java jit,热点代码检测</p>
-<p>优化之后,勉强能达到产品化的性能要求;不过由于luajava的机制问题,优化的点基本到头了;</p>
-<h1>jnlua</h1>
-<p>如果对lua c api的android开发者,不建议使用luajava,而使用<a href="https://code.google.com/p/jnlua/">jnlua</a>,</p>
-<p>纯jni实现,原理上性能应该会比luajava高一头</p>
-<p>jnlua分两个版本,0.9支持lua 5.2,1.0支持lua5.2</p>
-<p>0.9已经移植到android平台,1.0暂无(作者在wiki中说明未来会移植)</p>
-<p>缺点是文档很少,下篇我再说说jnlua</p>                </article>
-<p class="paginator">
-    Page 1 / 1
-</p>
-            </aside><!-- /#featured -->
-            </ol><!-- /#posts-list -->
-            </section><!-- /#content -->
-        <section id="extras" class="body">
-                <div class="blogroll">
-                        <h2>blogroll</h2>
-                        <ul>
-                            <li><a href="http://getpelican.com/">Pelican</a></li>
-                            <li><a href="http://python.org/">Python.org</a></li>
-                            <li><a href="http://jinja.pocoo.org/">Jinja2</a></li>
-                            <li><a href="#">You can modify those links in your config file</a></li>
+<body id="index">
+    <div class="row-fluid">
+        <div class="span10 offset1">
+            <header id="banner" >
+                <h1>
+                    <a href="/">zhengwen的博客 </a>
+                </h1>
+                <nav class="navbar">
+                    <div class="navbar-inner">
+                        <ul class="nav">
+                            <li class="active"><a href="/category/android.html">Android</a></li>
                         </ul>
-                </div><!-- /.blogroll -->
-                <div class="social">
-                        <h2>social</h2>
-                        <ul>
 
-                            <li><a href="#">You can add links in your config file</a></li>
-                            <li><a href="#">Another social link</a></li>
-                        </ul>
-                </div><!-- /.social -->
-        </section><!-- /#extras -->
+                    </div>
+                </nav>
+            </header><!-- /#banner -->
+        </div>
+    </div>
 
-        <footer id="contentinfo" class="body">
-                <address id="about" class="vcard body">
-                Proudly powered by <a href="http://getpelican.com/">Pelican</a>, which takes great advantage of <a href="http://python.org">Python</a>.
-                </address><!-- /#about -->
+    <div class="row-fluid">
+        <div class="span10 offset1">
+            <div class="row-fluid">
+                <div class="span10">
+<section >
+<h1>Articles in Android</h1>
 
-                <p>The theme is by <a href="http://coding.smashingmagazine.com/2009/08/04/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
-        </footer><!-- /#contentinfo -->
-
+<dl>
+    <dt>2013-12-02</dt>
+    <dd><a href="/luajavaxing-neng-you-hua-fen-xi.html">luajava性能优化分析</a></dd>
+</dl>
+</section>
+                </div>
+                <div class="span2">
+                    <section id="sidebar">
+                            <div>
+                                <h2>Links</h2>
+                                <ul>
+                                    <li><a href="http://weibo.com/a2pei">Weibo</a></li>
+                                    <li><a href="mailto:aaapei@gmail.com">Gmail</a></li>
+                                </ul>
+                            </div><!-- /.Links -->
+                            <div>
+                                <h2>Tags</h2>
+                                <ul id="cloud">
+                                     <li class="tag-4"><a href="/tag/lua-android.html">lua android</a></li>
+                                </ul>
+                             </div>
+<!-- /.Tags -->
+                    </section><!-- /#sidebar -->
+                </div>
+            </div>
+        </div>
+    </div>
+<!--
+    <footer id="site-footer">
+        <div class="row-fluid">
+            <div class="span10 offset1">
+                <address>
+                    <p>
+                        This blog is proudly powered by <a href="http://getpelican.com/">Pelican</a>, which takes great advantage of <a href="http://python.org">Python</a>.
+                    </p>
+                    <p>
+                        <a href="http://github.com/jsliang/pelican-fresh/">Fresh</a> is a responsive theme designed by <a href="http://jsliang.com/">jsliang</a>.
+                        Special thanks to <a href="http://coding.smashingmagazine.com/2009/08/04/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a> and <a href="http://twitter.github.com/bootstrap">Twitter Bootstrap</a>.
+                    </p>
+                </address>
+            </div>
+        </div>
+    </footer>
+	-->
+<script type="text/javascript">
+    var disqus_shortname = 'aaapeigithub';
+    (function () {
+        var s = document.createElement('script'); s.async = true;
+        s.type = 'text/javascript';
+        s.src = 'http://' + disqus_shortname + '.disqus.com/count.js';
+        (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+    }());
+</script>
+    <script src="http://code.jquery.com/jquery.min.js"></script>
+    <script src="/theme/js/bootstrap.min.js"></script>
 </body>
 </html>

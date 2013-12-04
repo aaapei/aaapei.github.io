@@ -1,7 +1,8 @@
 Title: luajava性能优化分析
 Date: 2013-12-02 20:20
-Category: Android
+Category:编程 
 Author: zhengwen
+tags:lua android
 
 最近在做一个lua的android项目,项目时间仓促,加上对lua完全陌生,于是选了个文档资料最全的lua bridge:luajava
 
@@ -15,7 +16,7 @@ luajava目前只支持到5.1,不过升级到5.2困难不大,主要是一些宏�
 
 #lua逻辑分析
 先看lua创建java object的代码,luajava.c中
-{% highlight sh %}
+```C
 int javaNewInstance( lua_State * L )
 {     
 	//some code …..
@@ -24,10 +25,10 @@ int javaNewInstance( lua_State * L )
 	javaClassName = ( *javaEnv )->NewStringUTF( javaEnv , className );
 	ret = ( *javaEnv )->CallStaticIntMethod( javaEnv , luajava_api_class , method, (jint)stateIndex , javaClassName );
 }
-{% endhighlight %}
-
+```
 然后是:
-{% highlight sh %}
+
+```Java
 public static int javaNewInstance(int luaState, String className) throws LuaException {
 	 LuaState L = LuaStateFactory.getExistingState(luaState);
 	synchronized (L) {
@@ -41,10 +42,10 @@ public static int javaNewInstance(int luaState, String className) throws LuaExce
 			return 1;
 	}
 }
-{% endhighlight %}
+```
 
 getObjInstance的逻辑暂时不论,先看L.pushjavaObject; 最终通过jni调用luajava.c中的 pushJavaObject,没错,是luajava.c中!!!
-{% highlight sh %}
+```Java
 int pushJavaObject( lua_State * L , jobject javaObject ){
 	//创建userdata略
 	/* pushes the __index metamethod */
@@ -52,8 +53,7 @@ int pushJavaObject( lua_State * L , jobject javaObject ){
 	lua_pushcfunction( L , &objectIndex );   lua_rawset( L , -3 );
 	lua_rawset( L , -3 );
 }
-{% endhighlight %}
-
+```
 这儿看明白了,luajava创建的javaobject,对应的userdata的__index元方法是objectIndex,
 任何方法的调用统一到objectIndex
 
@@ -62,7 +62,7 @@ int pushJavaObject( lua_State * L , jobject javaObject ){
 luajava为了提高效率,将类创建\方法查找的逻辑全部放在java层,但是类创建/方法查找又需要将结果通过jni放回lua stack中!!
 
 profile中显示70%的耗时在objectIndex,再看一下java层中的objectIndex代码
-{% highlight sh %}
+```Java
 public static int objectIndex(int luaState, Object obj, String methodName) throws LuaException {
 	 //some code
 	 Method[] methods = clazz.getMethods();
@@ -87,8 +87,7 @@ public static int objectIndex(int luaState, Object obj, String methodName) throw
  		method = methods[i];
  	}
  }
- {% endhighlight %}
-
+```
 
 由于c和lua的stack中没有传递参数个数,加上java和lua的对象类型没有一一对应;
 
@@ -97,16 +96,16 @@ luajava的做法是先通过getmethods获取所有同名方法, 然后compareTyp
 #性能优化
 确定原因后,就可以进行性能优化, 
 
-	1. 首先,在jni层将常用的method static化
-	2. 其次,compareTypes之前先确定是否有同名方法,java方法无重载时候跳过compareTypes逻辑
+1. 首先,在jni层将常用的method static化
+2. 其次,compareTypes之前先确定是否有同名方法,java方法无重载时候跳过compareTypes逻辑
 
 优化之后测试,效率还是远远不能达到产品化的需求;getmethods的cpu耗时还是很高,因此必须做cache;
 
 但是由于前面提到的参数问题,在objectIndex中不能唯一确定方法签名;这儿有两个方法:
 
-	1. 牺牲编码效率,lua中调用java method,通过类似jni调用方式,将方法签名一并带进来,objectIndex解析形成正确的方法签名
+1. 牺牲编码效率,lua中调用java method,通过类似jni调用方式,将方法签名一并带进来,objectIndex解析形成正确的方法签名
 
-	2. 牺牲java的方法重载,约定java class不做重载方法
+2. 牺牲java的方法重载,约定java class不做重载方法
 
 博主选的是方法2..原因是项目中交互很多,但是调用的class有限..
 
