@@ -216,41 +216,11 @@ by <a class="url fn" href="http://aaapei.github.io/author/zhengwen.html">zhengwe
         <hr />
     </div>
 		
-
- 
-        
-
- 
-
-    <div class='article'>
-        <a href="http://aaapei.github.io/luajavaxing-neng-you-hua-fen-xi.html"><h2>luajava性能优化分析</h2></a>
-        <div class= "well small"> 一 02 十二月 2013
-
-by <a class="url fn" href="http://aaapei.github.io/author/zhengwen.html">zhengwen</a>
- 
-
-
- </div>
-        <div class="summary"><p>最近在做一个lua的android项目,项目时间仓促,加上对lua完全陌生,于是选了个文档资料最全的lua bridge:luajava</p>
-<p>luajava目前只支持到5.1,不过升级到5.2困难不大,主要是一些宏开关以及静态变量;</p>
-<p>结果通过lua开始操作android ui时候,频繁掉祯,profile后发现90%+的cpu耗时在luajava中;</p>
-<p>掉坑了</p>
-<p>看了一下luajava本身代码其实不大;native层就一个luajava.c,java层,除了LuaJavaApi.java,其他java类都是Value Object</p>
-<h1>lua逻辑分析</h1>
-<p>先看lua创建java object的代码,luajava.c中</p>
-<div class="highlight"><pre><span class="kt">int</span> <span class="nf">javaNewInstance</span><span class="p">(</span> <span class="n">lua_State</span> <span class="o">*</span> <span class="n">L</span> <span class="p">)</span>
-<span class="p">{</span>     
-    <span class="c1">//some code …..</span>
-    <span class="n">method</span>  <span class="o">=</span> <span class="p">(</span> <span class="o">*</span><span class="n">javaEnv</span> <span class="p">)</span><span class="o">-&gt;</span><span class="n">GetStaticMethodID</span><span class="p">(</span> <span class="n">javaEnv</span> <span class="p">,</span> <span class="n">luajava_api_class</span> <span class="p">,</span> <span class="s">&quot;javaNewInstance&quot;</span> <span class="p">,</span><span class="s">&quot;(ILjava/lang/String;)I&quot;</span> <span class="p">);</span>
-     <span class="c1">//先调用java层创建javaobject</span>
-    <span class="n">javaClassName</span> <span class="o">=</span> <span class="p">(</span> <span class="o">*</span><span class="n">javaEnv</span> <span class="p">)</span><span class="o">-&gt;</span><span class="n">NewStringUTF ...</span></pre></div> <a class="btn btn-info xsmall" href="http://aaapei.github.io/luajavaxing-neng-you-hua-fen-xi.html">read more</a></div>
-    </div>	
-				
 <div class="pagination">
 <ul>
     <li class="prev disabled"><a href="#">&larr; Previous</a></li>
 
-    <li class="active"><a href="http://aaapei.github.io/index.html">1</a></li>
+    <li class="active"><a href="http://aaapei.github.io/category/android.html">1</a></li>
 
     <li class="next disabled"><a href="#">&rarr; Next</a></li>
 
