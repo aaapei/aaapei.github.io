@@ -9,14 +9,14 @@
 
     <!-- Le HTML5 shim, for IE6-8 support of HTML elements -->
     <!--[if lt IE 9]>
-    <script src="http://aaapei.com/theme/html5.js"></script>
+    <script src="http://localhost:8000/theme/html5.js"></script>
     <![endif]-->
 
     <!-- Le styles -->
-    <link href="http://aaapei.com/theme/bootstrap.min.css" rel="stylesheet">
-    <link href="http://aaapei.com/theme/bootstrap.min.responsive.css" rel="stylesheet">
-    <link href="http://aaapei.com/theme/local.css" rel="stylesheet">
-    <link href="http://aaapei.com/theme/pygments.css" rel="stylesheet">
+    <link href="http://localhost:8000/theme/bootstrap.min.css" rel="stylesheet">
+    <link href="http://localhost:8000/theme/bootstrap.min.responsive.css" rel="stylesheet">
+    <link href="http://localhost:8000/theme/local.css" rel="stylesheet">
+    <link href="http://localhost:8000/theme/pygments.css" rel="stylesheet">
 
 </head>
 
@@ -32,12 +32,12 @@
              <span class="icon-bar"></span>
          </a>
 
-        <a class="brand" href="http://aaapei.com">zhengwen的博客</a>
+        <a class="brand" href="http://localhost:8000">zhengwen的博客</a>
 
         <div class="nav-collapse">
         <ul class="nav">
             
-            <li><a href="http://aaapei.com/pages/guan-yu-wo.html">关于我</a></li>
+            <li><a href="http://localhost:8000/pages/guan-yu-wo.html">关于我</a></li>
         </ul>
         </div>
         
@@ -53,18 +53,17 @@
     <div class='article'>
         <div class="content-title">
             <h1>luajava性能优化分析</h1>
-一 02 十二月 2013
+2013-12-02
 
-by <a class="url fn" href="http://aaapei.com/author/zhengwen.html">zhengwen</a>
+by  <a class="url fn" href="http://localhost:8000/author/zhengwen.html">zhengwen</a>
  
 
 
         </div>
 	
-        <div><p>最近在做一个lua的android项目,项目时间仓促,加上对lua完全陌生,于是选了个文档资料最全的lua bridge:luajava</p>
-<p>luajava目前只支持到5.1,不过升级到5.2困难不大,主要是一些宏开关以及静态变量;</p>
-<p>结果通过lua开始操作android ui时候,频繁掉祯,profile后发现90%+的cpu耗时在luajava中;</p>
-<p>看了一下luajava本身代码其实不大;native层就一个luajava.c,java层,除了LuaJavaApi.java,其他java类都是Value Object</p>
+        <div><p>最近在做一个lua的android项目,项目时间仓促,加上对lua完全陌生,于是选了个文档资料最全的lua bridge:<em>luajava</em>
+luajava目前只支持到5.1,不过升级到5.2困难不大,主要是一些宏开关以及静态变量;结果通过lua开始操作android ui时候,频繁掉祯,profile后发现90%+的cpu耗时在luajava中<br />
+看了一下luajava本身代码其实不大;native层就一个luajava.c,java层,除了LuaJavaApi.java,其他java类都是Value Object</p>
 <h1>lua逻辑分析</h1>
 <p>先看lua创建java object的代码,luajava.c中</p>
 <div class="highlight"><pre><span class="kt">int</span> <span class="nf">javaNewInstance</span><span class="p">(</span> <span class="n">lua_State</span> <span class="o">*</span> <span class="n">L</span> <span class="p">)</span>
@@ -138,26 +137,19 @@ by <a class="url fn" href="http://aaapei.com/author/zhengwen.html">zhengwen</a>
 </pre></div>
 
 
-<p>由于c和lua的stack中没有传递参数个数,加上java和lua的对象类型没有一一对应;</p>
-<p>luajava的做法是先通过getmethods获取所有同名方法, 然后compareTypes将method的参数类型逐个取出与lua stack中的参数比较(又是一堆jni操作);</p>
+<p>由于c和lua的stack中没有传递参数个数,加上java和lua的对象类型没有一一对应;  luajava的做法是先通过getmethods获取所有同名方法,然后compareTypes将method的参数类型逐个取出与lua stack中的参数比较(又是一堆jni操作);</p>
 <h1>性能优化</h1>
 <p>确定原因后,就可以进行性能优化, </p>
 <ol>
 <li>首先,在jni层将常用的method static化</li>
 <li>其次,compareTypes之前先确定是否有同名方法,java方法无重载时候跳过compareTypes逻辑</li>
 </ol>
-<p>优化之后测试,效率还是远远不能达到产品化的需求;getmethods的cpu耗时还是很高,因此必须做cache;</p>
-<p>但是由于前面提到的参数问题,在objectIndex中不能唯一确定方法签名;这儿有两个方法:</p>
+<p>优化之后测试,效率还是远远不能达到产品化的需求;getmethods的cpu耗时还是很高,因此必须做cache;  但是由于前面提到的参数问题,在objectIndex中不能唯一确定方法签名;这儿有两个方法:</p>
 <ol>
-<li>
-<p>牺牲编码效率,lua中调用java method,通过类似jni调用方式,将方法签名一并带进来,objectIndex解析形成正确的方法签名</p>
-</li>
-<li>
-<p>牺牲java的方法重载,约定java class不做重载方法</p>
-</li>
+<li>牺牲编码效率,lua中调用java method,通过类似jni调用方式,将方法签名一并带进来,objectIndex解析形成正确的方法签名</li>
+<li>牺牲java的方法重载,约定java class不做重载方法</li>
 </ol>
-<p>博主选的是方法2..原因是项目中交互很多,但是调用的class有限..</p>
-<p>做cache的逻辑基本上同java jit,热点代码检测</p>
+<p>博主选的是方法2..原因是项目中交互很多,但是调用的class有限  做cache的逻辑基本上同java jit,热点代码检测</p>
 <p>优化之后,勉强能达到产品化的性能要求;不过由于luajava的机制问题,优化的点基本到头了;</p>
 <h1>jnlua</h1>
 <p>如果对lua c api的android开发者,不建议使用luajava,而使用<a href="https://code.google.com/p/jnlua/">jnlua</a>,</p>
@@ -189,12 +181,14 @@ by <a class="url fn" href="http://aaapei.com/author/zhengwen.html">zhengwen</a>
             <div class="well" style="padding: 8px 0; background-color: #FBFBFB;">
             <ul class="nav nav-list">
                 <li class="nav-header"> 
-                Site
+                导航
                 </li>
             
-                <li><a href="http://aaapei.com/">Archives</a>
-                <li><a href="http://aaapei.com/tags.html">Tags</a>
-                <li><a href="http://aaapei.com/" rel="alternate">Atom feed</a></li>
+                <li><a href="http://localhost:8000/">文章</a>
+				<li><a href="http://localhost:8000/tags.html">标签</a>
+				<!--
+                <li><a href="http://localhost:8000/" rel="alternate">Atom feed</a></li>
+				-->
             </ul>
             </div>
 
@@ -202,11 +196,11 @@ by <a class="url fn" href="http://aaapei.com/author/zhengwen.html">zhengwen</a>
             <div class="well" style="padding: 8px 0; background-color: #FBFBFB;">
             <ul class="nav nav-list">
                 <li class="nav-header"> 
-                Categories
+                分类
                 </li>
                 
-                <li><a href="http://aaapei.com/category/android.html">android</a></li>
-                <li><a href="http://aaapei.com/category/lua.html">lua</a></li>
+                <li><a href="http://localhost:8000/category/android.html">android</a></li>
+                <li><a href="http://localhost:8000/category/lua.html">lua</a></li>
                    
             </ul>
             </div>
@@ -218,8 +212,8 @@ by <a class="url fn" href="http://aaapei.com/author/zhengwen.html">zhengwen</a>
             <div class="well" style="padding: 8px 0; background-color: #FBFBFB;">
             <ul class="nav nav-list">
                 <li class="nav-header"> 
-                Social
-                </li>
+				联系我
+				</li>
            
                 <li><a href="http://weibo.com/a2pei">Weibo</a></li>
                 <li><a href="mailto:aaapei@gmail.com">Gmail</a></li>
@@ -231,7 +225,7 @@ by <a class="url fn" href="http://aaapei.com/author/zhengwen.html">zhengwen</a>
     </div>     </div> 
 <footer>
 <br />
-<p><a href="http://aaapei.com">zhengwen的博客</a> &copy; aaapei 2012</p>
+<p><a href="http://localhost:8000">zhengwen的博客</a> &copy; aaapei 2012</p>
 </footer>
 
 </div> <!-- /container -->

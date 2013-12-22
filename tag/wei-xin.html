@@ -9,14 +9,14 @@
 
     <!-- Le HTML5 shim, for IE6-8 support of HTML elements -->
     <!--[if lt IE 9]>
-    <script src="http://aaapei.com/theme/html5.js"></script>
+    <script src="http://localhost:8000/theme/html5.js"></script>
     <![endif]-->
 
     <!-- Le styles -->
-    <link href="http://aaapei.com/theme/bootstrap.min.css" rel="stylesheet">
-    <link href="http://aaapei.com/theme/bootstrap.min.responsive.css" rel="stylesheet">
-    <link href="http://aaapei.com/theme/local.css" rel="stylesheet">
-    <link href="http://aaapei.com/theme/pygments.css" rel="stylesheet">
+    <link href="http://localhost:8000/theme/bootstrap.min.css" rel="stylesheet">
+    <link href="http://localhost:8000/theme/bootstrap.min.responsive.css" rel="stylesheet">
+    <link href="http://localhost:8000/theme/local.css" rel="stylesheet">
+    <link href="http://localhost:8000/theme/pygments.css" rel="stylesheet">
 
 </head>
 
@@ -32,12 +32,12 @@
              <span class="icon-bar"></span>
          </a>
 
-        <a class="brand" href="http://aaapei.com">zhengwen的博客</a>
+        <a class="brand" href="http://localhost:8000">zhengwen的博客</a>
 
         <div class="nav-collapse">
         <ul class="nav">
             
-            <li><a href="http://aaapei.com/pages/guan-yu-wo.html">关于我</a></li>
+            <li><a href="http://localhost:8000/pages/guan-yu-wo.html">关于我</a></li>
         </ul>
         </div>
         
@@ -55,17 +55,17 @@
         
 
     <div class='article'>
-        <a href="http://aaapei.com/wei-xin-de-jsbridgeshi-xian.html"><h2>微信的jsbridge实现</h2></a>
-        <div class= "well small"> 三 11 十二月 2013
+        <a href="http://localhost:8000/wei-xin-de-jsbridgeshi-xian.html"><h2>微信的jsbridge实现</h2></a>
+        <div class= "well small"> 2013-12-11
 
-by <a class="url fn" href="http://aaapei.com/author/zhengwen.html">zhengwen</a>
+by  <a class="url fn" href="http://localhost:8000/author/zhengwen.html">zhengwen</a>
  
 
 
  </div>
         <div class="summary"><h3>微信开放的JSAPI接口</h3>
-<p>微信公共平台开放了操作webview界面的js接口,隐藏右上角按钮,隐藏导航栏以及获取网络状态的js接口</p>
-<p>sample:</p>
+<p>微信公共平台开放了操作webview界面的js接口,隐藏右上角按钮,隐藏导航栏以及获取网络状态的js接口<br />
+sample:  </p>
 <div class="highlight"><pre><span class="nx">WeixinJSBridge</span><span class="p">.</span><span class="nx">invoke</span><span class="p">(</span><span class="s1">&#39;getNetworkType&#39;</span><span class="p">,{},</span>
     <span class="kd">function</span><span class="p">(</span><span class="nx">e</span><span class="p">){</span>
         <span class="nx">WeixinJSBridge</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">e</span><span class="p">.</span><span class="nx">err_msg</span><span class="p">);</span>
@@ -73,15 +73,18 @@ by <a class="url fn" href="http://aaapei.com/author/zhengwen.html">zhengwen</a>
 </pre></div>
 
 
-<p>android的webview中有开放过一个addJavaScriptInterface函数,这个函数的作用是在页面的Window中注入一个JS对象,</p>
-<p>如果你的应用中使用了这个api,建议先看一下国内安全领域第一人黑哥的这篇文章<a href="http://hi.baidu.com/hi_heige/item/9baf99f063331d58c9f3379a">android webview 漏洞背后的节操</a>,</p>
+<p>webview中有开放过一个<em>addJavaScriptInterface</em>函数,这个函数的作用是在页面的Window中注入一个JS对象<br />
+如果你的应用中使用了这个api,建议先看一下国内安全领域第一人黑哥的这篇文章<a href="http://hi.baidu.com/hi_heige/item/9baf99f063331d58c9f3379a">android webview 漏洞背后的节操</a>,  </p>
 <p>没耐心的同学直接看结尾方案吧:</p>
-<p>1: 第1个方案是设置信任域，这个问题其实是不太靠谱的，在我之前在kcon里演讲《去年跨过的浏览器》里有很多信任域带来的安全问题</p>
-<p>2: 第2个方案是使用 shouldOverrideUrlLoading 的方式，据说这个方案还是比较靠谱的，只是可能代价比较大。</p>
-<p>3:  第3个方案就是教育那些开发商，没有必要用webview的时候就不要用，不要java与js交互就不要用。</p>
-<p>不过,按黑哥这篇文章的想法,其实这个漏洞危险等级是很低,就算以后被安全部门或乌云网站抓到的时候,可以无视之   </p>
-<p>暂时把安全问题放一边,Js对象的注入,对函数的参数类型有严格要求,它只能传递基本数据类型以及JSON;</p>
-<p>但微信的JsApi中,参数三是一个函数对象,那他是如果做到的呢 ...</p> <a class="btn btn-info xsmall" href="http://aaapei.com/wei-xin-de-jsbridgeshi-xian.html">read more</a></div>
+<blockquote>
+<p>第1个方案是设置信任域，这个问题其实是不太靠谱的，在我之前在kcon里演讲《去年跨过的浏览器》里有很多信任域带来的安全问题<br />
+ 第2个方案是使用 shouldOverrideUrlLoading 的方式，据说这个方案还是比较靠谱的，只是可能代价比较大<br />
+ 第3个方案就是教育那些开发商，没有必要用webview的时候就不要用，不要java与js交互就不要用  </p>
+</blockquote>
+<p>不过,按黑哥这篇文章的想法,其实这个漏洞危险等级是很低,就算以后被安全部门或乌云网站抓到的时候,可以无视之 <br />
+暂时把安全问题放一边,Js对象的注入,对函数的参数类型有严格要求,它只能传递基本数据类型以及JSON<br />
+但微信的JsApi中,参数三是一个函数对象,那他是如果做到的呢</p>
+<h3>逆向 ...</h3> <a class="btn btn-info xsmall" href="http://localhost:8000/wei-xin-de-jsbridgeshi-xian.html">read more</a></div>
     </div>	
 				
 
@@ -94,12 +97,14 @@ by <a class="url fn" href="http://aaapei.com/author/zhengwen.html">zhengwen</a>
             <div class="well" style="padding: 8px 0; background-color: #FBFBFB;">
             <ul class="nav nav-list">
                 <li class="nav-header"> 
-                Site
+                导航
                 </li>
             
-                <li><a href="http://aaapei.com/">Archives</a>
-                <li><a href="http://aaapei.com/tags.html">Tags</a>
-                <li><a href="http://aaapei.com/" rel="alternate">Atom feed</a></li>
+                <li><a href="http://localhost:8000/">文章</a>
+				<li><a href="http://localhost:8000/tags.html">标签</a>
+				<!--
+                <li><a href="http://localhost:8000/" rel="alternate">Atom feed</a></li>
+				-->
             </ul>
             </div>
 
@@ -107,11 +112,11 @@ by <a class="url fn" href="http://aaapei.com/author/zhengwen.html">zhengwen</a>
             <div class="well" style="padding: 8px 0; background-color: #FBFBFB;">
             <ul class="nav nav-list">
                 <li class="nav-header"> 
-                Categories
+                分类
                 </li>
                 
-                <li><a href="http://aaapei.com/category/android.html">android</a></li>
-                <li><a href="http://aaapei.com/category/lua.html">lua</a></li>
+                <li><a href="http://localhost:8000/category/android.html">android</a></li>
+                <li><a href="http://localhost:8000/category/lua.html">lua</a></li>
                    
             </ul>
             </div>
@@ -123,8 +128,8 @@ by <a class="url fn" href="http://aaapei.com/author/zhengwen.html">zhengwen</a>
             <div class="well" style="padding: 8px 0; background-color: #FBFBFB;">
             <ul class="nav nav-list">
                 <li class="nav-header"> 
-                Social
-                </li>
+				联系我
+				</li>
            
                 <li><a href="http://weibo.com/a2pei">Weibo</a></li>
                 <li><a href="mailto:aaapei@gmail.com">Gmail</a></li>
@@ -136,7 +141,7 @@ by <a class="url fn" href="http://aaapei.com/author/zhengwen.html">zhengwen</a>
     </div>     </div> 
 <footer>
 <br />
-<p><a href="http://aaapei.com">zhengwen的博客</a> &copy; aaapei 2012</p>
+<p><a href="http://localhost:8000">zhengwen的博客</a> &copy; aaapei 2012</p>
 </footer>
 
 </div> <!-- /container -->
