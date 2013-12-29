@@ -1,70 +1,90 @@
-<!DOCTYPE html>
-<html lang="zh">
-<head>
-    <meta charset="utf-8">
-    <title>zhengwen的博客</title>
-    <meta name="description" content="">
-    <meta name="author" content="aaapei">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!DOCTYPE HTML>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>zhengwen的博客</title>
+        <meta name="author" content="aaapei">
 
-    <!-- Le HTML5 shim, for IE6-8 support of HTML elements -->
-    <!--[if lt IE 9]>
-    <script src="http://aaapei.com/theme/html5.js"></script>
-    <![endif]-->
+        <!-- http://t.co/dKP3o1e -->
+        <meta name="HandheldFriendly" content="True">
+        <meta name="MobileOptimized" content="320">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <!-- Le styles -->
-    <link href="http://aaapei.com/theme/bootstrap.min.css" rel="stylesheet">
-    <link href="http://aaapei.com/theme/bootstrap.min.responsive.css" rel="stylesheet">
-    <link href="http://aaapei.com/theme/local.css" rel="stylesheet">
-    <link href="http://aaapei.com/theme/pygments.css" rel="stylesheet">
+        <!-- Open Graph tags -->
 
-</head>
 
-<body>
+                <meta property="og:type" content="article"/>
+                <meta property="og:title" content="luajava性能优化分析"/>
+                <meta property="og:url" content="http://localhost:8000/luajavaxing-neng-you-hua-fen-xi.html"/>
+                <meta property="og:description" content="最近在做一个lua的android项目,项目时间仓促,加上对lua完全陌生,于是选了个文档资料最全的lua bridge:luajava luajava目前只支持到5.1,不过升级到5.2困难不大,主要是一些宏开关以及静态变量;结果通过lua开始操作android ui时候,频繁掉祯,profile后发现90%+的cpu耗时在luajava中 看了一下luajava本身代码其实不大;native层就一个luajava.c,java层,除了LuaJavaApi.java,其他java类都是Value Object lua逻辑分析 先看lua创建java object的代码,luajava.c中 int javaNewInstance( lua_State * L ) { //some code ….. method = ( *javaEnv )->GetStaticMethodID( javaEnv , luajava_api_class , "javaNewInstance" ,"(ILjava/lang/String;)I" ); //先调用java层创建javaobject javaClassName = ( *javaEnv )->NewStringUTF( javaEnv ..."/>
+                <meta name="description" content="最近在做一个lua的android项目,项目时间仓促,加上对lua完全陌生,于是选了个文档资料最全的lua bridge:luajava luajava目前只支持到5.1,不过升级到5.2困难不大,主要是一些宏开关以及静态变量;结果通过lua开始操作android ui时候,频繁掉祯,profile后发现90%+的cpu耗时在luajava中 看了一下luajava本身代码其实不大;native层就一个luajava.c,java层,除了LuaJavaApi.java,其他java类都是Value Object lua逻辑分析 先看lua创建java object的代码,luajava.c中 int javaNewInstance( lua_State * L ) { //some code ….. method = ( *javaEnv )->GetStaticMethodID( javaEnv , luajava_api_class , "javaNewInstance" ,"(ILjava/lang/String;)I" ); //先调用java层创建javaobject javaClassName = ( *javaEnv )->NewStringUTF( javaEnv ...">
 
-<div class="navbar">
-    <div class="navbar-inner">
-    <div class="container">
 
-         <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
-             <span class="icon-bar"></span>
-             <span class="icon-bar"></span>
-             <span class="icon-bar"></span>
-         </a>
 
-        <a class="brand" href="http://aaapei.com">zhengwen的博客</a>
 
-        <div class="nav-collapse">
-        <ul class="nav">
-            
-            <li><a href="http://aaapei.com/pages/guan-yu-wo.html">关于我</a></li>
-        </ul>
-        </div>
-        
+
+        <link rel="canonical" href="">
+        <link href="http://localhost:8000/favicon.png" rel="shortcut icon">
+        <link href="http://localhost:8000/theme/css/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+        <link href="http://localhost:8000/theme/css/pygments.css" media="screen, projection" rel="stylesheet" type="text/css">
+
+        <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+        <link href="//fonts.googleapis.com/css?family=Open+Sans:400italic,400,700" rel='stylesheet' type='text/css'>
+        <link href="//fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel='stylesheet' type='text/css'>
+        <link href="//fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel='stylesheet' type='text/css'>
+
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+        <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+
+    </head>
+	<body>
+		<div class="container">
+			<div class="left-col">
+				<div class="intrude-less">
+				<header id="header" class="inner">
+	<div class="profilepic">
+		<img src="http://www.gravatar.com/avatar/4c187c40f3f52c969742c6476ade7e44?s=160" alt="Profile Picture" style="width: 160px;" />
+	</div>
+
+<hgroup>
+  <h2><a href="http://localhost:8000/">zhengwen的博客</a></h2>
+    <h3>生活 @hangzhou. 工作 @netease. 前阿里er.</h3>
+</hgroup>
+<nav id="main-nav">
+
+<ul class="main-navigation">
+</ul></nav>
+
+<nav id="sub-nav">
+	<div class="social">
+			<a class="email" href="mailto:aaapei@gmail.com" title="Email">Email</a>
+		<a class="weibo" href="http://weibo.com/a2pei" title="Weibo">Weibo</a>
+	</div>
+<section>
+  <h2>关于作者</h2>
+  <p>爱喵可是老婆不让养、已婚胖子、业余作家、伪程序员、技术不算太宅</p>
+</section>
+</nav>				</header>
+				</div>
+			</div>
+			<div class="mid-col">
+				<div class="mid-col-container">
+					<div id="content" class="inner">
+
+        <section id="content" class="body">
+            <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
+<div class="meta">
+    <div class="date">
+        <time datetime="2013-12-02T20:20:00.000000" itemprop="datePublished">一 02 十二月 2013</time>
     </div>
-    </div>
-</div>
-
-<div class="container">
-    <div class="content">
-    <div class="row">
-
-        <div class="span9">
-    <div class='article'>
-        <div class="content-title">
-            <h1>luajava性能优化分析</h1>
-2013-12-02
-
-by  <a class="url fn" href="http://aaapei.com/author/zhengwen.html">zhengwen</a>
- 
-
-
-        </div>
-	
-        <div><p>最近在做一个lua的android项目,项目时间仓促,加上对lua完全陌生,于是选了个文档资料最全的lua bridge:<em>luajava</em>
+    <div class="tags">
+        <a href="http://localhost:8000/tag/android.html">android</a> ,         <a href="http://localhost:8000/tag/lua.html">lua</a>     </div>
+</div>                <h1 class="title" itemprop="name"><a href="http://localhost:8000/luajavaxing-neng-you-hua-fen-xi.html" itemprop="url">luajava性能优化分析</a></h1>
+                <div class="entry-content" itemprop="articleBody">
+                    <p>最近在做一个lua的android项目,项目时间仓促,加上对lua完全陌生,于是选了个文档资料最全的lua bridge:<em>luajava</em>
 luajava目前只支持到5.1,不过升级到5.2困难不大,主要是一些宏开关以及静态变量;结果通过lua开始操作android ui时候,频繁掉祯,profile后发现90%+的cpu耗时在luajava中<br />
 看了一下luajava本身代码其实不大;native层就一个luajava.c,java层,除了LuaJavaApi.java,其他java类都是Value Object</p>
-<h1>lua逻辑分析</h1>
+<h2>lua逻辑分析</h2>
 <p>先看lua创建java object的代码,luajava.c中</p>
 <div class="highlight"><pre><span class="kt">int</span> <span class="nf">javaNewInstance</span><span class="p">(</span> <span class="n">lua_State</span> <span class="o">*</span> <span class="n">L</span> <span class="p">)</span>
 <span class="p">{</span>     
@@ -138,7 +158,7 @@ luajava目前只支持到5.1,不过升级到5.2困难不大,主要是一些宏�
 
 
 <p>由于c和lua的stack中没有传递参数个数,加上java和lua的对象类型没有一一对应;  luajava的做法是先通过getmethods获取所有同名方法,然后compareTypes将method的参数类型逐个取出与lua stack中的参数比较(又是一堆jni操作);</p>
-<h1>性能优化</h1>
+<h2>性能优化</h2>
 <p>确定原因后,就可以进行性能优化, </p>
 <ol>
 <li>首先,在jni层将常用的method static化</li>
@@ -151,86 +171,37 @@ luajava目前只支持到5.1,不过升级到5.2困难不大,主要是一些宏�
 </ol>
 <p>博主选的是方法2..原因是项目中交互很多,但是调用的class有限  做cache的逻辑基本上同java jit,热点代码检测</p>
 <p>优化之后,勉强能达到产品化的性能要求;不过由于luajava的机制问题,优化的点基本到头了;</p>
-<h1>jnlua</h1>
+<h2>jnlua</h2>
 <p>如果对lua c api的android开发者,不建议使用luajava,而使用<a href="https://code.google.com/p/jnlua/">jnlua</a>,</p>
 <p>纯jni实现,原理上性能应该会比luajava高一头</p>
 <p>jnlua分两个版本,0.9支持lua 5.2,1.0支持lua5.2</p>
 <p>0.9已经移植到android平台,1.0暂无(作者在wiki中说明未来会移植)</p>
-<p>缺点是文档很少,下篇我再说说jnlua</p></div>
-	
-        <hr>
-    	   
-        <h2>Comments</h2>
-<div id="disqus_thread"></div>
-<script type="text/javascript">
-    var disqus_shortname = 'aaapeigithub'; 
-    var disqus_title = 'luajava性能优化分析';
+<p>缺点是文档很少,下篇我再说说jnlua</p>
+                </div>
+            </article>
 
-    (function() {
-        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
-        dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
-        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
-    })();
-</script>
-<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
-    </div>
-        </div>
-        
-        <div class="span3">
+                <section id="comment">
+                    <h1 class="title">Comments</h1>
+                    <div id="disqus_thread" aria-live="polite">
+                        <script type="text/javascript">
+                            var disqus_identifier = "luajavaxing-neng-you-hua-fen-xi.html";
+                            (function() {
+                                var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+                                dsq.src = 'http://aaapeigithub.disqus.com/embed.js';
+                                (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+                            })();
+                        </script>
+                    </div>
+                </section>
 
-            <div class="well" style="padding: 8px 0; background-color: #FBFBFB;">
-            <ul class="nav nav-list">
-                <li class="nav-header"> 
-                导航
-                </li>
-            
-                <li><a href="http://aaapei.com/">文章</a>
-				<li><a href="http://aaapei.com/tags.html">标签</a>
-				<!--
-                <li><a href="http://aaapei.com/" rel="alternate">Atom feed</a></li>
-				-->
-            </ul>
-            </div>
+        </section>
 
-
-            <div class="well" style="padding: 8px 0; background-color: #FBFBFB;">
-            <ul class="nav nav-list">
-                <li class="nav-header"> 
-                分类
-                </li>
-                
-                <li><a href="http://aaapei.com/category/android.html">android</a></li>
-                <li><a href="http://aaapei.com/category/lua.html">lua</a></li>
-                   
-            </ul>
-            </div>
-
-
-
-
-            <div class="social">
-            <div class="well" style="padding: 8px 0; background-color: #FBFBFB;">
-            <ul class="nav nav-list">
-                <li class="nav-header"> 
-				联系我
-				</li>
-           
-                <li><a href="http://weibo.com/a2pei">Weibo</a></li>
-                <li><a href="mailto:aaapei@gmail.com">Gmail</a></li>
-            </ul>
-            </div>
-            </div>
-
-        </div>  
-    </div>     </div> 
-<footer>
-<br />
-<p><a href="http://aaapei.com">zhengwen的博客</a> &copy; aaapei 2012</p>
-</footer>
-
-</div> <!-- /container -->
-<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
-<script src="http://twitter.github.com/bootstrap/assets/js/bootstrap-collapse.js"></script>
- 
-</body>
+					</div>
+				</div>
+				<footer id="footer" class="inner">
+<p>Copyright &copy; 2013 - aaapei - <span class="credit">Powered by <a href="http://getpelican.com">Pelican</a></span></p>
+Design credit: <a href="http://shashankmehta.in/archive/2012/greyshade.html">Shashank Mehta</a>				</footer>
+			</div>
+		</div>
+	</body>
 </html>

@@ -1,0 +1,260 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>晃晃悠悠</title>
+        <meta name="author" content="aaapei">
+
+        <!-- http://t.co/dKP3o1e -->
+        <meta name="HandheldFriendly" content="True">
+        <meta name="MobileOptimized" content="320">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <!-- Open Graph tags -->
+
+
+                <meta property="og:type" content="article"/>
+                <meta property="og:title" content="微信的jsbridge实现"/>
+                <meta property="og:url" content="http://aaapei.com//blog/2013/12/wei-xin-de-jsbridgeshi-xian"/>
+                <meta property="og:description" content="微信开放的JSAPI接口 微信公共平台开放了几个操作webview界面的js接口 示例代码是这样的: WeixinJSBridge.invoke('getNetworkType',{}, function(e){ WeixinJSBridge.log(e.err_msg); }); android的webview api中有开放过一个addJavaScriptInterface函数,这个函数的作用是在页面的Window中注入一个JS对象 如果你的应用中使用了这个api,建议先看一下国内安全领域第一人黑哥的这篇文章android webview 漏洞背后的节操, 没耐心的同学直接看结尾方案吧: 第1个方案是设置信任域，这个问题其实是不太靠谱的，在我之前在kcon里演讲《去年跨过的浏览器》里有很多信任域带来的安全问题 第2个方案是使用 shouldOverrideUrlLoading 的方式，据说这个方案还是比较靠谱的，只是可能代价比较大 第3个方案就是教育那些开发商，没有必要用webview的时候就不要用，不要java与js交互就不要用 不过,按黑哥这篇文章的想法,其实这个漏洞危险等级是很低,就算以后被安全部门或乌云网站抓到的时候,可以无视之 暂时把安全问题放一边,Js对象的注入,对函数的参数类型有严格要求,它只能传递基本数据类型以及JSON 但微信的JsApi中,参数三是一个函数对象,那他是如果做到的呢 逆向 Android原生的机制既然不能支持函数对象的传递 ..."/>
+                <meta name="description" content="微信开放的JSAPI接口 微信公共平台开放了几个操作webview界面的js接口 示例代码是这样的: WeixinJSBridge.invoke('getNetworkType',{}, function(e){ WeixinJSBridge.log(e.err_msg); }); android的webview api中有开放过一个addJavaScriptInterface函数,这个函数的作用是在页面的Window中注入一个JS对象 如果你的应用中使用了这个api,建议先看一下国内安全领域第一人黑哥的这篇文章android webview 漏洞背后的节操, 没耐心的同学直接看结尾方案吧: 第1个方案是设置信任域，这个问题其实是不太靠谱的，在我之前在kcon里演讲《去年跨过的浏览器》里有很多信任域带来的安全问题 第2个方案是使用 shouldOverrideUrlLoading 的方式，据说这个方案还是比较靠谱的，只是可能代价比较大 第3个方案就是教育那些开发商，没有必要用webview的时候就不要用，不要java与js交互就不要用 不过,按黑哥这篇文章的想法,其实这个漏洞危险等级是很低,就算以后被安全部门或乌云网站抓到的时候,可以无视之 暂时把安全问题放一边,Js对象的注入,对函数的参数类型有严格要求,它只能传递基本数据类型以及JSON 但微信的JsApi中,参数三是一个函数对象,那他是如果做到的呢 逆向 Android原生的机制既然不能支持函数对象的传递 ...">
+
+
+
+
+
+        <link rel="canonical" href="">
+        <link href="http://aaapei.com/favicon.png" rel="shortcut icon">
+        <link href="http://aaapei.com/theme/css/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+        <link href="http://aaapei.com/theme/css/pygments.css" media="screen, projection" rel="stylesheet" type="text/css">
+
+        <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+        <link href="//fonts.googleapis.com/css?family=Open+Sans:400italic,400,700" rel='stylesheet' type='text/css'>
+        <link href="//fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel='stylesheet' type='text/css'>
+        <link href="//fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel='stylesheet' type='text/css'>
+
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+        <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+
+    </head>
+	<body>
+		<div class="container">
+			<div class="left-col">
+				<div class="intrude-less">
+				<header id="header" class="inner">
+	<div class="profilepic">
+		<img src="http://www.gravatar.com/avatar/4c187c40f3f52c969742c6476ade7e44?s=160" alt="Profile Picture" style="width: 160px;" />
+	</div>
+
+<hgroup>
+  <h2><a href="http://aaapei.com/">晃晃悠悠</a></h2>
+    <h3>zhengwen的博客</h3>
+</hgroup>
+<nav id="main-nav">
+
+<ul class="main-navigation">
+	        <li><a href="http://aaapei.com/./">首页</a></li>
+	        <li><a href="http://aaapei.com/categories">分类</a></li>
+	        <li><a href="http://aaapei.com/blog/tags">标签</a></li>
+</ul></nav>
+
+<nav id="sub-nav">
+	<div class="social">
+			<a class="email" href="mailto:aaapei@gmail.com" title="Email">Email</a>
+		<a class="weibo" href="http://weibo.com/a2pei" title="Weibo">Weibo</a>
+	</div>
+<section>
+  <h2>关于作者</h2>
+  <p>生活@hangzhou. 工作@netease. 前alier. <br/> 会一点python的Android码农,目前在学习前端&lua</p>
+</section>
+</nav>				</header>
+				</div>
+			</div>
+			<div class="mid-col">
+				<div class="mid-col-container">
+					<div id="content" class="inner">
+
+        <section id="content" class="body">
+            <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
+<div class="meta">
+    <div class="date">
+        <time datetime="2013-12-11T19:50:00.000000" itemprop="datePublished">三 11 十二月 2013</time>
+    </div>
+    <div class="tags">
+        <a href="http://aaapei.com//blog/tags/android">android</a> ,         <a href="http://aaapei.com//blog/tags/wei-xin">微信</a>     </div>
+</div>                <h1 class="title" itemprop="name"><a href="http://aaapei.com//blog/2013/12/wei-xin-de-jsbridgeshi-xian" itemprop="url">微信的jsbridge实现</a></h1>
+                <div class="entry-content" itemprop="articleBody">
+                    <h3>微信开放的JSAPI接口</h3>
+<p>微信公共平台开放了几个操作webview界面的js接口<br />
+示例代码是这样的:  </p>
+<div class="highlight"><pre><span class="nx">WeixinJSBridge</span><span class="p">.</span><span class="nx">invoke</span><span class="p">(</span><span class="s1">&#39;getNetworkType&#39;</span><span class="p">,{},</span>
+    <span class="kd">function</span><span class="p">(</span><span class="nx">e</span><span class="p">){</span>
+        <span class="nx">WeixinJSBridge</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">e</span><span class="p">.</span><span class="nx">err_msg</span><span class="p">);</span>
+    <span class="p">});</span>
+</pre></div>
+
+
+<p>android的webview api中有开放过一个<em>addJavaScriptInterface</em>函数,这个函数的作用是在页面的Window中注入一个JS对象<br />
+如果你的应用中使用了这个api,建议先看一下国内安全领域第一人黑哥的这篇文章<a href="http://hi.baidu.com/hi_heige/item/9baf99f063331d58c9f3379a">android webview 漏洞背后的节操</a>,  </p>
+<p>没耐心的同学直接看结尾方案吧:</p>
+<blockquote>
+<p>第1个方案是设置信任域，这个问题其实是不太靠谱的，在我之前在kcon里演讲《去年跨过的浏览器》里有很多信任域带来的安全问题<br />
+ 第2个方案是使用 shouldOverrideUrlLoading 的方式，据说这个方案还是比较靠谱的，只是可能代价比较大<br />
+ 第3个方案就是教育那些开发商，没有必要用webview的时候就不要用，不要java与js交互就不要用  </p>
+</blockquote>
+<p>不过,按黑哥这篇文章的想法,其实这个漏洞危险等级是很低,就算以后被安全部门或乌云网站抓到的时候,可以无视之 <br />
+暂时把安全问题放一边,Js对象的注入,对函数的参数类型有严格要求,它只能传递基本数据类型以及JSON<br />
+但微信的JsApi中,参数三是一个函数对象,那他是如果做到的呢</p>
+<h3>逆向</h3>
+<p>Android原生的机制既然不能支持函数对象的传递,于是猜测微信是否会对原始的api做了一层包装;<br />
+先下载weixin.apk,反编译,全局搜索"WeixinJSBrige",在assets目录找到一个wxjs.js;不知什么原因,微信团队没有对这个js文件进行代码混淆;</p>
+<h3>wxjs.js分析</h3>
+<p>wxjs.js有两千多行的代码,不过不必担心,其中有一大部分是jquery的实现<br />
+直接找我们想要的,先看'WeixinJSBridge'  </p>
+<div class="highlight"><pre>   <span class="n">var</span> <span class="n">__WeixinJSBridge</span> <span class="o">=</span> <span class="p">{</span>
+               <span class="c1">// public</span>
+        <span class="nl">invoke:</span><span class="n">_call</span><span class="p">,</span>
+        <span class="nl">call:</span><span class="n">_call</span><span class="p">,</span>
+        <span class="nl">on:</span><span class="n">_on</span><span class="p">,</span>
+        <span class="nl">env:</span><span class="n">_env</span><span class="p">,</span>
+        <span class="nl">log:</span><span class="n">_log</span><span class="p">,</span>
+       <span class="nl">_fetchQueue:</span> <span class="n">_fetchQueue</span><span class="p">,</span>
+        <span class="nl">_handleMessageFromWeixin:</span> <span class="n">_handleMessageFromWeixin</span><span class="p">,</span>
+   <span class="p">};</span>
+</pre></div>
+
+
+<p>看到方法名可以猜测微信JSBridge的大概的逻辑了;应该是消息队列处理机制,</p>
+<p>具体还是看一下微信是怎么实现的</p>
+<p>先看_call方法的逻辑:</p>
+<div class="highlight"><pre>  <span class="kd">function</span> <span class="nx">_call</span><span class="p">(</span><span class="nx">func</span><span class="p">,</span><span class="nx">params</span><span class="p">,</span><span class="nx">callback</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">func</span> <span class="o">||</span> <span class="k">typeof</span> <span class="nx">func</span> <span class="o">!==</span> <span class="s1">&#39;string&#39;</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">return</span><span class="p">;</span>
+        <span class="p">};</span>
+        <span class="k">if</span> <span class="p">(</span><span class="k">typeof</span> <span class="nx">params</span> <span class="o">!==</span> <span class="s1">&#39;object&#39;</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nx">params</span> <span class="o">=</span> <span class="p">{};</span>
+        <span class="p">};</span>
+
+        <span class="kd">var</span> <span class="nx">callbackID</span> <span class="o">=</span> <span class="p">(</span><span class="nx">_callback_count</span><span class="o">++</span><span class="p">).</span><span class="nx">toString</span><span class="p">();</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="k">typeof</span> <span class="nx">callback</span> <span class="o">===</span> <span class="s1">&#39;function&#39;</span><span class="p">)</span> <span class="p">{</span>
+          <span class="nx">_callback_map</span><span class="cp">[</span><span class="nx">callbackID</span><span class="cp">]</span> <span class="o">=</span> <span class="nx">callback</span><span class="p">;</span>
+        <span class="p">};</span>
+
+        <span class="kd">var</span> <span class="nx">msgObj</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;func&#39;</span><span class="o">:</span><span class="nx">func</span><span class="p">,</span><span class="s1">&#39;params&#39;</span><span class="o">:</span><span class="nx">params</span><span class="p">};</span>
+        <span class="nx">msgObj</span><span class="cp">[</span><span class="nx">_MESSAGE_TYPE</span><span class="cp">]</span> <span class="o">=</span> <span class="s1">&#39;call&#39;</span><span class="p">;</span>        
+        <span class="nx">msgObj</span><span class="cp">[</span><span class="nx">_CALLBACK_ID</span><span class="cp">]</span> <span class="o">=</span> <span class="nx">callbackID</span><span class="p">;</span>
+
+        <span class="nx">_sendMessage</span><span class="p">(</span><span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">(</span><span class="nx">msgObj</span><span class="p">));</span>
+    <span class="p">}</span>
+</pre></div>
+
+
+<p>callbackId是一个自增的ID,_call调用时候将id和回调函数通过_sendMessage存在队列中,</p>
+<p>再看一下_sendMessage的逻辑:</p>
+<div class="highlight"><pre>       <span class="kd">function</span> <span class="nx">_sendMessage</span><span class="p">(</span><span class="nx">message</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">_sendMessageQueue</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">message</span><span class="p">);</span>
+        <span class="nx">_readyMessageIframe</span><span class="p">.</span><span class="nx">src</span> <span class="o">=</span> <span class="nx">_CUSTOM_PROTOCOL_SCHEME</span> <span class="o">+</span> <span class="s1">&#39;://&#39;</span> <span class="o">+</span> <span class="nx">_QUEUE_HAS_MESSAGE</span><span class="p">;</span>
+      <span class="p">};</span>
+</pre></div>
+
+
+<p>事件队列和之前猜测的一样; 但是,为什么会构造一个url? 难道微信没有用addJavaScriptInterface</p>
+<p>既然有sendMessage,其他地方必然有一个取消息的逻辑:</p>
+<div class="highlight"><pre>      <span class="c1">//取出队列中的消息，并清空接收队列</span>
+    <span class="kd">function</span> <span class="nx">_fetchQueue</span><span class="p">()</span> <span class="p">{</span>
+        <span class="kd">var</span> <span class="nx">messageQueueString</span> <span class="o">=</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">(</span><span class="nx">_sendMessageQueue</span><span class="p">);</span>
+        <span class="nx">_sendMessageQueue</span> <span class="o">=</span> <span class="cp">[]</span><span class="p">;</span>
+        <span class="c1">//window.JsApi &amp;&amp; JsApi.keep_setReturnValue &amp;&amp; window.JsApi.keep_setReturnValue(&#39;SCENE_FETCHQUEUE&#39;, messageQueueString);</span>
+        <span class="nx">_setResultValue</span><span class="p">(</span><span class="s1">&#39;SCENE_FETCHQUEUE&#39;</span><span class="p">,</span> <span class="nx">messageQueueString</span><span class="p">);</span>
+        <span class="k">return</span> <span class="nx">messageQueueString</span><span class="p">;</span>
+    <span class="p">};</span>
+</pre></div>
+
+
+<p>JavaScript调用java的逻辑最终在_setResultValue中</p>
+<div class="highlight"><pre>    <span class="kd">function</span> <span class="nx">_setResultValue</span><span class="p">(</span><span class="nx">scene</span><span class="p">,</span> <span class="nx">result</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nx">result</span> <span class="o">===</span> <span class="kc">undefined</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nx">result</span> <span class="o">=</span> <span class="s1">&#39;dummy&#39;</span><span class="p">;</span>
+        <span class="p">}</span>
+        <span class="nx">_setResultIframe</span><span class="p">.</span><span class="nx">src</span> <span class="o">=</span> <span class="s1">&#39;weixin://private/setresult/&#39;</span> <span class="o">+</span> <span class="nx">scene</span> <span class="o">+</span> <span class="s1">&#39;&amp;&#39;</span> <span class="o">+</span> <span class="nx">base64encode</span><span class="p">(</span><span class="nx">UTF8</span><span class="p">.</span><span class="nx">encode</span><span class="p">(</span><span class="nx">result</span><span class="p">));</span>
+        <span class="c1">//_setResultIframe.src = &#39;weixin://private/setresult/&#39; + scene + &#39;&amp;&#39; + window.btoa(result);</span>
+    <span class="p">}</span>
+</pre></div>
+
+
+<p>又出现一个_setResultIfrmae,寻迹查找,最后找到了这个东西</p>
+<div class="highlight"><pre>    <span class="c1">//创建ifram的准备队列</span>
+    <span class="kd">function</span> <span class="nx">_createQueueReadyIframe</span><span class="p">(</span><span class="nx">doc</span><span class="p">)</span> <span class="p">{</span>
+        <span class="c1">// _setResultIframe 的初始化</span>
+        <span class="nx">_setResultIframe</span> <span class="o">=</span> <span class="nx">doc</span><span class="p">.</span><span class="nx">createElement</span><span class="p">(</span><span class="s1">&#39;iframe&#39;</span><span class="p">);</span>
+        <span class="nx">_setResultIframe</span><span class="p">.</span><span class="nx">id</span> <span class="o">=</span> <span class="s1">&#39;__WeixinJSBridgeIframe_SetResult&#39;</span><span class="p">;</span>
+        <span class="nx">_setResultIframe</span><span class="p">.</span><span class="nx">style</span><span class="p">.</span><span class="nx">display</span> <span class="o">=</span> <span class="s1">&#39;none&#39;</span><span class="p">;</span>
+        <span class="nx">doc</span><span class="p">.</span><span class="nx">documentElement</span><span class="p">.</span><span class="nx">appendChild</span><span class="p">(</span><span class="nx">_setResultIframe</span><span class="p">);</span>
+
+        <span class="nx">_readyMessageIframe</span> <span class="o">=</span> <span class="nx">doc</span><span class="p">.</span><span class="nx">createElement</span><span class="p">(</span><span class="s1">&#39;iframe&#39;</span><span class="p">);</span>
+        <span class="nx">_readyMessageIframe</span><span class="p">.</span><span class="nx">id</span> <span class="o">=</span> <span class="s1">&#39;__WeixinJSBridgeIframe&#39;</span><span class="p">;</span>
+        <span class="nx">_readyMessageIframe</span><span class="p">.</span><span class="nx">style</span><span class="p">.</span><span class="nx">display</span> <span class="o">=</span> <span class="s1">&#39;none&#39;</span><span class="p">;</span>
+        <span class="nx">doc</span><span class="p">.</span><span class="nx">documentElement</span><span class="p">.</span><span class="nx">appendChild</span><span class="p">(</span><span class="nx">_readyMessageIframe</span><span class="p">);</span>
+        <span class="k">return</span> <span class="nx">_readyMessageIframe</span><span class="p">;</span>
+    <span class="p">}</span>
+</pre></div>
+
+
+<p>看到这儿明白了,启鹅的工程师为了规避js注入的安全问题,没有采用JS注入的方式,而是采取的黑哥的方案2:</p>
+<p><em>shouldOverrideUrl</em></p>
+<p>在需要js调用native api的时候,js在页面中创建一个不可见的iframe,设置这个iframe的地址;</p>
+<p>在android代码拦截这个url来实现java和js参数;</p>
+<p>微信的这个js框架为所有的js函数做了一个统一的入口,</p>
+<p>所以编码代码不大,不失为一个好方法</p>
+<p>最后瞄一下java调用的js的入口,那就是标准的调用方式了;</p>
+<div class="highlight"><pre>  <span class="kd">function</span> <span class="nx">_handleMessageFromWeixin</span><span class="p">(</span><span class="nx">message</span><span class="p">)</span> <span class="p">{</span>
+      <span class="kd">var</span> <span class="nx">msgWrap</span> <span class="o">=</span> <span class="nx">message</span><span class="p">;</span>
+
+      <span class="k">switch</span><span class="p">(</span><span class="nx">msgWrap</span><span class="cp">[</span><span class="nx">_MESSAGE_TYPE</span><span class="cp">]</span><span class="p">){</span>
+        <span class="k">case</span> <span class="s1">&#39;callback&#39;</span><span class="o">:</span>
+        <span class="p">{</span>       
+          <span class="k">if</span><span class="p">(</span><span class="k">typeof</span> <span class="nx">msgWrap</span><span class="cp">[</span><span class="nx">_CALLBACK_ID</span><span class="cp">]</span> <span class="o">===</span> <span class="s1">&#39;string&#39;</span> <span class="o">&amp;&amp;</span> <span class="k">typeof</span> <span class="nx">_callback_map</span><span class="cp">[</span><span class="nx">msgWrap</span><span class="err">[</span><span class="nx">_CALLBACK_ID</span><span class="cp">]</span><span class="p">]</span> <span class="o">===</span> <span class="s1">&#39;function&#39;</span><span class="p">){</span>
+            <span class="kd">var</span> <span class="nx">ret</span> <span class="o">=</span> <span class="nx">_callback_map</span><span class="cp">[</span><span class="nx">msgWrap</span><span class="err">[</span><span class="nx">_CALLBACK_ID</span><span class="cp">]</span><span class="p">](</span><span class="nx">msgWrap</span><span class="cp">[</span><span class="s1">&#39;__params&#39;</span><span class="cp">]</span><span class="p">);</span> <span class="c1">//根据id进行函数 回调</span>
+            <span class="k">delete</span> <span class="nx">_callback_map</span><span class="cp">[</span><span class="nx">msgWrap</span><span class="err">[</span><span class="nx">_CALLBACK_ID</span><span class="cp">]</span><span class="p">];</span> <span class="c1">// 保证调用一次,删除函数</span>
+            <span class="c1">//window.JsApi &amp;&amp; JsApi.keep_setReturnValue &amp;&amp; window.JsApi.keep_setReturnValue(&#39;SCENE_HANDLEMSGFROMWX&#39;, JSON.stringify(ret));</span>
+            <span class="nx">_setResultValue</span><span class="p">(</span><span class="s1">&#39;SCENE_HANDLEMSGFROMWX&#39;</span><span class="p">,</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">(</span><span class="nx">ret</span><span class="p">));</span>
+            <span class="k">return</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">(</span><span class="nx">ret</span><span class="p">);</span>
+          <span class="p">}</span>
+        <span class="c1">//window.JsApi &amp;&amp; JsApi.keep_setReturnValue &amp;&amp; window.JsApi.keep_setReturnValue(&#39;SCENE_HANDLEMSGFROMWX&#39;, JSON.stringify({&#39;__err_code&#39;:&#39;cb404&#39;}));</span>
+        <span class="nx">_setResultValue</span><span class="p">(</span><span class="s1">&#39;SCENE_HANDLEMSGFROMWX&#39;</span><span class="p">,</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">({</span><span class="s1">&#39;__err_code&#39;</span><span class="o">:</span><span class="s1">&#39;cb404&#39;</span><span class="p">}));</span>
+          <span class="k">return</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">({</span><span class="s1">&#39;__err_code&#39;</span><span class="o">:</span><span class="s1">&#39;cb404&#39;</span><span class="p">});</span>          
+        <span class="p">}</span>
+        <span class="k">break</span><span class="p">;</span>
+        <span class="p">.....</span>
+</pre></div>
+
+
+<p>android调用:webview.loadurl("javascript:WeixinJsBridge._handleMessageFromWeixin")</p>
+                </div>
+            </article>
+
+                <section id="comment">
+                    <h1 class="title">Comments</h1>
+                    <div id="disqus_thread" aria-live="polite">
+                        <script type="text/javascript">
+                            var disqus_identifier = "/blog/2013/12/wei-xin-de-jsbridgeshi-xian";
+                            (function() {
+                                var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+                                dsq.src = 'http://aaapeigithub.disqus.com/embed.js';
+                                (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+                            })();
+                        </script>
+                    </div>
+                </section>
+
+        </section>
+
+					</div>
+				</div>
+				<footer id="footer" class="inner">
+<p>Copyright &copy; 2013 - aaapei - <span class="credit">Powered by <a href="http://getpelican.com">Pelican</a></span></p>				</footer>
+			</div>
+		</div>
+	</body>
+</html>

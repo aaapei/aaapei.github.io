@@ -37,6 +37,7 @@ h3 { margin-top: 2.5em; }
 .article a:hover { text-decoration: none; } 
 
 
+.article.title { padding: 6px 6px 4px; }
 
 /* Styling for the "other entries" section */
 /* Metadata */
