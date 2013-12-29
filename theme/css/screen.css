@@ -1867,7 +1867,7 @@ body {
 .container .left-col {
   width: 23%;
   position: fixed;
-  opacity: .3;
+  opacity: .6;
   -webkit-transition: all .2s ease-in;
   -moz-transition: all .2s ease-in;
   -o-transition: all .2s ease-in;
