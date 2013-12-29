@@ -117,10 +117,10 @@
     </div>
     <div class="tags">
         <a href="http://aaapei.com//blog/tags/android">android</a> ,         <a href="http://aaapei.com//blog/tags/lua">lua</a>     </div>
-</div>                <h1 class="title" itemprop="name"><a href="http://aaapei.com//blog/2013/12/luajavaxing-neng-you-hua-fen-xi" itemprop="url">luajava性能优化分析</a></h1>
+</div>                <h1 class="title" itemprop="name"><a href="http://aaapei.com//blog/2013/12/luajavaxing-neng-you-hua" itemprop="url">luajava性能优化</a></h1>
                 <div class="entry-content" itemprop="description"><p>最近在做一个lua的android项目,项目时间仓促,加上对lua完全陌生,于是选了个文档资料最全的lua bridge:<em>luajava</em>
-luajava目前只支持到5.1,不过升级到5.2困难不大,主要是一些宏开关以及静态变量;结果通过lua开始操作android ui时候,频繁掉祯,profile后发现90%+的cpu耗时在luajava中<br />
-看了一下luajava本身代码其实不大;native层就一个luajava.c,java层,除了LuaJavaApi.java,其他java类都是Value Object</p>
+luajava目前只支持到5.1,不过升级到5.2困难不大,主要是一些宏开关以及静态变量;实际运行的时候发现ui频繁掉祯,profile后发现90%+的cpu耗时在luajava中  </p>
+<p>看了一下luajava本身代码其实不大;native层就一个luajava.c,java层,除了LuaJavaApi.java,其他java类都是Value Object</p>
 <h3>lua逻辑分析</h3>
 <p>先看lua创建java object的代码,luajava.c中</p>
 <div class="highlight"><pre><span class="kt">int</span> <span class="nf">javaNewInstance</span><span class="p">(</span> <span class="n">lua_State</span> <span class="o">*</span> <span class="n">L</span> <span class="p">)</span>
@@ -128,8 +128,9 @@ luajava目前只支持到5.1,不过升级到5.2困难不大,主要是一些宏�
     <span class="c1">//some code …..</span>
     <span class="n">method</span>  <span class="o">=</span> <span class="p">(</span> <span class="o">*</span><span class="n">javaEnv</span> <span class="p">)</span><span class="o">-&gt;</span><span class="n">GetStaticMethodID</span><span class="p">(</span> <span class="n">javaEnv</span> <span class="p">,</span> <span class="n">luajava_api_class</span> <span class="p">,</span> <span class="s">&quot;javaNewInstance&quot;</span> <span class="p">,</span><span class="s">&quot;(ILjava/lang/String;)I&quot;</span> <span class="p">);</span>
      <span class="c1">//先调用java层创建javaobject</span>
-    <span class="n">javaClassName</span> <span class="o">=</span> <span class="p">(</span> <span class="o">*</span><span class="n">javaEnv</span> <span class="p">)</span><span class="o">-&gt;</span><span class="n">NewStringUTF</span><span class="p">(</span> <span class="n">javaEnv ...</span></pre></div>
-                    <a href="http://aaapei.com//blog/2013/12/luajavaxing-neng-you-hua-fen-xi">more ...</a>
+    <span class="n">javaClassName</span> <span class="o">=</span> <span class="p">(</span> <span class="o">*</span><span class="n">javaEnv</span> <span class="p">)</span><span class="o">-&gt;</span><span class="n">NewStringUTF</span><span class="p">(</span> <span class="n">javaEnv</span> <span class="p">,</span> <span class="n">className</span> <span class="p">);</span>
+    <span class="n">ret ...</span></pre></div>
+                    <a href="http://aaapei.com//blog/2013/12/luajavaxing-neng-you-hua">more ...</a>
                 </div>
                 <div class="meta">
                     <span class="author">Posted by <a href="http://aaapei.com/author/zhengwen.html">zhengwen</a></span>
