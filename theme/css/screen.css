@@ -11,7 +11,6 @@
   margin: 0;
   padding: 0;
 }
-
 /* line 7, ../../sass/base/_layout.scss */
 body {
   font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, sans-serif;
@@ -32,6 +31,32 @@ body {
     font-size: 13px;
   }
 }
+
+.tag {
+	width: 200px;
+	padding: 10px 10px 10px 10px;
+	font-family: "HelveticaNeue-Light","Helvetica Neue Light","Helvetica Neue",Helvetica,Arial,sans-serif;
+	font-weight: 300;
+	font-size: 24px;
+	display: inline;
+}
+
+.tag a:link {
+	color: #808080;
+	padding: 2px;
+}
+		
+.tag a:hover {
+	color: #000;
+}
+.tag a:hover {
+	color: #000;
+}
+.tag a:visited {
+	color: #808080;
+	padding: 2px;
+}
+
 
 /* line 20, ../../sass/base/_layout.scss */
 h1 {
@@ -869,8 +894,8 @@ article .entry-content img, article .entry-content video {
 }
 /* line 76, ../../sass/parts/_article.scss */
 article .entry-content blockquote {
-  background: #dddddd;
-  border-left: 5px solid #cccccc;
+  background: #fcfcfc;
+  border-left: 5px solid #1593c9;
   padding: 15px 20px;
   margin-top: 10px;
 }
@@ -1867,7 +1892,7 @@ body {
 .container .left-col {
   width: 23%;
   position: fixed;
-  opacity: .6;
+  opacity: .5;
   -webkit-transition: all .2s ease-in;
   -moz-transition: all .2s ease-in;
   -o-transition: all .2s ease-in;
@@ -1894,6 +1919,11 @@ body {
   -moz-border-radius: 50%;
   -webkit-border-radius: 50%;
 }
+.container .left-col #header #sub-nav #about-me {
+	color: #EEEEEE;
+	text-shadow: 0 1px #333;
+}
+
 /* line 242, ../../sass/_greyshade.scss */
 .container .left-col #header a {
   color: #EFEFEF;

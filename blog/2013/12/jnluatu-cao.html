@@ -16,8 +16,8 @@
                 <meta property="og:type" content="article"/>
                 <meta property="og:title" content="jnlua吐槽"/>
                 <meta property="og:url" content="http://aaapei.com//blog/2013/12/jnluatu-cao"/>
-                <meta property="og:description" content="纯吐槽 前端时间对luabridge的性能问题很头痛,后来找到号称jni实现的jnlua,从原理上说,如果luabridge在动态绑定的逻辑可以只在jni上完成,而不走虚拟机的解释器,性能上可以提升很多,在jnlua的项目主页上还找到了,5.1的android移植版，于是打开beyondcompare迅速合并了个5.2的android移植版，实际运行的时候直接秒退了.翻了下代码,一口老血. jnlua号称jni实现，但事实上动态绑定的几个api还是java实现，由于luabridge的瓶颈基本都在反射那块，和luajava相比，jnlua没有性能上的优势,算是典型的重复造轮子 至于所谓的5.1的android移植版,它为了兼容android的lib不支持java.beans.BeanInfo类，删除了相关的JavaModule，DefaultJavaReflector两个类,代价是android移植版不再支持了lua脚本中调用java！ 口怕的是，jnlua的项目主页竟然还加了jnlua的链接， 虽然应该支持开源项目，但是挂这样一个半成品项目在主页上，还是要说一句 你在外面这么屌，luajava知道吗 各位想用jnlua的android同学，如果非要用jnlua的话，移植的时候其实是可以引入一些第三方库的，比如openbeans jnlua的代码结构较luajava层次分的更加清晰一些，api粒度更细; 好吧，个人觉得这种基础架构型的bridge，性能才是决定是否使用的第一要素，继续用luajava吧"/>
-                <meta name="description" content="纯吐槽 前端时间对luabridge的性能问题很头痛,后来找到号称jni实现的jnlua,从原理上说,如果luabridge在动态绑定的逻辑可以只在jni上完成,而不走虚拟机的解释器,性能上可以提升很多,在jnlua的项目主页上还找到了,5.1的android移植版，于是打开beyondcompare迅速合并了个5.2的android移植版，实际运行的时候直接秒退了.翻了下代码,一口老血. jnlua号称jni实现，但事实上动态绑定的几个api还是java实现，由于luabridge的瓶颈基本都在反射那块，和luajava相比，jnlua没有性能上的优势,算是典型的重复造轮子 至于所谓的5.1的android移植版,它为了兼容android的lib不支持java.beans.BeanInfo类，删除了相关的JavaModule，DefaultJavaReflector两个类,代价是android移植版不再支持了lua脚本中调用java！ 口怕的是，jnlua的项目主页竟然还加了jnlua的链接， 虽然应该支持开源项目，但是挂这样一个半成品项目在主页上，还是要说一句 你在外面这么屌，luajava知道吗 各位想用jnlua的android同学，如果非要用jnlua的话，移植的时候其实是可以引入一些第三方库的，比如openbeans jnlua的代码结构较luajava层次分的更加清晰一些，api粒度更细; 好吧，个人觉得这种基础架构型的bridge，性能才是决定是否使用的第一要素，继续用luajava吧">
+                <meta property="og:description" content="纯吐槽 前端时间对luabridge的性能问题很头痛,后来找到号称jni实现的jnlua,从原理上说,如果luabridge在动态绑定的逻辑可以只在jni上完成,而不走虚拟机的解释器,性能上可以提升很多,在jnlua的项目主页上还找到了,5.1的android移植版，于是打开beyondcompare迅速合并了个5.2的android移植版，实际运行的时候直接秒退了.翻了下代码,一口老血. jnlua号称jni实现，但事实上动态绑定的几个api还是java实现，由于luabridge的瓶颈基本都在反射那块，和luajava相比，jnlua没有性能上的优势,算是典型的重复造轮子 至于所谓的5.1的android移植版,它为了兼容android的lib不支持java.beans.BeanInfo类，删除了相关的JavaModule，DefaultJavaReflector两个类,代价是android移植版不再支持了lua脚本中调用java！ 口怕的是，jnlua的项目主页竟然还加了移植版的链接， 虽然应该支持开源项目，但是挂这样一个半成品项目在主页上，还是要说一句 你在外面这么屌，luajava知道吗 各位想用jnlua的android同学，如果非要用jnlua的话，移植的时候其实是可以引入一些第三方库的，比如openbeans jnlua的代码结构较luajava层次分的更加清晰一些，api粒度更细; 好吧，个人觉得这种基础架构型的bridge，性能才是决定是否使用的第一要素，继续用luajava吧"/>
+                <meta name="description" content="纯吐槽 前端时间对luabridge的性能问题很头痛,后来找到号称jni实现的jnlua,从原理上说,如果luabridge在动态绑定的逻辑可以只在jni上完成,而不走虚拟机的解释器,性能上可以提升很多,在jnlua的项目主页上还找到了,5.1的android移植版，于是打开beyondcompare迅速合并了个5.2的android移植版，实际运行的时候直接秒退了.翻了下代码,一口老血. jnlua号称jni实现，但事实上动态绑定的几个api还是java实现，由于luabridge的瓶颈基本都在反射那块，和luajava相比，jnlua没有性能上的优势,算是典型的重复造轮子 至于所谓的5.1的android移植版,它为了兼容android的lib不支持java.beans.BeanInfo类，删除了相关的JavaModule，DefaultJavaReflector两个类,代价是android移植版不再支持了lua脚本中调用java！ 口怕的是，jnlua的项目主页竟然还加了移植版的链接， 虽然应该支持开源项目，但是挂这样一个半成品项目在主页上，还是要说一句 你在外面这么屌，luajava知道吗 各位想用jnlua的android同学，如果非要用jnlua的话，移植的时候其实是可以引入一些第三方库的，比如openbeans jnlua的代码结构较luajava层次分的更加清晰一些，api粒度更细; 好吧，个人觉得这种基础架构型的bridge，性能才是决定是否使用的第一要素，继续用luajava吧">
 
 
 
@@ -56,6 +56,7 @@
 	        <li><a href="http://aaapei.com/./">首页</a></li>
 	        <li><a href="http://aaapei.com/categories">分类</a></li>
 	        <li><a href="http://aaapei.com/blog/tags">标签</a></li>
+	        <li><a href="http://aaapei.com/pages/sui-sui-nian">碎碎念</a></li>
 </ul></nav>
 
 <nav id="sub-nav">
@@ -63,9 +64,9 @@
 			<a class="email" href="mailto:aaapei@gmail.com" title="Email">Email</a>
 		<a class="weibo" href="http://weibo.com/a2pei" title="Weibo">Weibo</a>
 	</div>
-<section>
-  <h2>关于作者</h2>
-  <p>生活@hangzhou. 工作@netease. 前alier. <br/> 会一点python的Android码农,目前在学习前端&lua</p>
+<section id="about-me">
+  <h2>关于我</h2>
+  <p>生活@hangzhou. 工作@netease.<br/> 移动端码农. 正在减肥的胖子. 食肉. 想养喵但老婆不让</p>
 </section>
 </nav>				</header>
 				</div>
@@ -88,7 +89,7 @@
 <p>前端时间对luabridge的性能问题很头痛,后来找到号称jni实现的<em>jnlua</em>,从原理上说,如果luabridge在动态绑定的逻辑可以只在jni上完成,而不走虚拟机的解释器,性能上可以提升很多,在jnlua的项目主页上还找到了,5.1的android移植版，于是打开beyondcompare迅速合并了个5.2的android移植版，实际运行的时候直接秒退了.翻了下代码,一口老血.   </p>
 <p>jnlua号称jni实现，但事实上动态绑定的几个api还是java实现，由于luabridge的瓶颈基本都在反射那块，和luajava相比，jnlua没有性能上的优势,算是典型的重复造轮子  </p>
 <p>至于所谓的5.1的android移植版,它为了兼容android的lib不支持java.beans.BeanInfo类，删除了相关的JavaModule，DefaultJavaReflector两个类,代价是android移植版不再支持了lua脚本中调用java！  </p>
-<p>口怕的是，jnlua的项目主页竟然还加了android移植版的链接，  </p>
+<p>口怕的是，jnlua的项目主页竟然还加了移植版的链接，  </p>
 <p>虽然应该支持开源项目，但是挂这样一个半成品项目在主页上，还是要说一句  你在外面这么屌，luajava知道吗  </p>
 <p>各位想用jnlua的android同学，如果非要用jnlua的话，移植的时候其实是可以引入一些第三方库的，比如<em>openbeans</em>  </p>
 <p>jnlua的代码结构较luajava层次分的更加清晰一些，api粒度更细;

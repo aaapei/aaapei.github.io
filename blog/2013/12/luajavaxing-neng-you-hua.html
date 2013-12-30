@@ -16,8 +16,8 @@
                 <meta property="og:type" content="article"/>
                 <meta property="og:title" content="luajava性能优化"/>
                 <meta property="og:url" content="http://aaapei.com//blog/2013/12/luajavaxing-neng-you-hua"/>
-                <meta property="og:description" content="最近在做一个lua的android项目,项目时间仓促,加上对lua完全陌生,于是选了个文档资料最全的lua bridge:luajava luajava目前只支持到5.1,不过升级到5.2困难不大,主要是一些宏开关以及静态变量;实际运行的时候发现ui频繁掉祯,profile后发现90%+的cpu耗时在luajava中 看了一下luajava本身代码其实不大;native层就一个luajava.c,java层,除了LuaJavaApi.java,其他java类都是Value Object lua逻辑分析 先看lua创建java object的代码,luajava.c中 int javaNewInstance( lua_State * L ) { //some code ….. method = ( *javaEnv )->GetStaticMethodID( javaEnv , luajava_api_class , "javaNewInstance" ,"(ILjava/lang/String;)I" ); //先调用java层创建javaobject javaClassName = ( *javaEnv )->NewStringUTF( javaEnv , className ); ret ..."/>
-                <meta name="description" content="最近在做一个lua的android项目,项目时间仓促,加上对lua完全陌生,于是选了个文档资料最全的lua bridge:luajava luajava目前只支持到5.1,不过升级到5.2困难不大,主要是一些宏开关以及静态变量;实际运行的时候发现ui频繁掉祯,profile后发现90%+的cpu耗时在luajava中 看了一下luajava本身代码其实不大;native层就一个luajava.c,java层,除了LuaJavaApi.java,其他java类都是Value Object lua逻辑分析 先看lua创建java object的代码,luajava.c中 int javaNewInstance( lua_State * L ) { //some code ….. method = ( *javaEnv )->GetStaticMethodID( javaEnv , luajava_api_class , "javaNewInstance" ,"(ILjava/lang/String;)I" ); //先调用java层创建javaobject javaClassName = ( *javaEnv )->NewStringUTF( javaEnv , className ); ret ...">
+                <meta property="og:description" content="最近在做一个lua的android项目,对应lua的生态环境完成陌生完全陌生,所以选用了个文档资料最全的lua bridge:luajava luajava目前只支持到lua5.1,不过升级到5.2困难不大,主要是一些宏开关以及静态变量;然而实际运行的时候发现卡的很不行,ui频繁掉祯,profile后发现90%+的cpu耗时在luajava中 看了一下luajava本身代码其实不大;索性就追了一下,luajava的native层就一个luajava.c,java层,除了LuaJavaApi.java,其他java类都是Value Object lua逻辑分析 先看lua创建java object的代码,luajava.c中 int javaNewInstance( lua_State * L ) { //some code ….. method = ( *javaEnv )->GetStaticMethodID( javaEnv , luajava_api_class , "javaNewInstance" ,"(ILjava/lang/String;)I" ); //先调用java层创建javaobject javaClassName = ( *javaEnv )->NewStringUTF( javaEnv , className ..."/>
+                <meta name="description" content="最近在做一个lua的android项目,对应lua的生态环境完成陌生完全陌生,所以选用了个文档资料最全的lua bridge:luajava luajava目前只支持到lua5.1,不过升级到5.2困难不大,主要是一些宏开关以及静态变量;然而实际运行的时候发现卡的很不行,ui频繁掉祯,profile后发现90%+的cpu耗时在luajava中 看了一下luajava本身代码其实不大;索性就追了一下,luajava的native层就一个luajava.c,java层,除了LuaJavaApi.java,其他java类都是Value Object lua逻辑分析 先看lua创建java object的代码,luajava.c中 int javaNewInstance( lua_State * L ) { //some code ….. method = ( *javaEnv )->GetStaticMethodID( javaEnv , luajava_api_class , "javaNewInstance" ,"(ILjava/lang/String;)I" ); //先调用java层创建javaobject javaClassName = ( *javaEnv )->NewStringUTF( javaEnv , className ...">
 
 
 
@@ -56,6 +56,7 @@
 	        <li><a href="http://aaapei.com/./">首页</a></li>
 	        <li><a href="http://aaapei.com/categories">分类</a></li>
 	        <li><a href="http://aaapei.com/blog/tags">标签</a></li>
+	        <li><a href="http://aaapei.com/pages/sui-sui-nian">碎碎念</a></li>
 </ul></nav>
 
 <nav id="sub-nav">
@@ -63,9 +64,9 @@
 			<a class="email" href="mailto:aaapei@gmail.com" title="Email">Email</a>
 		<a class="weibo" href="http://weibo.com/a2pei" title="Weibo">Weibo</a>
 	</div>
-<section>
-  <h2>关于作者</h2>
-  <p>生活@hangzhou. 工作@netease. 前alier. <br/> 会一点python的Android码农,目前在学习前端&lua</p>
+<section id="about-me">
+  <h2>关于我</h2>
+  <p>生活@hangzhou. 工作@netease.<br/> 移动端码农. 正在减肥的胖子. 食肉. 想养喵但老婆不让</p>
 </section>
 </nav>				</header>
 				</div>
@@ -84,9 +85,9 @@
         <a href="http://aaapei.com//blog/tags/android">android</a> ,         <a href="http://aaapei.com//blog/tags/lua">lua</a>     </div>
 </div>                <h1 class="title" itemprop="name"><a href="http://aaapei.com//blog/2013/12/luajavaxing-neng-you-hua" itemprop="url">luajava性能优化</a></h1>
                 <div class="entry-content" itemprop="articleBody">
-                    <p>最近在做一个lua的android项目,项目时间仓促,加上对lua完全陌生,于是选了个文档资料最全的lua bridge:<em>luajava</em>
-luajava目前只支持到5.1,不过升级到5.2困难不大,主要是一些宏开关以及静态变量;实际运行的时候发现ui频繁掉祯,profile后发现90%+的cpu耗时在luajava中  </p>
-<p>看了一下luajava本身代码其实不大;native层就一个luajava.c,java层,除了LuaJavaApi.java,其他java类都是Value Object</p>
+                    <p>最近在做一个lua的android项目,对应lua的生态环境完成陌生完全陌生,所以选用了个文档资料最全的lua bridge:<em>luajava</em><br />
+luajava目前只支持到lua5.1,不过升级到5.2困难不大,主要是一些宏开关以及静态变量;然而实际运行的时候发现卡的很不行,ui频繁掉祯,profile后发现90%+的cpu耗时在luajava中  </p>
+<p>看了一下luajava本身代码其实不大;索性就追了一下,luajava的native层就一个luajava.c,java层,除了LuaJavaApi.java,其他java类都是Value Object</p>
 <h3>lua逻辑分析</h3>
 <p>先看lua创建java object的代码,luajava.c中</p>
 <div class="highlight"><pre><span class="kt">int</span> <span class="nf">javaNewInstance</span><span class="p">(</span> <span class="n">lua_State</span> <span class="o">*</span> <span class="n">L</span> <span class="p">)</span>
