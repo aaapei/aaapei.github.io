@@ -2,7 +2,7 @@
 <html>
     <head>
         <meta charset="utf-8">
-        <title>I'm aaapeI</title>
+        <title>I'm aaapei</title>
         <meta name="author" content="aaapei">
 
         <!-- http://t.co/dKP3o1e -->
@@ -15,7 +15,7 @@
 
                 <meta property="og:type" content="article"/>
                 <meta property="og:title" content="微信的jsbridge实现"/>
-                <meta property="og:url" content="http://aaapei.com//blog/2013/12/wei-xin-de-jsbridgeshi-xian"/>
+                <meta property="og:url" content="http://aaapei.com/blog/2013/12/wei-xin-de-jsbridgeshi-xian"/>
                 <meta property="og:description" content="微信公共平台开放了几个操作webview界面的js接口 示例代码是这样的: WeixinJSBridge.invoke('getNetworkType',{}, function(e){ WeixinJSBridge.log(e.err_msg); }); android的webview api中有开放过一个addJavaScriptInterface函数,这个函数的作用是在页面的Window中注入一个JS对象 如果你的应用中使用了这个api,建议先看一下国内安全领域第一人黑哥的这篇文章android webview 漏洞背后的节操, 没耐心的同学直接看结尾方案吧: 第1个方案是设置信任域，这个问题其实是不太靠谱的，在我之前在kcon里演讲《去年跨过的浏览器》里有很多信任域带来的安全问题 第2个方案是使用 shouldOverrideUrlLoading 的方式，据说这个方案还是比较靠谱的，只是可能代价比较大 第3个方案就是教育那些开发商，没有必要用webview的时候就不要用，不要java与js交互就不要用 不过,按黑哥这篇文章的想法,这个漏洞危险等级很低,可以无视之 暂时把安全问题放一边,Js对象的注入,对函数的参数类型有严格要求,它只能传递基本数据类型以及JSON 但微信的JsApi中,参数三是一个函数对象,那他是如果做到的呢 逆向 Android原生的机制既然不能支持函数对象的传递,于是猜测微信是否会对原始的api做了一层包装; 先下载weixin ..."/>
                 <meta name="description" content="微信公共平台开放了几个操作webview界面的js接口 示例代码是这样的: WeixinJSBridge.invoke('getNetworkType',{}, function(e){ WeixinJSBridge.log(e.err_msg); }); android的webview api中有开放过一个addJavaScriptInterface函数,这个函数的作用是在页面的Window中注入一个JS对象 如果你的应用中使用了这个api,建议先看一下国内安全领域第一人黑哥的这篇文章android webview 漏洞背后的节操, 没耐心的同学直接看结尾方案吧: 第1个方案是设置信任域，这个问题其实是不太靠谱的，在我之前在kcon里演讲《去年跨过的浏览器》里有很多信任域带来的安全问题 第2个方案是使用 shouldOverrideUrlLoading 的方式，据说这个方案还是比较靠谱的，只是可能代价比较大 第3个方案就是教育那些开发商，没有必要用webview的时候就不要用，不要java与js交互就不要用 不过,按黑哥这篇文章的想法,这个漏洞危险等级很低,可以无视之 暂时把安全问题放一边,Js对象的注入,对函数的参数类型有严格要求,它只能传递基本数据类型以及JSON 但微信的JsApi中,参数三是一个函数对象,那他是如果做到的呢 逆向 Android原生的机制既然不能支持函数对象的传递,于是猜测微信是否会对原始的api做了一层包装; 先下载weixin ...">
 
@@ -48,7 +48,7 @@
 
 <hgroup>
 <br/>
-<h1><a href="http://aaapei.com/">I'm aaapeI</a></h1>
+<h1><a href="http://aaapei.com/">I'm aaapei</a></h1>
     <h3>&nbsp;&nbsp;少年去游荡</h3>
 </hgroup>
 <nav id="main-nav">
@@ -80,11 +80,11 @@
             <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
 <div class="meta">
     <div class="date">
-        <time datetime="2013-12-11T19:50:00.000000" itemprop="datePublished">三 11 十二月 2013</time>
+        <time datetime="2013-12-11" itemprop="datePublished">2013-12-11</time>
     </div>
     <div class="tags">
-        <a href="http://aaapei.com//blog/tags/android">android</a> ,         <a href="http://aaapei.com//blog/tags/wei-xin">微信</a>     </div>
-</div>                <h1 class="title" itemprop="name"><a href="http://aaapei.com//blog/2013/12/wei-xin-de-jsbridgeshi-xian" itemprop="url">微信的jsbridge实现</a></h1>
+        <a href="http://aaapei.com/blog/tags/android">android</a> ,         <a href="http://aaapei.com/blog/tags/wei-xin">微信</a>     </div>
+</div>                <h1 class="title" itemprop="name"><a href="http://aaapei.com/blog/2013/12/wei-xin-de-jsbridgeshi-xian" itemprop="url">微信的jsbridge实现</a></h1>
                 <div class="entry-content" itemprop="articleBody">
                     <p>微信公共平台开放了几个操作webview界面的js接口<br />
 示例代码是这样的:  </p>
@@ -239,7 +239,7 @@
                     <h1 class="title">Comments</h1>
                     <div id="disqus_thread" aria-live="polite">
                         <script type="text/javascript">
-                            var disqus_identifier = "/blog/2013/12/wei-xin-de-jsbridgeshi-xian";
+                            var disqus_identifier = "blog/2013/12/wei-xin-de-jsbridgeshi-xian";
                             (function() {
                                 var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
                                 dsq.src = 'http://aaapeigithub.disqus.com/embed.js';
@@ -254,7 +254,7 @@
 					</div>
 				</div>
 				<footer id="footer" class="inner">
-<p>Copyright &copy; 2013 - aaapei - <span class="credit">Powered by <a href="http://getpelican.com">Pelican</a></span></p>				</footer>
+<p>Copyright &copy; 2013 - aaapei </p>				</footer>
 			</div>
 		</div>
 	</body>
