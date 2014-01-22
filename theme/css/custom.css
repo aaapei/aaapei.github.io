@@ -1,0 +1,31 @@
+@media="screen, projection"
+.archives1 .catelog {
+	position: relative;
+}
+.archives1 .catelog {
+	line-height: 35px;
+	width: 200px;
+	position: absolute;
+	top: 0;
+	padding-top: 15px;
+	border-top: 1px solid #fff;
+}
+.archives1 .article {
+	margin-left: 200px;
+	padding: 15px 0;
+}
+
+.archives1 .article .title {
+	font-weight: 300;
+	line-height: 35px;
+	margin-bottom: 20px;
+	margin-left: 200px;
+	padding: 15px 0;
+}
+
+.archives1 .article .date{
+	color: #999;
+	font-size: 0.9em;
+	line-height: 2;
+	margin-top: 15px;
+}
