@@ -15,7 +15,7 @@
 
                 <meta property="og:type" content="article"/>
                 <meta property="og:title" content="luajava性能优化"/>
-                <meta property="og:url" content="http://aaapei.com//blog/2013/12/luajavaxing-neng-you-hua"/>
+                <meta property="og:url" content="http://localhost:8000/blog/2013/12/luajavaxing-neng-you-hua"/>
                 <meta property="og:description" content="最近在做一个lua的android项目,对于lua的生态环境完全陌生,所以选用了个文档资料最全的lua bridge:luajava luajava目前只支持到lua5.1,不过升级到5.2困难不大,主要是一些宏开关以及静态变量;然而实际运行的时候发现卡的很不行,ui频繁掉祯,profile后发现90%+的cpu耗时在luajava中 看了一下luajava本身代码量不大;索性就追了一下,luajava的native层就一个luajava.c,java层,除了LuaJavaApi.java,其他java类都是Value Object lua逻辑分析 先看lua创建java object的代码,luajava.c中 int javaNewInstance( lua_State * L ) { //some code ….. method = ( *javaEnv )->GetStaticMethodID( javaEnv , luajava_api_class , "javaNewInstance" ,"(ILjava/lang/String;)I" ); //先调用java层创建javaobject javaClassName = ( *javaEnv )->NewStringUTF( javaEnv , className ..."/>
                 <meta name="description" content="最近在做一个lua的android项目,对于lua的生态环境完全陌生,所以选用了个文档资料最全的lua bridge:luajava luajava目前只支持到lua5.1,不过升级到5.2困难不大,主要是一些宏开关以及静态变量;然而实际运行的时候发现卡的很不行,ui频繁掉祯,profile后发现90%+的cpu耗时在luajava中 看了一下luajava本身代码量不大;索性就追了一下,luajava的native层就一个luajava.c,java层,除了LuaJavaApi.java,其他java类都是Value Object lua逻辑分析 先看lua创建java object的代码,luajava.c中 int javaNewInstance( lua_State * L ) { //some code ….. method = ( *javaEnv )->GetStaticMethodID( javaEnv , luajava_api_class , "javaNewInstance" ,"(ILjava/lang/String;)I" ); //先调用java层创建javaobject javaClassName = ( *javaEnv )->NewStringUTF( javaEnv , className ...">
 
@@ -24,9 +24,9 @@
 
 
         <link rel="canonical" href="">
-        <link href="http://aaapei.com/favicon.png" rel="shortcut icon">
-        <link href="http://aaapei.com/theme/css/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
-        <link href="http://aaapei.com/theme/css/pygments.css" media="screen, projection" rel="stylesheet" type="text/css">
+        <link href="http://localhost:8000/favicon.png" rel="shortcut icon">
+        <link href="http://localhost:8000/theme/css/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+        <link href="http://localhost:8000/theme/css/pygments.css" media="screen, projection" rel="stylesheet" type="text/css">
 
         <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
         <link href="//fonts.googleapis.com/css?family=Open+Sans:400italic,400,700" rel='stylesheet' type='text/css'>
@@ -48,16 +48,17 @@
 
 <hgroup>
 	<br/>
-	<h1><a href="http://aaapei.com/">I'm aaapei</a></h1>
+	<h1><a href="http://localhost:8000/">I'm aaapei</a></h1>
+	<br/>
     <h3>少年去游荡</h3>
 </hgroup>
 <nav id="main-nav">
 
 <ul class="main-navigation">
-	        <li><a href="http://aaapei.com/./">首页</a></li>
-	        <li><a href="http://aaapei.com/categories">分类</a></li>
-	        <li><a href="http://aaapei.com/blog/tags">标签</a></li>
-	        <li><a href="http://aaapei.com/pages/sui-sui-nian">碎碎念</a></li>
+	        <li><a href="http://localhost:8000/.">首页</a></li>
+	        <li><a href="http://localhost:8000/categories">分类</a></li>
+	        <li><a href="http://localhost:8000/blog/tags">标签</a></li>
+	        <li><a href="http://localhost:8000/pages/sui-sui-nian">碎碎念</a></li>
 </ul></nav>
 
 <nav id="sub-nav">
@@ -83,8 +84,8 @@
         <time datetime="2013-12-02T20:20:00.000000" itemprop="datePublished">2013-12-02</time>
     </div>
     <div class="tags">
-        <a href="http://aaapei.com//blog/tags/android">android</a> ,         <a href="http://aaapei.com//blog/tags/lua">lua</a>     </div>
-</div>                <h1 class="title" itemprop="name"><a href="http://aaapei.com//blog/2013/12/luajavaxing-neng-you-hua" itemprop="url">luajava性能优化</a></h1>
+        <a href="http://localhost:8000/blog/tags/android">android</a> ,         <a href="http://localhost:8000/blog/tags/lua">lua</a>     </div>
+</div>                <h1 class="title" itemprop="name"><a href="http://localhost:8000/blog/2013/12/luajavaxing-neng-you-hua" itemprop="url">luajava性能优化</a></h1>
                 <div class="entry-content" itemprop="articleBody">
                     <p>最近在做一个lua的android项目,对于lua的生态环境完全陌生,所以选用了个文档资料最全的lua bridge:<em>luajava</em><br />
 luajava目前只支持到lua5.1,不过升级到5.2困难不大,主要是一些宏开关以及静态变量;然而实际运行的时候发现卡的很不行,ui频繁掉祯,profile后发现90%+的cpu耗时在luajava中  </p>
@@ -181,7 +182,7 @@ luajava目前只支持到lua5.1,不过升级到5.2困难不大,主要是一些�
                     <h1 class="title">Comments</h1>
                     <div id="disqus_thread" aria-live="polite">
                         <script type="text/javascript">
-                            var disqus_identifier = "/blog/2013/12/luajavaxing-neng-you-hua";
+                            var disqus_identifier = "blog/2013/12/luajavaxing-neng-you-hua";
                             (function() {
                                 var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
                                 dsq.src = 'http://aaapeigithub.disqus.com/embed.js';
