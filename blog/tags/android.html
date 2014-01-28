@@ -77,6 +77,30 @@
             <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
 <div class="meta">
     <div class="date">
+        <time datetime="2014-01-28T17:30:00.000000" itemprop="datePublished">2014-01-28</time>
+    </div>
+    <div class="tags">
+        <a href="http://aaapei.com/blog/tags/android">android</a>     </div>
+</div>                <h1 class="title" itemprop="name"><a href="http://aaapei.com/blog/2014/01/android-bitmap-tips" itemprop="url">android bitmap tips</a></h1>
+                <div class="entry-content" itemprop="description"><p>大部分android开发者只知道bitmap再使用之后，需要显式的调用一次bitmap.recycle，以通知系统回收内存;  </p>
+<p>这个观点，在android3.0之后其实已经过时了，android3.0将bitmap所引用的位图资源从native heap移到虚拟机的heap空间，bitmap的生命周期由虚拟机管理，开发者只需要保证在应用中不在持有对bitmap的引用，即可保证不发生内存泄漏；
+将bitmap的位图内存转移到虚拟机heap后，由于位图资源本身较大，造成gc的概率的增加   </p>
+<h3>bitmap proxy</h3>
+<p>在一般的应用场景中，bitmap的引用一般是和imageview关联；当大量imageview持有对bitmap的引用时，虚拟机无法释放bitmap的内存，导致oom；</p>
+<p>针对这种场景，开发者可以实现一个bitmap的代理类，作为bitmap和imageview的中间层，在imageview不可见时（例如imageview是一个listview的子控件，listview发生滚动/activiy切换到后台），即释放掉对bitamp的引用；当imageview重新可见时，通过代理类重新去加载bitmap，以解耦bitmap和iamgeview的引用关系;   </p>
+<h3>inBitmap</h3>
+<p>android在3.0之后新增了一个BitmapFactory.Options.inBitmap开关，加了这个开关之后，bitmapfactory在加载位图时候，会尝试使用inbitmap指向的已分配在heap中位图空间；而不是重新申请一块内存；从而减少了虚拟机最讨厌的短生命周期大内存对象；  不过这个开关有严格的使用场景，即两个bitamp的位图大小必须一致</p>
+					<br/ >
+					<a href="http://aaapei.com/blog/2014/01/android-bitmap-tips">查看全文</a>
+                </div>
+                <div class="meta">
+                    <span class="author">Posted by <a href="http://aaapei.com/author/zhengwen.html">zhengwen</a></span>
+                </div>
+            </article>
+            <hr/>
+            <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
+<div class="meta">
+    <div class="date">
         <time datetime="2013-12-11T19:50:00.000000" itemprop="datePublished">2013-12-11</time>
     </div>
     <div class="tags">
