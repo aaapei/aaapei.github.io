@@ -2024,3 +2024,31 @@ a:hover {
     float: none;
   }
 }
+#categories .category {
+	position: relative;
+}
+
+
+#categories .category .categorytitle {
+	line-height: 35px;
+	width: 200px;
+	position: absolute;
+	top: 0;
+	padding-top: 15px;
+	border-top: 1px solid rgb(255, 255, 255);
+}
+#categories .category article {
+	margin-left: 200px;
+	padding: 15px 0  !important;
+}
+
+#categories .category  article h1.categoryartile a {
+	color: rgb(51, 51, 51);
+	font-weight:normal;
+	-webkit-transition: color 0.3s;
+	-moz-transition: color 0.3s;
+	-o-transition: color 0.3s;
+	transition: color 0.3s;
+}
+
+.container .left-col #header #sub-nav .search::before {
