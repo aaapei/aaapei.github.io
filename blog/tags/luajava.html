@@ -74,71 +74,39 @@
 			<div class="mid-col">
 				<div class="mid-col-container">
 					<div id="content" class="inner">
-		<section id="archives" itemscope="" itemtype="http://schema.org/Blog">
-			<h2 class="archives">Archives for I'm aaapei</h2>
-					<section class="archive">
-						<h1 class="year">2014</h1>
-
-				<article itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
+            <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
 <div class="meta">
     <div class="date">
         <time datetime="2014-02-19T19:50:00.000000" itemprop="datePublished">2014-02-19</time>
     </div>
     <div class="tags">
         <a href="http://aaapei.com/blog/tags/lua">lua</a> ,         <a href="http://aaapei.com/blog/tags/luajava">luajava</a>     </div>
-</div>					<h1 class="title" itemprop="name"><a href='blog/2014/02/luazai-kua-yu-yan-huan-jing-zhong-de-nei-cun-xie-lu'>lua在跨语言环境中的内存泄露</a></h1>
-				</article>
+</div>                <h1 class="title" itemprop="name"><a href="http://aaapei.com/blog/2014/02/luazai-kua-yu-yan-huan-jing-zhong-de-nei-cun-xie-lu" itemprop="url">lua在跨语言环境中的内存泄露</a></h1>
+                <div class="entry-content" itemprop="description"><p>前段时间在android环境中使用lua,采用的luabridge是luajava,遇到一个内存泄露问题,查了很久,终于定位了;</p>
+<p>场景是这样的:<br />
+1:在lua中创建了一个java对象,将jobject指针传递给java;对应在luajava中,即传递了一个luaobject给java;java保存了这个对象;<br />
+2:在Lua中需要对这个java对象设置一个事件回调,比如说为某个控件setOnClickListener;<br />
+其中设置的代码是这样的:</p>
+<div class="highlight"><pre><span class="nx">local</span> <span class="nx">viewclick_cb</span><span class="o">=</span><span class="p">{}</span>
+<span class="kd">function</span> <span class="nx">viewclick_cb</span><span class="p">.</span><span class="nx">onClick</span><span class="p">(</span><span class="nx">v</span><span class="p">)</span>
+    <span class="nx">self</span><span class="o">:</span><span class="nx">cb</span><span class="p">(</span><span class="nx">v</span><span class="p">)</span>  
+<span class="nx">end</span>
+<span class="nx">local</span> <span class="nx">listenerProxy</span>  <span class="o">=</span> <span class="nx">luajava</span><span class="p">.</span><span class="nx">createProxy</span><span class="p">(</span><span class="s1">&#39;android.view.View$OnClickListener&#39;</span><span class="p">,</span><span class="nx">viewclick_cb</span><span class="p">)</span>       
+<span class="nx">javaobjhandler</span><span class="o">:</span><span class="nx">setOnClickListener</span><span class="p">(</span><span class="nx">ListenerProxy</span><span class="p">)</span>   
+</pre></div>
 
 
-				<article itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
-<div class="meta">
-    <div class="date">
-        <time datetime="2014-01-28T17:30:00.000000" itemprop="datePublished">2014-01-28</time>
-    </div>
-    <div class="tags">
-        <a href="http://aaapei.com/blog/tags/android">android</a>     </div>
-</div>					<h1 class="title" itemprop="name"><a href='blog/2014/01/android-bitmap-tips'>android bitmap tips</a></h1>
-				</article>
-
-						</section>
-						<section class="archive">
-						<h1 class="year">2013</h1>
-
-				<article itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
-<div class="meta">
-    <div class="date">
-        <time datetime="2013-12-29T00:00:00.000000" itemprop="datePublished">2013-12-29</time>
-    </div>
-    <div class="tags">
-        <a href="http://aaapei.com/blog/tags/lua">lua</a>     </div>
-</div>					<h1 class="title" itemprop="name"><a href='blog/2013/12/jnluatu-cao'>jnlua吐槽</a></h1>
-				</article>
-
-
-				<article itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
-<div class="meta">
-    <div class="date">
-        <time datetime="2013-12-11T19:50:00.000000" itemprop="datePublished">2013-12-11</time>
-    </div>
-    <div class="tags">
-        <a href="http://aaapei.com/blog/tags/android">android</a> ,         <a href="http://aaapei.com/blog/tags/wei-xin">微信</a>     </div>
-</div>					<h1 class="title" itemprop="name"><a href='blog/2013/12/wei-xin-de-jsbridgeshi-xian'>微信的jsbridge实现</a></h1>
-				</article>
-
-
-				<article itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
-<div class="meta">
-    <div class="date">
-        <time datetime="2013-12-02T20:20:00.000000" itemprop="datePublished">2013-12-02</time>
-    </div>
-    <div class="tags">
-        <a href="http://aaapei.com/blog/tags/android">android</a> ,         <a href="http://aaapei.com/blog/tags/lua">lua</a>     </div>
-</div>					<h1 class="title" itemprop="name"><a href='blog/2013/12/luajavaxing-neng-you-hua'>luajava性能优化</a></h1>
-				</article>
-
-
-			</section>
-		</section>
+<p>lua和java交互时,对象生命周期管理分两种情况:</p>
+<blockquote>
+<p>1:java对象传递个lua虚拟机,lua虚拟机为java对象创建一个userdata,在globalref中增加一个引用,标记这个java对象正在被使用;同时,为这个userdata设置一个__gc元方法,当lua对象需要被释放时,_gc元方法回调,释放掉java对象的globaref ...</p></blockquote>
+					<br/ >
+					<a href="http://aaapei.com/blog/2014/02/luazai-kua-yu-yan-huan-jing-zhong-de-nei-cun-xie-lu">查看全文</a>
+                </div>
+                <div class="meta">
+                    <span class="author">Posted by <a href="http://aaapei.com/author/zhengwen.html">zhengwen</a></span>
+                </div>
+            </article>
+            <hr/>
 
 					</div>
 				</div>

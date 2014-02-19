@@ -1,0 +1,140 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>I'm aaapei</title>
+        <meta name="author" content="aaapei">
+
+        <!-- http://t.co/dKP3o1e -->
+        <meta name="HandheldFriendly" content="True">
+        <meta name="MobileOptimized" content="320">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <!-- Open Graph tags -->
+
+
+                <meta property="og:type" content="article"/>
+                <meta property="og:title" content="lua在跨语言中的内存泄露"/>
+                <meta property="og:url" content="http://localhost:8000/blog/2014/02/luazai-kua-yu-yan-zhong-de-nei-cun-xie-lu"/>
+                <meta property="og:description" content="前段时间在android环境中使用lua,采用的luabridge是luajava,遇到一个内存泄露问题,查了很久,终于定位了; 场景是这样的: 1:在lua中创建了一个java对象,将jobject指针传递给java;对应在luajava中,即传递了一个luaobject给java;java保存了这个对象; 2:在Lua中需要对这个java对象设置一个事件回调,比如说为某个控件setOnClickListener; 其中设置的代码是这样的: local viewclick_cb={} function viewclick_cb.onClick(v) self:cb(v) end local listenerProxy = luajava.createProxy('android.view.View$OnClickListener',viewclick_cb) javaobjhandler:setOnClickListener(ListenerProxy) lua和java交互时,对象生命周期管理分两种情况: 1:java对象传递个lua虚拟机,lua虚拟机为java对象创建一个userdata,在globalref中增加一个引用,标记这个java对象正在被使用;同时,为这个userdata设置一个__gc元方法,当lua对象需要被释放时,_gc元方法回调,释放掉java对象的globaref ..."/>
+                <meta name="description" content="前段时间在android环境中使用lua,采用的luabridge是luajava,遇到一个内存泄露问题,查了很久,终于定位了; 场景是这样的: 1:在lua中创建了一个java对象,将jobject指针传递给java;对应在luajava中,即传递了一个luaobject给java;java保存了这个对象; 2:在Lua中需要对这个java对象设置一个事件回调,比如说为某个控件setOnClickListener; 其中设置的代码是这样的: local viewclick_cb={} function viewclick_cb.onClick(v) self:cb(v) end local listenerProxy = luajava.createProxy('android.view.View$OnClickListener',viewclick_cb) javaobjhandler:setOnClickListener(ListenerProxy) lua和java交互时,对象生命周期管理分两种情况: 1:java对象传递个lua虚拟机,lua虚拟机为java对象创建一个userdata,在globalref中增加一个引用,标记这个java对象正在被使用;同时,为这个userdata设置一个__gc元方法,当lua对象需要被释放时,_gc元方法回调,释放掉java对象的globaref ...">
+
+
+
+
+
+        <link rel="canonical" href="">
+        <link href="http://localhost:8000/favicon.png" rel="shortcut icon">
+        <link href="http://localhost:8000/theme/css/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+        <link href="http://localhost:8000/theme/css/pygments.css" media="screen, projection" rel="stylesheet" type="text/css">
+
+        <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+        <link href="//fonts.googleapis.com/css?family=Open+Sans:400italic,400,700" rel='stylesheet' type='text/css'>
+        <link href="//fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel='stylesheet' type='text/css'>
+        <link href="//fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel='stylesheet' type='text/css'>
+
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+        <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+
+    </head>
+	<body>
+		<div class="container">
+			<div class="left-col">
+				<div class="intrude-less">
+				<header id="header" class="inner">
+	<div class="profilepic">
+		<img src="http://www.gravatar.com/avatar/4c187c40f3f52c969742c6476ade7e44?s=160" alt="Profile Picture" style="width: 160px;" />
+	</div>
+
+<hgroup>
+	<br/>
+	<h1><a href="http://localhost:8000/">I'm aaapei</a></h1>
+    <h3>少年去游荡</h3>
+</hgroup>
+<nav id="main-nav">
+
+<ul class="main-navigation">
+	        <li><a href="http://localhost:8000/.">首页</a></li>
+	        <li><a href="http://localhost:8000/categories">分类</a></li>
+	        <li><a href="http://localhost:8000/blog/tags">标签</a></li>
+	        <li><a href="http://localhost:8000/pages/sui-sui-nian">碎碎念</a></li>
+</ul></nav>
+
+<nav id="sub-nav">
+	<div class="social">
+			<a class="email" href="mailto:aaapei@gmail.com" title="Email">Email</a>
+		<a class="weibo" href="http://weibo.com/a2pei" title="Weibo">Weibo</a>
+	</div>
+<section id="about-me">
+  <h2>关于我</h2>
+  <p>生活@hangzhou. 工作@netease.<br/> 移动端码农. 正在减肥的胖子. 食肉. <br/>想养喵但老婆不让</p>
+</section>
+</nav>				</header>
+				</div>
+			</div>
+			<div class="mid-col">
+				<div class="mid-col-container">
+					<div id="content" class="inner">
+
+        <section id="content" class="body">
+            <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
+<div class="meta">
+    <div class="date">
+        <time datetime="2014-02-19T19:50:00.000000" itemprop="datePublished">2014-02-19</time>
+    </div>
+    <div class="tags">
+        <a href="http://localhost:8000/blog/tags/lua">lua</a> ,         <a href="http://localhost:8000/blog/tags/luajava">luajava</a>     </div>
+</div>                <h1 class="title" itemprop="name"><a href="http://localhost:8000/blog/2014/02/luazai-kua-yu-yan-zhong-de-nei-cun-xie-lu" itemprop="url">lua在跨语言中的内存泄露</a></h1>
+                <div class="entry-content" itemprop="articleBody">
+                    <p>前段时间在android环境中使用lua,采用的luabridge是luajava,遇到一个内存泄露问题,查了很久,终于定位了;</p>
+<p>场景是这样的:</p>
+<p>1:在lua中创建了一个java对象,将jobject指针传递给java;对应在luajava中,即传递了一个luaobject给java;java保存了这个对象;</p>
+<p>2:在Lua中需要对这个java对象设置一个事件回调,比如说为某个控件setOnClickListener;</p>
+<p>其中设置的代码是这样的:</p>
+<div class="highlight"><pre>          <span class="nx">local</span> <span class="nx">viewclick_cb</span><span class="o">=</span><span class="p">{}</span>
+          <span class="kd">function</span> <span class="nx">viewclick_cb</span><span class="p">.</span><span class="nx">onClick</span><span class="p">(</span><span class="nx">v</span><span class="p">)</span>
+            <span class="nx">self</span><span class="o">:</span><span class="nx">cb</span><span class="p">(</span><span class="nx">v</span><span class="p">)</span>  
+          <span class="nx">end</span>
+          <span class="nx">local</span> <span class="nx">listenerProxy</span>  <span class="o">=</span> <span class="nx">luajava</span><span class="p">.</span><span class="nx">createProxy</span><span class="p">(</span><span class="s1">&#39;android.view.View$OnClickListener&#39;</span><span class="p">,</span><span class="nx">viewclick_cb</span><span class="p">)</span>     
+          <span class="nx">javaobjhandler</span><span class="o">:</span><span class="nx">setOnClickListener</span><span class="p">(</span><span class="nx">ListenerProxy</span><span class="p">)</span>   
+</pre></div>
+
+
+<p>lua和java交互时,对象生命周期管理分两种情况:</p>
+<blockquote>
+<p>1:java对象传递个lua虚拟机,lua虚拟机为java对象创建一个userdata,在globalref中增加一个引用,标记这个java对象正在被使用;同时,为这个userdata设置一个__gc元方法,当lua对象需要被释放时,_gc元方法回调,释放掉java对象的globaref;  </p>
+<p>2:lua对象传递个java虚拟机,将lua对象放到LUA_REGISTRYINDEX中,调用luaL_ref得到一个引用交给一个java对象;在这个java对象的finalize中调用luaL_unref释放引用;  </p>
+</blockquote>
+<p>单独看,都没有问题,但当这两个策略同时作用时,就可能产生循环引用;<br />
+比如上述代码中,回调函数中self:cb(v)与上下文相关的场景;<br />
+java虚拟机和lua虚拟机采取的都是mark-sweep策略,其mark方式都是根节点标记法;两个虚拟机都认为对象存在引用,导致内存泄露;
+这个内存泄露问题在其他语言环境中也应该存在;  </p>
+<p>最后采取的解决方式,采取云风大神这篇<a href="http://blog.codingnow.com/2007/10/lua_c_object_reference.html">文章</a>的思路:<br />
+事件回调通过消息机制而不是直接引用的方式,回调函数保存在一个全局weak table中;回调函数关联在一个lua对象,和lua对象生命周期保持一致;回调事件发生时,java通过一个全局的weak table查询回调函数;</p>
+                </div>
+            </article>
+
+                <section id="comment">
+                    <h1 class="title">Comments</h1>
+                    <div id="disqus_thread" aria-live="polite">
+                        <script type="text/javascript">
+                            var disqus_identifier = "blog/2014/02/luazai-kua-yu-yan-zhong-de-nei-cun-xie-lu";
+                            (function() {
+                                var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+                                dsq.src = 'http://aaapeigithub.disqus.com/embed.js';
+                                (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+                            })();
+                        </script>
+                    </div>
+                </section>
+
+        </section>
+
+					</div>
+				</div>
+				<footer id="footer" class="inner">
+<p>Copyright &copy; 2013 - aaapei - <span class="credit">Powered by <a href="http://getpelican.com">Pelican</a></span></p>				</footer>
+			</div>
+		</div>
+	</body>
+</html>
