@@ -1,0 +1,355 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom"><title>I'm aaapei</title><link href="http://aaapei.com/" rel="alternate"></link><link href="http://aaapei.com/atom.xml" rel="self"></link><id>http://aaapei.com/</id><updated>2014-04-19T23:21:00+08:00</updated><entry><title>android中lua脚本的部署</title><link href="http://aaapei.com/blog/2014/04/androidzhong-luajiao-ben-de-bu-shu" rel="alternate"></link><updated>2014-04-19T23:21:00+08:00</updated><author><name>zhengwen</name></author><id>tag:aaapei.com,2014-04-19:blog/2014/04/androidzhong-luajiao-ben-de-bu-shu</id><summary type="html">&lt;p&gt;“愤怒的小鸟”中，lua脚本是运行时部署在应用的data目录，同时做了脚本加密；&lt;br /&gt;
+但是如果你的lua脚本有了模块包，脚本就会有多级目录，而android的data目录下是不允许有子目录；&lt;br /&gt;
+当然，lua脚本也可以在运行时拷贝到外置sd卡中，不过既然放置在不安全的公共目录，就会有被第三方删除或篡改的危险，那么每次启动的时候必须做一次文件校验，同时，也必须对脚本进行加密，避免程序逻辑暴露；  &lt;/p&gt;
+&lt;h3&gt;lua自定义加载器&lt;/h3&gt;
+&lt;p&gt;lua引擎提供了一个自定义加载器，当lua脚本中调用require时，会回调到自定义加载器的CFunction；利用这样特性，可以尝试取消掉脚本的运行时拷贝，而直接从应用的asset资源目录加载；自定义加载器的原理中，云风的blog中有介绍，&lt;a href="http://blog.codingnow.com/2007/04/user_define_lua_loader.html"&gt;以自定义方式加载lua模块&lt;/a&gt;&lt;br /&gt;
+直接贴个代码实现  &lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="k"&gt;void&lt;/span&gt; &lt;span class="nx"&gt;addAssetLuaLoader&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;lua_State&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="nx"&gt;L&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;lua_CFunction&lt;/span&gt; &lt;span class="nx"&gt;func&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="p"&gt;{&lt;/span&gt;
+   &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="o"&gt;!&lt;/span&gt;&lt;span class="nx"&gt;func&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="k"&gt;return&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+
+   &lt;span class="nx"&gt;lua_getglobal&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;L&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;package&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;                   
+   &lt;span class="nx"&gt;lua_getfield&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;L&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;loaders&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;   
+   &lt;span class="nx"&gt;lua_pushcfunction&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;L&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;func&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;  
+   &lt;span class="kr"&gt;int&lt;/span&gt; &lt;span class="nx"&gt;i&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+   &lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt; &lt;span class="nx"&gt;i&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kr"&gt;int&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="nx"&gt;lua_objlen&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;L&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="nx"&gt;i&lt;/span&gt; &lt;span class="o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="o"&gt;--&lt;/span&gt;&lt;span class="nx"&gt;i&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+   &lt;span class="p"&gt;{&lt;/span&gt;
+      &lt;span class="nx"&gt;lua_rawgeti&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;L&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;i&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;    
+      &lt;span class="nx"&gt;lua_rawseti&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;L&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="mi"&gt;3&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;i&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;    
+   &lt;span class="p"&gt;}&lt;/span&gt;
+   &lt;span class="nx"&gt;lua_rawseti&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;L&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+   &lt;span class="nx"&gt;lua_setfield&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;L&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;loaders&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;                       
+   &lt;span class="nx"&gt;lua_pop&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;L&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;在lua引擎启动时，调用&lt;em&gt;addAssetLuaLoader&lt;/em&gt;进行初始化，把你的CFunction加入到到lua的&lt;em&gt;package.loader&lt;/em&gt;表中；&lt;br /&gt;
+其中asset lua  Loader的逻辑是这样的  &lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;    &lt;span class="c1"&gt;//搜索路径&lt;/span&gt;
+    &lt;span class="n"&gt;std&lt;/span&gt;&lt;span class="o"&gt;::&lt;/span&gt;&lt;span class="n"&gt;string&lt;/span&gt; &lt;span class="n"&gt;searchpath&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;?.lua;?/init.lua;&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+   &lt;span class="kt"&gt;size_t&lt;/span&gt; &lt;span class="n"&gt;next&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;searchpath&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;find_first_of&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;;&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+   &lt;span class="k"&gt;do&lt;/span&gt;
+   &lt;span class="p"&gt;{&lt;/span&gt;
+      &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;next&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="n"&gt;std&lt;/span&gt;&lt;span class="o"&gt;::&lt;/span&gt;&lt;span class="n"&gt;string&lt;/span&gt;&lt;span class="o"&gt;::&lt;/span&gt;&lt;span class="n"&gt;npos&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="n"&gt;next&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;searchpath&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;length&lt;/span&gt;&lt;span class="p"&gt;();&lt;/span&gt;
+      &lt;span class="n"&gt;std&lt;/span&gt;&lt;span class="o"&gt;::&lt;/span&gt;&lt;span class="n"&gt;string&lt;/span&gt; &lt;span class="n"&gt;prefix&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;searchpath&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;substr&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;begin&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;next&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;begin&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+      &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;prefix&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="sc"&gt;&amp;#39;.&amp;#39;&lt;/span&gt; &lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class="n"&gt;prefix&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="sc"&gt;&amp;#39;/&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+      &lt;span class="p"&gt;{&lt;/span&gt;
+         &lt;span class="n"&gt;prefix&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;prefix&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;substr&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+      &lt;span class="p"&gt;}&lt;/span&gt;
+      &lt;span class="n"&gt;pos&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;prefix&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;find&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;?&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+      &lt;span class="n"&gt;chunkName&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;prefix&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;replace&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;pos&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;filename&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+      &lt;span class="c1"&gt;//从asset目录读取字节流&lt;/span&gt;
+      &lt;span class="n"&gt;chunk&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt;  &lt;span class="n"&gt;getAssetData&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;chunkName&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="o"&gt;&amp;amp;&lt;/span&gt;&lt;span class="n"&gt;chunkSize&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt; 
+      &lt;span class="k"&gt;if&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;chunk&lt;/span&gt;&lt;span class="p"&gt;){&lt;/span&gt;
+        &lt;span class="k"&gt;break&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+      &lt;span class="p"&gt;}&lt;/span&gt;   
+      &lt;span class="n"&gt;begin&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;next&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+      &lt;span class="n"&gt;next&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;searchpath&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;find_first_of&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;;&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;begin&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+   &lt;span class="p"&gt;}&lt;/span&gt; &lt;span class="k"&gt;while&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;begin&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kt"&gt;int&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="n"&gt;searchpath&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;length&lt;/span&gt;&lt;span class="p"&gt;());&lt;/span&gt;
+
+   &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;chunk&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+   &lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="c1"&gt;// 解开加密lua&lt;/span&gt;
+      &lt;span class="n"&gt;loadencryrtbuffer&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;L&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kt"&gt;char&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="n"&gt;chunk&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kt"&gt;int&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="n"&gt;chunkSize&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;chunkName&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;c_str&lt;/span&gt;&lt;span class="p"&gt;());&lt;/span&gt;
+      &lt;span class="n"&gt;delete&lt;/span&gt; &lt;span class="p"&gt;[]&lt;/span&gt;&lt;span class="n"&gt;chunk&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+   &lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;当lua脚本中调用require时，asset lua loader就会回调得到一个fileName，将filename增补后缀名，转化成完整的asset相对文件路径，读取文件字节流；&lt;br /&gt;
+这段字节流可以直接是经过加密的字节流，也可以是未加密的原始lua脚本，然后通过&lt;em&gt;luaL_loadbuffer&lt;/em&gt;调用执行；&lt;/p&gt;
+&lt;h3&gt;asset资源的读取&lt;/h3&gt;
+&lt;p&gt;android2.3之后，ndk提供了直接操作asset资源的c api，可以在c中直接读取asset文件&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="kt"&gt;unsigned&lt;/span&gt; &lt;span class="kt"&gt;char&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="n"&gt;data&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="c1"&gt;//filename也就是上个代码块中的chunkName，即lua文件在asset的相对目录&lt;/span&gt;
+    &lt;span class="n"&gt;AAsset&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="n"&gt;asset&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;AAssetManager_open&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;gAssetManager&lt;/span&gt; &lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="n"&gt;filename&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;c_str&lt;/span&gt;&lt;span class="p"&gt;(),&lt;/span&gt; &lt;span class="n"&gt;AASSET_MODE_UNKNOWN&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+    &lt;span class="k"&gt;if&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;asset&lt;/span&gt;&lt;span class="p"&gt;){&lt;/span&gt;
+        &lt;span class="kt"&gt;off_t&lt;/span&gt; &lt;span class="n"&gt;fileSize&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;AAsset_getLength&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;asset&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+        &lt;span class="n"&gt;data&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kt"&gt;unsigned&lt;/span&gt; &lt;span class="kt"&gt;char&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="n"&gt;malloc&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;fileSize&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+        &lt;span class="kt"&gt;int&lt;/span&gt; &lt;span class="n"&gt;bytesread&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;AAsset_read&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;asset&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kt"&gt;void&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="n"&gt;data&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;fileSize&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+        &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;size&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+        &lt;span class="p"&gt;{&lt;/span&gt;
+              &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;size&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;bytesread&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+        &lt;span class="p"&gt;}&lt;/span&gt;
+        &lt;span class="n"&gt;AAsset_close&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;asset&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+    &lt;span class="p"&gt;}&lt;/span&gt;
+    &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="n"&gt;data&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;不过lua脚本的位置移动asset目录后，lua脚本常用的代码热更新机制就遇到些许问题，毕竟不可能将热更新代码重新写入到dex文件中；&lt;br /&gt;
+就时候，机可以考虑将lua脚本进行模块化拆分，需要热更新的脚本部署在sd卡中，其他固化在APK的资源包中，随版本更新进行迭代；&lt;br /&gt;
+既然有了自定义加载器，动态代码的热更新实现就简单多了。&lt;/p&gt;</summary><category term="android"></category><category term="lua"></category></entry><entry><title>lua在跨语言环境中的内存泄露</title><link href="http://aaapei.com/blog/2014/02/luazai-kua-yu-yan-huan-jing-zhong-de-nei-cun-xie-lu" rel="alternate"></link><updated>2014-02-19T19:50:00+08:00</updated><author><name>zhengwen</name></author><id>tag:aaapei.com,2014-02-19:blog/2014/02/luazai-kua-yu-yan-huan-jing-zhong-de-nei-cun-xie-lu</id><summary type="html">&lt;p&gt;前段时间在android环境中使用lua,采用的luabridge是luajava,遇到一个内存泄露问题,查了很久,终于定位了;&lt;/p&gt;
+&lt;p&gt;场景是这样的:&lt;br /&gt;
+1:在lua中创建了一个java对象,将jobject指针传递给java;对应在luajava中,即传递了一个luaobject给java;java保存了这个对象;&lt;br /&gt;
+2:在Lua中需要对这个java对象设置一个事件回调,比如说为某个控件setOnClickListener;&lt;br /&gt;
+其中设置的代码是这样的:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="nx"&gt;local&lt;/span&gt; &lt;span class="nx"&gt;viewclick_cb&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="p"&gt;{}&lt;/span&gt;
+&lt;span class="kd"&gt;function&lt;/span&gt; &lt;span class="nx"&gt;viewclick_cb&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;onClick&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;v&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="nx"&gt;self&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="nx"&gt;cb&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;v&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;  
+&lt;span class="nx"&gt;end&lt;/span&gt;
+&lt;span class="nx"&gt;local&lt;/span&gt; &lt;span class="nx"&gt;listenerProxy&lt;/span&gt;  &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nx"&gt;luajava&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;createProxy&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;android.view.View$OnClickListener&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="nx"&gt;viewclick_cb&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;       
+&lt;span class="nx"&gt;javaobjhandler&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="nx"&gt;setOnClickListener&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;ListenerProxy&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;   
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;lua和java交互时,对象生命周期管理分两种情况:&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;1:java对象传递个lua虚拟机,lua虚拟机为java对象创建一个userdata,在globalref中增加一个引用,标记这个java对象正在被使用;同时,为这个userdata设置一个__gc元方法,当lua对象需要被释放时,_gc元方法回调,释放掉java对象的globaref;  &lt;/p&gt;
+&lt;p&gt;2:lua对象传递个java虚拟机,将lua对象放到LUA_REGISTRYINDEX中,调用luaL_ref得到一个引用交给一个java对象;在这个java对象的finalize中调用luaL_unref释放引用;  &lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;单独看,都没有问题,但当这两个策略同时作用时,就可能产生循环引用;&lt;br /&gt;
+比如上述代码中,回调函数中self:cb(v)与上下文相关的场景;&lt;br /&gt;
+java虚拟机和lua虚拟机采取的都是mark-sweep策略,其mark方式都是根节点标记法;两个虚拟机都认为对象存在引用,导致内存泄露;
+这个内存泄露问题在其他语言环境中也应该存在;  &lt;/p&gt;
+&lt;p&gt;最后采取的解决方式,采取云风大神这篇&lt;a href="http://blog.codingnow.com/2007/10/lua_c_object_reference.html"&gt;文章&lt;/a&gt;的思路:&lt;br /&gt;
+事件回调通过消息机制而不是直接引用的方式,回调函数保存在一个全局weak table中;回调函数关联在一个lua对象中,和lua对象生命周期保持一致;回调事件发生时,java通过一个全局的weak table查询回调函数;&lt;/p&gt;</summary><category term="lua"></category><category term="luajava"></category></entry><entry><title>android bitmap tips</title><link href="http://aaapei.com/blog/2014/01/android-bitmap-tips" rel="alternate"></link><updated>2014-01-28T17:30:00+08:00</updated><author><name>zhengwen</name></author><id>tag:aaapei.com,2014-01-28:blog/2014/01/android-bitmap-tips</id><summary type="html">&lt;p&gt;大部分android开发者只知道bitmap再使用之后，需要显式的调用一次bitmap.recycle，回收bitmap内存;  &lt;/p&gt;
+&lt;p&gt;这个观点，在android3.0之后其实已经过时了，android3.0将bitmap所引用的位图资源从native heap移到虚拟机的heap空间，bitmap的生命周期由虚拟机管理，开发者只需要保证在应用中不在持有对bitmap的引用，即可保证不发生内存泄漏；位图资源的内存由GC进行回收；&lt;br /&gt;
+将bitmap的位图内存转移到虚拟机heap后，由于位图资源本身较大，造成gc的概率的增加   &lt;/p&gt;
+&lt;h3&gt;bitmap proxy&lt;/h3&gt;
+&lt;p&gt;在一般的应用场景中，bitmap的引用一般是和imageview关联；当大量imageview持有对bitmap的引用时，虚拟机无法释放bitmap的内存，导致oom；&lt;/p&gt;
+&lt;p&gt;针对这种场景，开发者可以实现一个bitmap的代理类，作为bitmap和imageview的中间层，在imageview不可见时（例如imageview是一个listview的子控件，listview发生滚动/activiy切换到后台），即释放掉对bitamp的引用；当imageview重新可见时，通过代理类重新去加载bitmap，以解耦bitmap和iamgeview的引用关系;   &lt;/p&gt;
+&lt;h3&gt;inBitmap&lt;/h3&gt;
+&lt;p&gt;android在3.0之后新增了一个BitmapFactory.Options.inBitmap开关，加了这个开关之后，bitmapfactory在加载位图时候，会尝试使用inbitmap指向的已分配在heap中位图空间；而不是重新申请一块内存；从而减少了虚拟机最讨厌的短生命周期大内存对象；  不过这个开关有严格的使用场景，即两个bitamp的位图大小必须一致&lt;/p&gt;</summary><category term="android"></category></entry><entry><title>jnlua吐槽</title><link href="http://aaapei.com/blog/2013/12/jnluatu-cao" rel="alternate"></link><updated>2013-12-29T00:00:00+08:00</updated><author><name>zhengwen</name></author><id>tag:aaapei.com,2013-12-29:blog/2013/12/jnluatu-cao</id><summary type="html">&lt;p&gt;纯吐槽 &lt;/p&gt;
+&lt;p&gt;前端时间对luabridge的性能问题很头痛,后来找到号称jni实现的&lt;em&gt;jnlua&lt;/em&gt;, 从原理上说,如果luabridge在动态绑定的逻辑可以只在jni上完成,而不走虚拟机的解释器,性能上可以提升很多,在jnlua的项目主页上还找到了,5.1的android移植版，于是打开beyondcompare迅速合并了个5.2的android移植版，实际运行的时候直接秒退了.翻了下代码,一口老血.   &lt;/p&gt;
+&lt;p&gt;jnlua号称jni实现，但事实上动态绑定的几个api还是通过java实现，由于luabridge的瓶颈基本都在反射那块，和luajava相比，jnlua没有性能上的优势,算是典型的重复造轮子  &lt;/p&gt;
+&lt;p&gt;至于所谓的5.1的android移植版,它为了兼容android的lib不支持的java.beans.BeanInfo类，删除了相关的JavaModule，DefaultJavaReflector两个类,代价是android移植版不再支持了lua脚本中调用java！  &lt;/p&gt;
+&lt;p&gt;口怕的是，jnlua的项目主页竟然还加了移植版的链接，  &lt;/p&gt;
+&lt;p&gt;虽然应该支持开源项目，但是挂这样一个半成品项目在主页上，还是要说一句  你在外面这么屌，luajava知道吗  &lt;/p&gt;
+&lt;p&gt;各位想用jnlua的android同学，如果非要用jnlua的话，移植的时候其实是可以引入一些第三方库的，比如&lt;em&gt;openbeans&lt;/em&gt;  &lt;/p&gt;
+&lt;p&gt;jnlua的代码结构较luajava层次分的更加清晰一些，api粒度更细;
+好吧，个人觉得这种基础架构型的bridge，性能才是决定是否使用的第一要素，继续用luajava吧&lt;/p&gt;</summary><category term="lua"></category></entry><entry><title>微信的jsbridge实现</title><link href="http://aaapei.com/blog/2013/12/wei-xin-de-jsbridgeshi-xian" rel="alternate"></link><updated>2013-12-11T19:50:00+08:00</updated><author><name>zhengwen</name></author><id>tag:aaapei.com,2013-12-11:blog/2013/12/wei-xin-de-jsbridgeshi-xian</id><summary type="html">&lt;p&gt;微信公共平台开放了几个操作webview界面的js接口&lt;br /&gt;
+示例代码是这样的:  &lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="nx"&gt;WeixinJSBridge&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;invoke&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;getNetworkType&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,{},&lt;/span&gt;
+    &lt;span class="kd"&gt;function&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;e&lt;/span&gt;&lt;span class="p"&gt;){&lt;/span&gt;
+        &lt;span class="nx"&gt;WeixinJSBridge&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;log&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;e&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;err_msg&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+    &lt;span class="p"&gt;});&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;android的webview api中有开放过一个&lt;em&gt;addJavaScriptInterface&lt;/em&gt;函数,这个函数的作用是在页面的Window中注入一个JS对象&lt;br /&gt;
+如果你的应用中使用了这个api,建议先看一下国内安全领域第一人黑哥的这篇文章&lt;a href="http://hi.baidu.com/hi_heige/item/9baf99f063331d58c9f3379a"&gt;android webview 漏洞背后的节操&lt;/a&gt;,  &lt;/p&gt;
+&lt;p&gt;没耐心的同学直接看结尾的解决方案吧:&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;第1个方案是设置信任域，这个问题其实是不太靠谱的，在我之前在kcon里演讲《去年跨过的浏览器》里有很多信任域带来的安全问题&lt;br /&gt;
+ 第2个方案是使用 shouldOverrideUrlLoading 的方式，据说这个方案还是比较靠谱的，只是可能代价比较大&lt;br /&gt;
+ 第3个方案就是教育那些开发商，没有必要用webview的时候就不要用，不要java与js交互就不要用  &lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;不过,按黑哥这篇文章的想法,这个漏洞危险等级很低,可以无视之&lt;br /&gt;
+暂时把安全问题放一边,Js对象的注入,对函数的参数类型有严格要求,它只能传递基本数据类型以及JSON&lt;br /&gt;
+但微信的JsApi中,参数三是一个函数对象,那他是如果做到的呢&lt;/p&gt;
+&lt;h3&gt;逆向&lt;/h3&gt;
+&lt;p&gt;Android原生的机制既然不能支持函数对象的传递,于是猜测微信是否会对原始的api做了一层包装;&lt;br /&gt;
+先下载weixin.apk,反编译,全局搜索"WeixinJSBrige",在assets目录找到一个wxjs.js;不知什么原因,微信团队没有对这个js文件进行代码混淆;&lt;/p&gt;
+&lt;h3&gt;wxjs.js分析&lt;/h3&gt;
+&lt;p&gt;wxjs.js有两千多行的代码,不过不必担心,其中有一大部分是jquery的实现&lt;br /&gt;
+直接找我们想要的,先看'WeixinJSBridge'  &lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;   &lt;span class="n"&gt;var&lt;/span&gt; &lt;span class="n"&gt;__WeixinJSBridge&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+               &lt;span class="c1"&gt;// public&lt;/span&gt;
+        &lt;span class="nl"&gt;invoke:&lt;/span&gt;&lt;span class="n"&gt;_call&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+        &lt;span class="nl"&gt;call:&lt;/span&gt;&lt;span class="n"&gt;_call&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+        &lt;span class="nl"&gt;on:&lt;/span&gt;&lt;span class="n"&gt;_on&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+        &lt;span class="nl"&gt;env:&lt;/span&gt;&lt;span class="n"&gt;_env&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+        &lt;span class="nl"&gt;log:&lt;/span&gt;&lt;span class="n"&gt;_log&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+       &lt;span class="nl"&gt;_fetchQueue:&lt;/span&gt; &lt;span class="n"&gt;_fetchQueue&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+        &lt;span class="nl"&gt;_handleMessageFromWeixin:&lt;/span&gt; &lt;span class="n"&gt;_handleMessageFromWeixin&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+   &lt;span class="p"&gt;};&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;看到方法名可以猜测微信JSBridge的大概的逻辑了;应该是消息队列处理机制,&lt;/p&gt;
+&lt;p&gt;具体还是看一下微信是怎么实现的&lt;/p&gt;
+&lt;p&gt;先看_call方法的逻辑:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;  &lt;span class="kd"&gt;function&lt;/span&gt; &lt;span class="nx"&gt;_call&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;func&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="nx"&gt;params&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="nx"&gt;callback&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+        &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="o"&gt;!&lt;/span&gt;&lt;span class="nx"&gt;func&lt;/span&gt; &lt;span class="o"&gt;||&lt;/span&gt; &lt;span class="k"&gt;typeof&lt;/span&gt; &lt;span class="nx"&gt;func&lt;/span&gt; &lt;span class="o"&gt;!==&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;string&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+            &lt;span class="k"&gt;return&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+        &lt;span class="p"&gt;};&lt;/span&gt;
+        &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;typeof&lt;/span&gt; &lt;span class="nx"&gt;params&lt;/span&gt; &lt;span class="o"&gt;!==&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;object&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+            &lt;span class="nx"&gt;params&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;{};&lt;/span&gt;
+        &lt;span class="p"&gt;};&lt;/span&gt;
+
+        &lt;span class="kd"&gt;var&lt;/span&gt; &lt;span class="nx"&gt;callbackID&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;_callback_count&lt;/span&gt;&lt;span class="o"&gt;++&lt;/span&gt;&lt;span class="p"&gt;).&lt;/span&gt;&lt;span class="nx"&gt;toString&lt;/span&gt;&lt;span class="p"&gt;();&lt;/span&gt;
+
+        &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;typeof&lt;/span&gt; &lt;span class="nx"&gt;callback&lt;/span&gt; &lt;span class="o"&gt;===&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;function&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+          &lt;span class="nx"&gt;_callback_map&lt;/span&gt;&lt;span class="cp"&gt;[&lt;/span&gt;&lt;span class="nx"&gt;callbackID&lt;/span&gt;&lt;span class="cp"&gt;]&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nx"&gt;callback&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+        &lt;span class="p"&gt;};&lt;/span&gt;
+
+        &lt;span class="kd"&gt;var&lt;/span&gt; &lt;span class="nx"&gt;msgObj&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;func&amp;#39;&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="nx"&gt;func&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;params&amp;#39;&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="nx"&gt;params&lt;/span&gt;&lt;span class="p"&gt;};&lt;/span&gt;
+        &lt;span class="nx"&gt;msgObj&lt;/span&gt;&lt;span class="cp"&gt;[&lt;/span&gt;&lt;span class="nx"&gt;_MESSAGE_TYPE&lt;/span&gt;&lt;span class="cp"&gt;]&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;call&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;        
+        &lt;span class="nx"&gt;msgObj&lt;/span&gt;&lt;span class="cp"&gt;[&lt;/span&gt;&lt;span class="nx"&gt;_CALLBACK_ID&lt;/span&gt;&lt;span class="cp"&gt;]&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nx"&gt;callbackID&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+
+        &lt;span class="nx"&gt;_sendMessage&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;JSON&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;stringify&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;msgObj&lt;/span&gt;&lt;span class="p"&gt;));&lt;/span&gt;
+    &lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;callbackId是一个自增的ID,_call调用时候将id和回调函数通过_sendMessage存在队列中,&lt;/p&gt;
+&lt;p&gt;再看一下_sendMessage的逻辑:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;       &lt;span class="kd"&gt;function&lt;/span&gt; &lt;span class="nx"&gt;_sendMessage&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;message&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+        &lt;span class="nx"&gt;_sendMessageQueue&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;push&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;message&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+        &lt;span class="nx"&gt;_readyMessageIframe&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;src&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nx"&gt;_CUSTOM_PROTOCOL_SCHEME&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;://&amp;#39;&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="nx"&gt;_QUEUE_HAS_MESSAGE&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+      &lt;span class="p"&gt;};&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;事件队列和之前猜测的一样; 但是,为什么会构造一个url? 难道微信没有用addJavaScriptInterface&lt;/p&gt;
+&lt;p&gt;既然有sendMessage,其他地方必然有一个取消息的逻辑:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;      &lt;span class="c1"&gt;//取出队列中的消息，并清空接收队列&lt;/span&gt;
+    &lt;span class="kd"&gt;function&lt;/span&gt; &lt;span class="nx"&gt;_fetchQueue&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+        &lt;span class="kd"&gt;var&lt;/span&gt; &lt;span class="nx"&gt;messageQueueString&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nx"&gt;JSON&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;stringify&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;_sendMessageQueue&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+        &lt;span class="nx"&gt;_sendMessageQueue&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="cp"&gt;[]&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+        &lt;span class="c1"&gt;//window.JsApi &amp;amp;&amp;amp; JsApi.keep_setReturnValue &amp;amp;&amp;amp; window.JsApi.keep_setReturnValue(&amp;#39;SCENE_FETCHQUEUE&amp;#39;, messageQueueString);&lt;/span&gt;
+        &lt;span class="nx"&gt;_setResultValue&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;SCENE_FETCHQUEUE&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;messageQueueString&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+        &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="nx"&gt;messageQueueString&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+    &lt;span class="p"&gt;};&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;JavaScript调用java的逻辑最终在_setResultValue中&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;    &lt;span class="kd"&gt;function&lt;/span&gt; &lt;span class="nx"&gt;_setResultValue&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;scene&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;result&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+        &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;result&lt;/span&gt; &lt;span class="o"&gt;===&lt;/span&gt; &lt;span class="kc"&gt;undefined&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+            &lt;span class="nx"&gt;result&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;dummy&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+        &lt;span class="p"&gt;}&lt;/span&gt;
+        &lt;span class="nx"&gt;_setResultIframe&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;src&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;weixin://private/setresult/&amp;#39;&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="nx"&gt;scene&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;&amp;amp;&amp;#39;&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="nx"&gt;base64encode&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;UTF8&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;encode&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;result&lt;/span&gt;&lt;span class="p"&gt;));&lt;/span&gt;
+        &lt;span class="c1"&gt;//_setResultIframe.src = &amp;#39;weixin://private/setresult/&amp;#39; + scene + &amp;#39;&amp;amp;&amp;#39; + window.btoa(result);&lt;/span&gt;
+    &lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;又出现一个_setResultIfrmae,寻迹查找,最后找到了这个东西&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;    &lt;span class="c1"&gt;//创建ifram的准备队列&lt;/span&gt;
+    &lt;span class="kd"&gt;function&lt;/span&gt; &lt;span class="nx"&gt;_createQueueReadyIframe&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;doc&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+        &lt;span class="c1"&gt;// _setResultIframe 的初始化&lt;/span&gt;
+        &lt;span class="nx"&gt;_setResultIframe&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nx"&gt;doc&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;createElement&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;iframe&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+        &lt;span class="nx"&gt;_setResultIframe&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;id&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;__WeixinJSBridgeIframe_SetResult&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+        &lt;span class="nx"&gt;_setResultIframe&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;style&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;display&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;none&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+        &lt;span class="nx"&gt;doc&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;documentElement&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;appendChild&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;_setResultIframe&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+
+        &lt;span class="nx"&gt;_readyMessageIframe&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nx"&gt;doc&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;createElement&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;iframe&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+        &lt;span class="nx"&gt;_readyMessageIframe&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;id&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;__WeixinJSBridgeIframe&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+        &lt;span class="nx"&gt;_readyMessageIframe&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;style&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;display&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;none&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+        &lt;span class="nx"&gt;doc&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;documentElement&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;appendChild&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;_readyMessageIframe&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+        &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="nx"&gt;_readyMessageIframe&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+    &lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;看到这儿明白了,启鹅的工程师为了规避js注入的安全问题,没有采用JS注入的方式,而是采取的黑哥的方案2:&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;shouldOverrideUrl&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;在需要js调用native api的时候,js在页面中创建一个不可见的iframe,设置这个iframe的地址;&lt;/p&gt;
+&lt;p&gt;在android代码拦截这个url来实现java和js参数;&lt;/p&gt;
+&lt;p&gt;微信的这个js框架为所有的js函数做了一个统一的入口,&lt;/p&gt;
+&lt;p&gt;所以编码代码不大,不失为一个好方法&lt;/p&gt;
+&lt;p&gt;最后瞄一下java调用的js的入口,那就是标准的调用方式了;&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;  &lt;span class="kd"&gt;function&lt;/span&gt; &lt;span class="nx"&gt;_handleMessageFromWeixin&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;message&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+      &lt;span class="kd"&gt;var&lt;/span&gt; &lt;span class="nx"&gt;msgWrap&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nx"&gt;message&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+
+      &lt;span class="k"&gt;switch&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;msgWrap&lt;/span&gt;&lt;span class="cp"&gt;[&lt;/span&gt;&lt;span class="nx"&gt;_MESSAGE_TYPE&lt;/span&gt;&lt;span class="cp"&gt;]&lt;/span&gt;&lt;span class="p"&gt;){&lt;/span&gt;
+        &lt;span class="k"&gt;case&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;callback&amp;#39;&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;
+        &lt;span class="p"&gt;{&lt;/span&gt;       
+          &lt;span class="k"&gt;if&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;typeof&lt;/span&gt; &lt;span class="nx"&gt;msgWrap&lt;/span&gt;&lt;span class="cp"&gt;[&lt;/span&gt;&lt;span class="nx"&gt;_CALLBACK_ID&lt;/span&gt;&lt;span class="cp"&gt;]&lt;/span&gt; &lt;span class="o"&gt;===&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;string&amp;#39;&lt;/span&gt; &lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class="k"&gt;typeof&lt;/span&gt; &lt;span class="nx"&gt;_callback_map&lt;/span&gt;&lt;span class="cp"&gt;[&lt;/span&gt;&lt;span class="nx"&gt;msgWrap&lt;/span&gt;&lt;span class="err"&gt;[&lt;/span&gt;&lt;span class="nx"&gt;_CALLBACK_ID&lt;/span&gt;&lt;span class="cp"&gt;]&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;===&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;function&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;){&lt;/span&gt;
+            &lt;span class="kd"&gt;var&lt;/span&gt; &lt;span class="nx"&gt;ret&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nx"&gt;_callback_map&lt;/span&gt;&lt;span class="cp"&gt;[&lt;/span&gt;&lt;span class="nx"&gt;msgWrap&lt;/span&gt;&lt;span class="err"&gt;[&lt;/span&gt;&lt;span class="nx"&gt;_CALLBACK_ID&lt;/span&gt;&lt;span class="cp"&gt;]&lt;/span&gt;&lt;span class="p"&gt;](&lt;/span&gt;&lt;span class="nx"&gt;msgWrap&lt;/span&gt;&lt;span class="cp"&gt;[&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;__params&amp;#39;&lt;/span&gt;&lt;span class="cp"&gt;]&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt; &lt;span class="c1"&gt;//根据id进行函数 回调&lt;/span&gt;
+            &lt;span class="k"&gt;delete&lt;/span&gt; &lt;span class="nx"&gt;_callback_map&lt;/span&gt;&lt;span class="cp"&gt;[&lt;/span&gt;&lt;span class="nx"&gt;msgWrap&lt;/span&gt;&lt;span class="err"&gt;[&lt;/span&gt;&lt;span class="nx"&gt;_CALLBACK_ID&lt;/span&gt;&lt;span class="cp"&gt;]&lt;/span&gt;&lt;span class="p"&gt;];&lt;/span&gt; &lt;span class="c1"&gt;// 保证调用一次,删除函数&lt;/span&gt;
+            &lt;span class="c1"&gt;//window.JsApi &amp;amp;&amp;amp; JsApi.keep_setReturnValue &amp;amp;&amp;amp; window.JsApi.keep_setReturnValue(&amp;#39;SCENE_HANDLEMSGFROMWX&amp;#39;, JSON.stringify(ret));&lt;/span&gt;
+            &lt;span class="nx"&gt;_setResultValue&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;SCENE_HANDLEMSGFROMWX&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;JSON&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;stringify&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;ret&lt;/span&gt;&lt;span class="p"&gt;));&lt;/span&gt;
+            &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="nx"&gt;JSON&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;stringify&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;ret&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+          &lt;span class="p"&gt;}&lt;/span&gt;
+        &lt;span class="c1"&gt;//window.JsApi &amp;amp;&amp;amp; JsApi.keep_setReturnValue &amp;amp;&amp;amp; window.JsApi.keep_setReturnValue(&amp;#39;SCENE_HANDLEMSGFROMWX&amp;#39;, JSON.stringify({&amp;#39;__err_code&amp;#39;:&amp;#39;cb404&amp;#39;}));&lt;/span&gt;
+        &lt;span class="nx"&gt;_setResultValue&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;SCENE_HANDLEMSGFROMWX&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;JSON&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;stringify&lt;/span&gt;&lt;span class="p"&gt;({&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;__err_code&amp;#39;&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;cb404&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;}));&lt;/span&gt;
+          &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="nx"&gt;JSON&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;stringify&lt;/span&gt;&lt;span class="p"&gt;({&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;__err_code&amp;#39;&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;cb404&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;});&lt;/span&gt;          
+        &lt;span class="p"&gt;}&lt;/span&gt;
+        &lt;span class="k"&gt;break&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+        &lt;span class="p"&gt;.....&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;android调用:webview.loadurl("javascript:WeixinJsBridge._handleMessageFromWeixin")&lt;/p&gt;</summary><category term="android"></category><category term="微信"></category></entry><entry><title>luajava性能优化</title><link href="http://aaapei.com/blog/2013/12/luajavaxing-neng-you-hua" rel="alternate"></link><updated>2013-12-02T20:20:00+08:00</updated><author><name>zhengwen</name></author><id>tag:aaapei.com,2013-12-02:blog/2013/12/luajavaxing-neng-you-hua</id><summary type="html">&lt;p&gt;最近在做一个lua的android项目,对于lua的生态环境完全陌生,所以选用了个文档资料最全的lua bridge:&lt;em&gt;luajava&lt;/em&gt;&lt;br /&gt;
+luajava目前只支持到lua5.1,不过升级到5.2困难不大,主要是一些宏开关以及静态变量;然而实际运行的时候发现卡的很不行,ui频繁掉祯,profile后发现90%+的cpu耗时在luajava中  &lt;/p&gt;
+&lt;p&gt;看了一下luajava本身代码量不大;索性就追了一下,luajava的native层就一个luajava.c,java层,除了LuaJavaApi.java,其他java类都是Value Object&lt;/p&gt;
+&lt;h3&gt;lua逻辑分析&lt;/h3&gt;
+&lt;p&gt;先看lua创建java object的代码,luajava.c中&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="kt"&gt;int&lt;/span&gt; &lt;span class="nf"&gt;javaNewInstance&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt; &lt;span class="n"&gt;lua_State&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="n"&gt;L&lt;/span&gt; &lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="p"&gt;{&lt;/span&gt;     
+    &lt;span class="c1"&gt;//some code …..&lt;/span&gt;
+    &lt;span class="n"&gt;method&lt;/span&gt;  &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;javaEnv&lt;/span&gt; &lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="n"&gt;GetStaticMethodID&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt; &lt;span class="n"&gt;javaEnv&lt;/span&gt; &lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;luajava_api_class&lt;/span&gt; &lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;javaNewInstance&amp;quot;&lt;/span&gt; &lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;(ILjava/lang/String;)I&amp;quot;&lt;/span&gt; &lt;span class="p"&gt;);&lt;/span&gt;
+     &lt;span class="c1"&gt;//先调用java层创建javaobject&lt;/span&gt;
+    &lt;span class="n"&gt;javaClassName&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;javaEnv&lt;/span&gt; &lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="n"&gt;NewStringUTF&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt; &lt;span class="n"&gt;javaEnv&lt;/span&gt; &lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;className&lt;/span&gt; &lt;span class="p"&gt;);&lt;/span&gt;
+    &lt;span class="n"&gt;ret&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;javaEnv&lt;/span&gt; &lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="n"&gt;CallStaticIntMethod&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt; &lt;span class="n"&gt;javaEnv&lt;/span&gt; &lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;luajava_api_class&lt;/span&gt; &lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;method&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;jint&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="n"&gt;stateIndex&lt;/span&gt; &lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;javaClassName&lt;/span&gt; &lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Java中的newInstance代码是这样的:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="n"&gt;public&lt;/span&gt; &lt;span class="k"&gt;static&lt;/span&gt; &lt;span class="kt"&gt;int&lt;/span&gt; &lt;span class="nf"&gt;javaNewInstance&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kt"&gt;int&lt;/span&gt; &lt;span class="n"&gt;luaState&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;String&lt;/span&gt; &lt;span class="n"&gt;className&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="n"&gt;throws&lt;/span&gt; &lt;span class="n"&gt;LuaException&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+     &lt;span class="n"&gt;LuaState&lt;/span&gt; &lt;span class="n"&gt;L&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;LuaStateFactory&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;getExistingState&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;luaState&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+    &lt;span class="n"&gt;synchronized&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;L&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+            &lt;span class="n"&gt;Class&lt;/span&gt; &lt;span class="n"&gt;clazz&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+            &lt;span class="n"&gt;try&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+                &lt;span class="n"&gt;clazz&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;Class&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;forName&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;className&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+             &lt;span class="p"&gt;}&lt;/span&gt; &lt;span class="n"&gt;catch&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;ClassNotFoundException&lt;/span&gt; &lt;span class="n"&gt;e&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+                 &lt;span class="n"&gt;throw&lt;/span&gt; &lt;span class="n"&gt;new&lt;/span&gt; &lt;span class="n"&gt;LuaException&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;e&lt;/span&gt;&lt;span class="p"&gt;);}&lt;/span&gt;
+            &lt;span class="n"&gt;bject&lt;/span&gt; &lt;span class="n"&gt;ret&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;getObjInstance&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;L&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;clazz&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+            &lt;span class="n"&gt;L&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;pushJavaObject&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;ret&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+            &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+    &lt;span class="p"&gt;}&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;getObjInstance的逻辑暂时不论,先看L.pushjavaObject; 最终通过jni调用luajava.c中的 pushJavaObject,没错,是luajava.c中!!!  &lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="kr"&gt;int&lt;/span&gt; &lt;span class="nx"&gt;pushJavaObject&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt; &lt;span class="nx"&gt;lua_State&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="nx"&gt;L&lt;/span&gt; &lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;jobject&lt;/span&gt; &lt;span class="nx"&gt;javaObject&lt;/span&gt; &lt;span class="p"&gt;){&lt;/span&gt;
+    &lt;span class="c1"&gt;//创建userdata略&lt;/span&gt;
+    &lt;span class="cm"&gt;/* pushes the __index metamethod */&lt;/span&gt;
+    &lt;span class="nx"&gt;lua_pushstring&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt; &lt;span class="nx"&gt;L&lt;/span&gt; &lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;__index&amp;quot;&lt;/span&gt; &lt;span class="p"&gt;);&lt;/span&gt;
+    &lt;span class="nx"&gt;lua_pushcfunction&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt; &lt;span class="nx"&gt;L&lt;/span&gt; &lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="o"&gt;&amp;amp;&lt;/span&gt;&lt;span class="nx"&gt;objectIndex&lt;/span&gt; &lt;span class="p"&gt;);&lt;/span&gt;   &lt;span class="nx"&gt;lua_rawset&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt; &lt;span class="nx"&gt;L&lt;/span&gt; &lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="mi"&gt;3&lt;/span&gt; &lt;span class="p"&gt;);&lt;/span&gt;
+    &lt;span class="nx"&gt;lua_rawset&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt; &lt;span class="nx"&gt;L&lt;/span&gt; &lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="mi"&gt;3&lt;/span&gt; &lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;这儿的逻辑是,luajava创建的javaobject,对应的userdata的__index元方法是objectIndex,任何方法的调用统一到objectIndex,最终的调用关系到LuaJavaApi.java中的objectIndex… 是不是特别绕..  &lt;/p&gt;
+&lt;p&gt;luajava为了提高效率,将类创建\方法查找的逻辑全部放在java层,但是类创建/方法查找又需要将结果通过jni放回lua stack中!!  &lt;/p&gt;
+&lt;p&gt;luajava所有的cpu耗时又有70%的耗时在objectIndex,再看一下java层中的objectIndex代码  &lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="n"&gt;public&lt;/span&gt; &lt;span class="k"&gt;static&lt;/span&gt; &lt;span class="kt"&gt;int&lt;/span&gt; &lt;span class="nf"&gt;objectIndex&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kt"&gt;int&lt;/span&gt; &lt;span class="n"&gt;luaState&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;Object&lt;/span&gt; &lt;span class="n"&gt;obj&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;String&lt;/span&gt; &lt;span class="n"&gt;methodName&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="n"&gt;throws&lt;/span&gt; &lt;span class="n"&gt;LuaException&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+     &lt;span class="c1"&gt;//some code&lt;/span&gt;
+     &lt;span class="n"&gt;Method&lt;/span&gt;&lt;span class="p"&gt;[]&lt;/span&gt; &lt;span class="n"&gt;methods&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;clazz&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;getMethods&lt;/span&gt;&lt;span class="p"&gt;();&lt;/span&gt;
+     &lt;span class="n"&gt;Method&lt;/span&gt; &lt;span class="n"&gt;method&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;null&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+    &lt;span class="c1"&gt;// gets method and arguments&lt;/span&gt;
+    &lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kt"&gt;int&lt;/span&gt; &lt;span class="n"&gt;i&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="n"&gt;i&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&lt;/span&gt; &lt;span class="n"&gt;methods&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;length&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="n"&gt;i&lt;/span&gt;&lt;span class="o"&gt;++&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+        &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="o"&gt;!&lt;/span&gt;&lt;span class="n"&gt;methods&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;i&lt;/span&gt;&lt;span class="p"&gt;].&lt;/span&gt;&lt;span class="n"&gt;getName&lt;/span&gt;&lt;span class="p"&gt;().&lt;/span&gt;&lt;span class="n"&gt;equals&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;methodName&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+            &lt;span class="k"&gt;continue&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+         &lt;span class="n"&gt;Class&lt;/span&gt;&lt;span class="p"&gt;[]&lt;/span&gt; &lt;span class="n"&gt;parameters&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;methods&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;i&lt;/span&gt;&lt;span class="p"&gt;].&lt;/span&gt;&lt;span class="n"&gt;getParameterTypes&lt;/span&gt;&lt;span class="p"&gt;();&lt;/span&gt;
+         &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;parameters&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;length&lt;/span&gt; &lt;span class="o"&gt;!=&lt;/span&gt; &lt;span class="n"&gt;top&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+            &lt;span class="k"&gt;continue&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+         &lt;span class="n"&gt;boolean&lt;/span&gt; &lt;span class="n"&gt;okMethod&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nb"&gt;true&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+        &lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kt"&gt;int&lt;/span&gt; &lt;span class="n"&gt;j&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="n"&gt;j&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&lt;/span&gt; &lt;span class="n"&gt;parameters&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;length&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="n"&gt;j&lt;/span&gt;&lt;span class="o"&gt;++&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+            &lt;span class="n"&gt;try&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+                 &lt;span class="n"&gt;objs&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;j&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;compareTypes&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;L&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;parameters&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;j&lt;/span&gt;&lt;span class="p"&gt;],&lt;/span&gt; &lt;span class="n"&gt;j&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+            &lt;span class="p"&gt;}&lt;/span&gt; &lt;span class="n"&gt;catch&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;Exception&lt;/span&gt; &lt;span class="n"&gt;e&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+                &lt;span class="n"&gt;okMethod&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nb"&gt;false&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+                &lt;span class="k"&gt;break&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+            &lt;span class="p"&gt;}&lt;/span&gt;
+        &lt;span class="p"&gt;}&lt;/span&gt;
+    &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;okMethod&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+        &lt;span class="n"&gt;method&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;methods&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;i&lt;/span&gt;&lt;span class="p"&gt;];&lt;/span&gt;
+    &lt;span class="p"&gt;}&lt;/span&gt;
+ &lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;由于c和lua的stack中没有传递参数个数,加上java和lua的对象类型没有一一对应;  luajava的做法是先通过getmethods获取所有同名方法,然后compareTypes将method的参数类型逐个取出与lua stack中的参数比较(又是一堆jni操作);  &lt;/p&gt;
+&lt;h3&gt;性能优化&lt;/h3&gt;
+&lt;p&gt;确定原因后,就可以进行性能优化, 
+1. 首先,在jni层将常用的method static化
+2. 其次,compareTypes之前先确定是否有同名方法,java方法无重载时候跳过compareTypes逻辑&lt;br /&gt;
+优化之后测试,效率还是远远不能达到产品化的需求;getmethods的cpu耗时还是很高,因此必须做cache;  但是由于前面提到的参数问题,在objectIndex中不能唯一确定方法签名;这儿有两个方法:&lt;br /&gt;
+1. 牺牲编码效率,lua中调用java method,通过类似jni调用方式,将方法签名一并带进来,objectIndex解析形成正确的方法签名
+2. 牺牲java的方法重载,约定java class不做重载方法&lt;/p&gt;
+&lt;p&gt;博主选的是方法2..原因是项目中交互很多,但是调用的class有限  做cache的逻辑基本上同java jit,热点代码检测&lt;br /&gt;
+优化之后,勉强能达到产品化的性能要求;不过由于luajava的机制问题,优化的点基本到头了;&lt;/p&gt;
+&lt;h3&gt;jnlua&lt;/h3&gt;
+&lt;p&gt;如果对lua c api的android开发者,不建议使用luajava,而使用&lt;a href="https://code.google.com/p/jnlua/"&gt;jnlua&lt;/a&gt;,纯jni实现,原理上性能应该会比luajava高一头  &lt;/p&gt;
+&lt;p&gt;jnlua分两个版本,0.9支持lua 5.2,1.0支持lua5.2,0.9已经移植到android平台,1.0暂无(作者在wiki中说明未来会移植)&lt;br /&gt;
+缺点是文档很少,有时间我再说说jnlua&lt;/p&gt;</summary><category term="lua"></category><category term="android"></category></entry></feed>
