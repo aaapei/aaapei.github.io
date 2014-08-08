@@ -15,7 +15,7 @@
 
                 <meta property="og:type" content="article"/>
                 <meta property="og:title" content="lua在跨语言环境中的内存泄露"/>
-                <meta property="og:url" content="http://aaapei.com/blog/2014/02/luazai-kua-yu-yan-huan-jing-zhong-de-nei-cun-xie-lu"/>
+                <meta property="og:url" content="http://blog.aaapei.com/blog/2014/02/luazai-kua-yu-yan-huan-jing-zhong-de-nei-cun-xie-lu"/>
                 <meta property="og:description" content="前段时间在android环境中使用lua,采用的luabridge是luajava,遇到一个内存泄露问题,查了很久,终于定位了; 场景是这样的: 1:在lua中创建了一个java对象,将jobject指针传递给java;对应在luajava中,即传递了一个luaobject给java;java保存了这个对象; 2:在Lua中需要对这个java对象设置一个事件回调,比如说为某个控件setOnClickListener; 其中设置的代码是这样的: local viewclick_cb={} function viewclick_cb.onClick(v) self:cb(v) end local listenerProxy = luajava.createProxy('android.view.View$OnClickListener',viewclick_cb) javaobjhandler:setOnClickListener(ListenerProxy) lua和java交互时,对象生命周期管理分两种情况: 1:java对象传递个lua虚拟机,lua虚拟机为java对象创建一个userdata,在globalref中增加一个引用,标记这个java对象正在被使用;同时,为这个userdata设置一个__gc元方法,当lua对象需要被释放时,_gc元方法回调,释放掉java对象的globaref ..."/>
                 <meta name="description" content="前段时间在android环境中使用lua,采用的luabridge是luajava,遇到一个内存泄露问题,查了很久,终于定位了; 场景是这样的: 1:在lua中创建了一个java对象,将jobject指针传递给java;对应在luajava中,即传递了一个luaobject给java;java保存了这个对象; 2:在Lua中需要对这个java对象设置一个事件回调,比如说为某个控件setOnClickListener; 其中设置的代码是这样的: local viewclick_cb={} function viewclick_cb.onClick(v) self:cb(v) end local listenerProxy = luajava.createProxy('android.view.View$OnClickListener',viewclick_cb) javaobjhandler:setOnClickListener(ListenerProxy) lua和java交互时,对象生命周期管理分两种情况: 1:java对象传递个lua虚拟机,lua虚拟机为java对象创建一个userdata,在globalref中增加一个引用,标记这个java对象正在被使用;同时,为这个userdata设置一个__gc元方法,当lua对象需要被释放时,_gc元方法回调,释放掉java对象的globaref ...">
 
@@ -24,9 +24,9 @@
 
 
         <link rel="canonical" href="">
-        <link href="http://aaapei.com/favicon.png" rel="shortcut icon">
-        <link href="http://aaapei.com/theme/css/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
-        <link href="http://aaapei.com/theme/css/pygments.css" media="screen, projection" rel="stylesheet" type="text/css">
+        <link href="http://blog.aaapei.com/favicon.png" rel="shortcut icon">
+        <link href="http://blog.aaapei.com/theme/css/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+        <link href="http://blog.aaapei.com/theme/css/pygments.css" media="screen, projection" rel="stylesheet" type="text/css">
 
         <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
         <link href="//fonts.googleapis.com/css?family=Open+Sans:400italic,400,700" rel='stylesheet' type='text/css'>
@@ -58,23 +58,23 @@
 
 <hgroup>
 	<br/>
-	<h1><a href="http://aaapei.com/">I'm aaapei</a></h1>
+	<h1><a href="http://blog.aaapei.com/">I'm aaapei</a></h1>
     <h3>少年去游荡</h3>
 </hgroup>
 <nav id="main-nav">
 
 <ul class="main-navigation">
-	        <li><a href="http://aaapei.com/.">首页</a></li>
-	        <li><a href="http://aaapei.com/categories">分类</a></li>
-	        <li><a href="http://aaapei.com/blog/tags">标签</a></li>
-	        <li><a href="http://aaapei.com/pages/sui-sui-nian">碎碎念</a></li>
+	        <li><a href="http://blog.aaapei.com/.">首页</a></li>
+	        <li><a href="http://blog.aaapei.com/categories">分类</a></li>
+	        <li><a href="http://blog.aaapei.com/blog/tags">标签</a></li>
+	        <li><a href="http://blog.aaapei.com/pages/sui-sui-nian">碎碎念</a></li>
 </ul></nav>
 
 <nav id="sub-nav">
 	<div class="social">
 			<a class="email" href="mailto:aaapei@gmail.com" title="Email">Email</a>
 		<a class="weibo" href="http://weibo.com/a2pei" title="Weibo">Weibo</a>
-			<a class="rss" href="http://aaapei.com/rss.xml" title="RSS">ATOM</a>
+			<a class="rss" href="http://blog.aaapei.com/rss.xml" title="RSS">ATOM</a>
 	</div>
 <section id="about-me">
   <h2>关于我</h2>
@@ -94,8 +94,8 @@
         <time datetime="2014-02-19T19:50:00.000000" itemprop="datePublished">2014-02-19</time>
     </div>
     <div class="tags">
-        <a href="http://aaapei.com/blog/tags/lua">lua</a> ,         <a href="http://aaapei.com/blog/tags/luajava">luajava</a>     </div>
-</div>                <h1 class="title" itemprop="name"><a href="http://aaapei.com/blog/2014/02/luazai-kua-yu-yan-huan-jing-zhong-de-nei-cun-xie-lu" itemprop="url">lua在跨语言环境中的内存泄露</a></h1>
+        <a href="http://blog.aaapei.com/blog/tags/lua">lua</a> ,         <a href="http://blog.aaapei.com/blog/tags/luajava">luajava</a>     </div>
+</div>                <h1 class="title" itemprop="name"><a href="http://blog.aaapei.com/blog/2014/02/luazai-kua-yu-yan-huan-jing-zhong-de-nei-cun-xie-lu" itemprop="url">lua在跨语言环境中的内存泄露</a></h1>
                 <div class="entry-content" itemprop="articleBody">
                     <p>前段时间在android环境中使用lua,采用的luabridge是luajava,遇到一个内存泄露问题,查了很久,终于定位了;</p>
 <p>场景是这样的:<br />

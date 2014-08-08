@@ -15,7 +15,7 @@
 
                 <meta property="og:type" content="article"/>
                 <meta property="og:title" content="android中lua脚本的部署"/>
-                <meta property="og:url" content="http://aaapei.com/blog/2014/04/androidzhong-luajiao-ben-de-bu-shu"/>
+                <meta property="og:url" content="http://blog.aaapei.com/blog/2014/04/androidzhong-luajiao-ben-de-bu-shu"/>
                 <meta property="og:description" content="“愤怒的小鸟”中，lua脚本是运行时部署在应用的data目录，同时做了脚本加密； 但是如果你的lua脚本有了模块包，脚本就会有多级目录，而android的data目录下是不允许有子目录； 当然，lua脚本也可以在运行时拷贝到外置sd卡中，不过既然放置在不安全的公共目录，就会有被第三方删除或篡改的危险，那么每次启动的时候必须做一次文件校验，同时，也必须对脚本进行加密，避免程序逻辑暴露； lua自定义加载器 lua引擎提供了一个自定义加载器，当lua脚本中调用require时，会回调到自定义加载器的CFunction；利用这样特性，可以尝试取消掉脚本的运行时拷贝，而直接从应用的asset资源目录加载；自定义加载器的原理中，云风的blog中有介绍，以自定义方式加载lua模块 直接贴个代码实现 void addAssetLuaLoader(lua_State *L, lua_CFunction func) { if (!func) return; lua_getglobal(L, "package"); lua_getfield(L, -1, "loaders"); lua_pushcfunction(L, func); int i=0; for ( i ..."/>
                 <meta name="description" content="“愤怒的小鸟”中，lua脚本是运行时部署在应用的data目录，同时做了脚本加密； 但是如果你的lua脚本有了模块包，脚本就会有多级目录，而android的data目录下是不允许有子目录； 当然，lua脚本也可以在运行时拷贝到外置sd卡中，不过既然放置在不安全的公共目录，就会有被第三方删除或篡改的危险，那么每次启动的时候必须做一次文件校验，同时，也必须对脚本进行加密，避免程序逻辑暴露； lua自定义加载器 lua引擎提供了一个自定义加载器，当lua脚本中调用require时，会回调到自定义加载器的CFunction；利用这样特性，可以尝试取消掉脚本的运行时拷贝，而直接从应用的asset资源目录加载；自定义加载器的原理中，云风的blog中有介绍，以自定义方式加载lua模块 直接贴个代码实现 void addAssetLuaLoader(lua_State *L, lua_CFunction func) { if (!func) return; lua_getglobal(L, "package"); lua_getfield(L, -1, "loaders"); lua_pushcfunction(L, func); int i=0; for ( i ...">
 
@@ -24,9 +24,9 @@
 
 
         <link rel="canonical" href="">
-        <link href="http://aaapei.com/favicon.png" rel="shortcut icon">
-        <link href="http://aaapei.com/theme/css/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
-        <link href="http://aaapei.com/theme/css/pygments.css" media="screen, projection" rel="stylesheet" type="text/css">
+        <link href="http://blog.aaapei.com/favicon.png" rel="shortcut icon">
+        <link href="http://blog.aaapei.com/theme/css/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+        <link href="http://blog.aaapei.com/theme/css/pygments.css" media="screen, projection" rel="stylesheet" type="text/css">
 
         <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
         <link href="//fonts.googleapis.com/css?family=Open+Sans:400italic,400,700" rel='stylesheet' type='text/css'>
@@ -58,23 +58,23 @@
 
 <hgroup>
 	<br/>
-	<h1><a href="http://aaapei.com/">I'm aaapei</a></h1>
+	<h1><a href="http://blog.aaapei.com/">I'm aaapei</a></h1>
     <h3>少年去游荡</h3>
 </hgroup>
 <nav id="main-nav">
 
 <ul class="main-navigation">
-	        <li><a href="http://aaapei.com/.">首页</a></li>
-	        <li><a href="http://aaapei.com/categories">分类</a></li>
-	        <li><a href="http://aaapei.com/blog/tags">标签</a></li>
-	        <li><a href="http://aaapei.com/pages/sui-sui-nian">碎碎念</a></li>
+	        <li><a href="http://blog.aaapei.com/.">首页</a></li>
+	        <li><a href="http://blog.aaapei.com/categories">分类</a></li>
+	        <li><a href="http://blog.aaapei.com/blog/tags">标签</a></li>
+	        <li><a href="http://blog.aaapei.com/pages/sui-sui-nian">碎碎念</a></li>
 </ul></nav>
 
 <nav id="sub-nav">
 	<div class="social">
 			<a class="email" href="mailto:aaapei@gmail.com" title="Email">Email</a>
 		<a class="weibo" href="http://weibo.com/a2pei" title="Weibo">Weibo</a>
-			<a class="rss" href="http://aaapei.com/rss.xml" title="RSS">ATOM</a>
+			<a class="rss" href="http://blog.aaapei.com/rss.xml" title="RSS">ATOM</a>
 	</div>
 <section id="about-me">
   <h2>关于我</h2>
@@ -94,8 +94,8 @@
         <time datetime="2014-04-19T23:21:00.000000" itemprop="datePublished">2014-04-19</time>
     </div>
     <div class="tags">
-        <a href="http://aaapei.com/blog/tags/android">android</a> ,         <a href="http://aaapei.com/blog/tags/lua">lua</a>     </div>
-</div>                <h1 class="title" itemprop="name"><a href="http://aaapei.com/blog/2014/04/androidzhong-luajiao-ben-de-bu-shu" itemprop="url">android中lua脚本的部署</a></h1>
+        <a href="http://blog.aaapei.com/blog/tags/android">android</a> ,         <a href="http://blog.aaapei.com/blog/tags/lua">lua</a>     </div>
+</div>                <h1 class="title" itemprop="name"><a href="http://blog.aaapei.com/blog/2014/04/androidzhong-luajiao-ben-de-bu-shu" itemprop="url">android中lua脚本的部署</a></h1>
                 <div class="entry-content" itemprop="articleBody">
                     <p>“愤怒的小鸟”中，lua脚本是运行时部署在应用的data目录，同时做了脚本加密；<br />
 但是如果你的lua脚本有了模块包，脚本就会有多级目录，而android的data目录下是不允许有子目录；<br />
