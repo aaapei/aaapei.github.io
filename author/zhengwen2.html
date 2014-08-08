@@ -64,8 +64,8 @@
 
 <ul class="main-navigation">
 	        <li><a href="http://blog.aaapei.com/.">首页</a></li>
-	        <li><a href="http://blog.aaapei.com/categories">分类</a></li>
-	        <li><a href="http://blog.aaapei.com/blog/tags">标签</a></li>
+	        <li><a href="http://blog.aaapei.com/categories.html">分类</a></li>
+	        <li><a href="http://blog.aaapei.com/tags">标签</a></li>
 	        <li><a href="http://blog.aaapei.com/pages/sui-sui-nian">碎碎念</a></li>
 </ul></nav>
 
@@ -91,8 +91,8 @@
         <time datetime="2013-12-11T19:50:00.000000" itemprop="datePublished">2013-12-11</time>
     </div>
     <div class="tags">
-        <a href="http://blog.aaapei.com/blog/tags/android">android</a> ,         <a href="http://blog.aaapei.com/blog/tags/wei-xin">微信</a>     </div>
-</div>                <h1 class="title" itemprop="name"><a href="http://blog.aaapei.com/blog/2013/12/wei-xin-de-jsbridgeshi-xian" itemprop="url">微信的jsbridge实现</a></h1>
+        <a href="http://blog.aaapei.com/tags/android">android</a> ,         <a href="http://blog.aaapei.com/tags/wei-xin">微信</a>     </div>
+</div>                <h1 class="title" itemprop="name"><a href="http://blog.aaapei.com/article/2013/12/wei-xin-de-jsbridgeshi-xian" itemprop="url">微信的jsbridge实现</a></h1>
                 <div class="entry-content" itemprop="description"><p>微信公共平台开放了几个操作webview界面的js接口<br />
 示例代码是这样的:  </p>
 <div class="highlight"><pre><span class="nx">WeixinJSBridge</span><span class="p">.</span><span class="nx">invoke</span><span class="p">(</span><span class="s1">&#39;getNetworkType&#39;</span><span class="p">,{},</span>
@@ -117,7 +117,7 @@
 <p>Android原生的机制既然不能支持函数对象的传递,于是猜测微信是否会对原始的api做了一层包装;<br />
 先下载weixin ...</p>
 					<br/ >
-					<a href="http://blog.aaapei.com/blog/2013/12/wei-xin-de-jsbridgeshi-xian">查看全文</a>
+					<a href="http://blog.aaapei.com/article/2013/12/wei-xin-de-jsbridgeshi-xian">查看全文</a>
                 </div>
                 <div class="meta">
                     <span class="author">Posted by <a href="http://blog.aaapei.com/author/zhengwen.html">zhengwen</a></span>
@@ -130,8 +130,8 @@
         <time datetime="2013-12-02T20:20:00.000000" itemprop="datePublished">2013-12-02</time>
     </div>
     <div class="tags">
-        <a href="http://blog.aaapei.com/blog/tags/android">android</a> ,         <a href="http://blog.aaapei.com/blog/tags/lua">lua</a>     </div>
-</div>                <h1 class="title" itemprop="name"><a href="http://blog.aaapei.com/blog/2013/12/luajavaxing-neng-you-hua" itemprop="url">luajava性能优化</a></h1>
+        <a href="http://blog.aaapei.com/tags/android">android</a> ,         <a href="http://blog.aaapei.com/tags/lua">lua</a>     </div>
+</div>                <h1 class="title" itemprop="name"><a href="http://blog.aaapei.com/article/2013/12/luajavaxing-neng-you-hua" itemprop="url">luajava性能优化</a></h1>
                 <div class="entry-content" itemprop="description"><p>最近在做一个lua的android项目,对于lua的生态环境完全陌生,所以选用了个文档资料最全的lua bridge:<em>luajava</em><br />
 luajava目前只支持到lua5.1,不过升级到5.2困难不大,主要是一些宏开关以及静态变量;然而实际运行的时候发现卡的很不行,ui频繁掉祯,profile后发现90%+的cpu耗时在luajava中  </p>
 <p>看了一下luajava本身代码量不大;索性就追了一下,luajava的native层就一个luajava.c,java层,除了LuaJavaApi.java,其他java类都是Value Object</p>
@@ -144,7 +144,7 @@ luajava目前只支持到lua5.1,不过升级到5.2困难不大,主要是一些�
      <span class="c1">//先调用java层创建javaobject</span>
     <span class="n">javaClassName</span> <span class="o">=</span> <span class="p">(</span> <span class="o">*</span><span class="n">javaEnv</span> <span class="p">)</span><span class="o">-&gt;</span><span class="n">NewStringUTF</span><span class="p">(</span> <span class="n">javaEnv</span> <span class="p">,</span> <span class="n">className ...</span></pre></div>
 					<br/ >
-					<a href="http://blog.aaapei.com/blog/2013/12/luajavaxing-neng-you-hua">查看全文</a>
+					<a href="http://blog.aaapei.com/article/2013/12/luajavaxing-neng-you-hua">查看全文</a>
                 </div>
                 <div class="meta">
                     <span class="author">Posted by <a href="http://blog.aaapei.com/author/zhengwen.html">zhengwen</a></span>

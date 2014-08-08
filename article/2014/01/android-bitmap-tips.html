@@ -1,0 +1,134 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>I'm aaapei</title>
+        <meta name="author" content="aaapei">
+
+        <!-- http://t.co/dKP3o1e -->
+        <meta name="HandheldFriendly" content="True">
+        <meta name="MobileOptimized" content="320">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <!-- Open Graph tags -->
+
+
+                <meta property="og:type" content="article"/>
+                <meta property="og:title" content="android bitmap tips"/>
+                <meta property="og:url" content="http://blog.aaapei.com/article/2014/01/android-bitmap-tips"/>
+                <meta property="og:description" content="大部分android开发者只知道bitmap再使用之后，需要显式的调用一次bitmap.recycle，回收bitmap内存; 这个观点，在android3.0之后其实已经过时了，android3.0将bitmap所引用的位图资源从native heap移到虚拟机的heap空间，bitmap的生命周期由虚拟机管理，开发者只需要保证在应用中不在持有对bitmap的引用，即可保证不发生内存泄漏；位图资源的内存由GC进行回收； 将bitmap的位图内存转移到虚拟机heap后，由于位图资源本身较大，造成gc的概率的增加 bitmap proxy 在一般的应用场景中，bitmap的引用一般是和imageview关联；当大量imageview持有对bitmap的引用时，虚拟机无法释放bitmap的内存，导致oom； 针对这种场景，开发者可以实现一个bitmap的代理类，作为bitmap和imageview的中间层，在imageview不可见时（例如imageview是一个listview的子控件，listview发生滚动/activiy切换到后台），即释放掉对bitamp的引用；当imageview重新可见时，通过代理类重新去加载bitmap，以解耦bitmap和iamgeview的引用关系; inBitmap android在3.0之后新增了一个BitmapFactory.Options.inBitmap开关，加了这个开关之后，bitmapfactory在加载位图时候，会尝试使用inbitmap指向的已分配在heap中位图空间；而不是重新申请一块内存；从而减少了虚拟机最讨厌的短生命周期大内存对象； 不过这个开关有严格的使用场景，即两个bitamp的位图大小必须一致"/>
+                <meta name="description" content="大部分android开发者只知道bitmap再使用之后，需要显式的调用一次bitmap.recycle，回收bitmap内存; 这个观点，在android3.0之后其实已经过时了，android3.0将bitmap所引用的位图资源从native heap移到虚拟机的heap空间，bitmap的生命周期由虚拟机管理，开发者只需要保证在应用中不在持有对bitmap的引用，即可保证不发生内存泄漏；位图资源的内存由GC进行回收； 将bitmap的位图内存转移到虚拟机heap后，由于位图资源本身较大，造成gc的概率的增加 bitmap proxy 在一般的应用场景中，bitmap的引用一般是和imageview关联；当大量imageview持有对bitmap的引用时，虚拟机无法释放bitmap的内存，导致oom； 针对这种场景，开发者可以实现一个bitmap的代理类，作为bitmap和imageview的中间层，在imageview不可见时（例如imageview是一个listview的子控件，listview发生滚动/activiy切换到后台），即释放掉对bitamp的引用；当imageview重新可见时，通过代理类重新去加载bitmap，以解耦bitmap和iamgeview的引用关系; inBitmap android在3.0之后新增了一个BitmapFactory.Options.inBitmap开关，加了这个开关之后，bitmapfactory在加载位图时候，会尝试使用inbitmap指向的已分配在heap中位图空间；而不是重新申请一块内存；从而减少了虚拟机最讨厌的短生命周期大内存对象； 不过这个开关有严格的使用场景，即两个bitamp的位图大小必须一致">
+
+
+
+
+
+        <link rel="canonical" href="">
+        <link href="http://blog.aaapei.com/favicon.png" rel="shortcut icon">
+        <link href="http://blog.aaapei.com/theme/css/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+        <link href="http://blog.aaapei.com/theme/css/pygments.css" media="screen, projection" rel="stylesheet" type="text/css">
+
+        <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+        <link href="//fonts.googleapis.com/css?family=Open+Sans:400italic,400,700" rel='stylesheet' type='text/css'>
+        <link href="//fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel='stylesheet' type='text/css'>
+        <link href="//fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel='stylesheet' type='text/css'>
+
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+        <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+
+    </head>
+<body>
+	<script>
+		  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+				    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+				  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+				    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+					  ga('create', 'UA-51785732-1', 'aaapei.com');
+					    ga('send', 'pageview');
+
+		</script>
+		<div class="container">
+			<div class="left-col">
+				<div class="intrude-less">
+				<header id="header" class="inner">
+	<div class="profilepic">
+		<img src="http://www.gravatar.com/avatar/4c187c40f3f52c969742c6476ade7e44?s=160" alt="Profile Picture" style="width: 160px;" />
+	</div>
+
+<hgroup>
+	<br/>
+	<h1><a href="http://blog.aaapei.com/">I'm aaapei</a></h1>
+    <h3>少年去游荡</h3>
+</hgroup>
+<nav id="main-nav">
+
+<ul class="main-navigation">
+	        <li><a href="http://blog.aaapei.com/.">首页</a></li>
+	        <li><a href="http://blog.aaapei.com/categories.html">分类</a></li>
+	        <li><a href="http://blog.aaapei.com/tags">标签</a></li>
+	        <li><a href="http://blog.aaapei.com/pages/sui-sui-nian">碎碎念</a></li>
+</ul></nav>
+
+<nav id="sub-nav">
+	<div class="social">
+			<a class="email" href="mailto:aaapei@gmail.com" title="Email">Email</a>
+		<a class="weibo" href="http://weibo.com/a2pei" title="Weibo">Weibo</a>
+			<a class="rss" href="http://blog.aaapei.com/rss.xml" title="RSS">ATOM</a>
+	</div>
+<section id="about-me">
+  <h2>关于我</h2>
+  <p>生活@hangzhou. 工作@netease.<br/> 移动端码农. 正在减肥的胖子. 食肉. <br/>想养喵但老婆不让</p>
+</section>
+</nav>				</header>
+				</div>
+			</div>
+			<div class="mid-col">
+				<div class="mid-col-container">
+					<div id="content" class="inner">
+
+        <section id="content" class="body">
+            <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
+<div class="meta">
+    <div class="date">
+        <time datetime="2014-01-28T17:30:00.000000" itemprop="datePublished">2014-01-28</time>
+    </div>
+    <div class="tags">
+        <a href="http://blog.aaapei.com/tags/android">android</a>     </div>
+</div>                <h1 class="title" itemprop="name"><a href="http://blog.aaapei.com/article/2014/01/android-bitmap-tips" itemprop="url">android bitmap tips</a></h1>
+                <div class="entry-content" itemprop="articleBody">
+                    <p>大部分android开发者只知道bitmap再使用之后，需要显式的调用一次bitmap.recycle，回收bitmap内存;  </p>
+<p>这个观点，在android3.0之后其实已经过时了，android3.0将bitmap所引用的位图资源从native heap移到虚拟机的heap空间，bitmap的生命周期由虚拟机管理，开发者只需要保证在应用中不在持有对bitmap的引用，即可保证不发生内存泄漏；位图资源的内存由GC进行回收；<br />
+将bitmap的位图内存转移到虚拟机heap后，由于位图资源本身较大，造成gc的概率的增加   </p>
+<h3>bitmap proxy</h3>
+<p>在一般的应用场景中，bitmap的引用一般是和imageview关联；当大量imageview持有对bitmap的引用时，虚拟机无法释放bitmap的内存，导致oom；</p>
+<p>针对这种场景，开发者可以实现一个bitmap的代理类，作为bitmap和imageview的中间层，在imageview不可见时（例如imageview是一个listview的子控件，listview发生滚动/activiy切换到后台），即释放掉对bitamp的引用；当imageview重新可见时，通过代理类重新去加载bitmap，以解耦bitmap和iamgeview的引用关系;   </p>
+<h3>inBitmap</h3>
+<p>android在3.0之后新增了一个BitmapFactory.Options.inBitmap开关，加了这个开关之后，bitmapfactory在加载位图时候，会尝试使用inbitmap指向的已分配在heap中位图空间；而不是重新申请一块内存；从而减少了虚拟机最讨厌的短生命周期大内存对象；  不过这个开关有严格的使用场景，即两个bitamp的位图大小必须一致</p>
+                </div>
+            </article>
+
+                <section id="comment">
+                    <h1 class="title">Comments</h1>
+                    <div id="disqus_thread" aria-live="polite">
+                        <script type="text/javascript">
+                            var disqus_identifier = "article/2014/01/android-bitmap-tips";
+                            (function() {
+                                var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+                                dsq.src = 'http://aaapeigithub.disqus.com/embed.js';
+                                (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+                            })();
+                        </script>
+                    </div>
+                </section>
+
+        </section>
+
+					</div>
+				</div>
+				<footer id="footer" class="inner">
+<p>Copyright &copy; 2013 - aaapei - <span class="credit">Powered by <a href="http://getpelican.com">Pelican</a></span></p>				</footer>
+			</div>
+		</div>
+	</body>
+</html>

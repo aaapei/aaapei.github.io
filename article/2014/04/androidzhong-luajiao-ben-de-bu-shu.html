@@ -1,0 +1,209 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>I'm aaapei</title>
+        <meta name="author" content="aaapei">
+
+        <!-- http://t.co/dKP3o1e -->
+        <meta name="HandheldFriendly" content="True">
+        <meta name="MobileOptimized" content="320">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <!-- Open Graph tags -->
+
+
+                <meta property="og:type" content="article"/>
+                <meta property="og:title" content="android中lua脚本的部署"/>
+                <meta property="og:url" content="http://blog.aaapei.com/article/2014/04/androidzhong-luajiao-ben-de-bu-shu"/>
+                <meta property="og:description" content="“愤怒的小鸟”中，lua脚本是运行时部署在应用的data目录，同时做了脚本加密； 但是如果你的lua脚本有了模块包，脚本就会有多级目录，而android的data目录下是不允许有子目录； 当然，lua脚本也可以在运行时拷贝到外置sd卡中，不过既然放置在不安全的公共目录，就会有被第三方删除或篡改的危险，那么每次启动的时候必须做一次文件校验，同时，也必须对脚本进行加密，避免程序逻辑暴露； lua自定义加载器 lua引擎提供了一个自定义加载器，当lua脚本中调用require时，会回调到自定义加载器的CFunction；利用这样特性，可以尝试取消掉脚本的运行时拷贝，而直接从应用的asset资源目录加载；自定义加载器的原理中，云风的blog中有介绍，以自定义方式加载lua模块 直接贴个代码实现 void addAssetLuaLoader(lua_State *L, lua_CFunction func) { if (!func) return; lua_getglobal(L, "package"); lua_getfield(L, -1, "loaders"); lua_pushcfunction(L, func); int i=0; for ( i ..."/>
+                <meta name="description" content="“愤怒的小鸟”中，lua脚本是运行时部署在应用的data目录，同时做了脚本加密； 但是如果你的lua脚本有了模块包，脚本就会有多级目录，而android的data目录下是不允许有子目录； 当然，lua脚本也可以在运行时拷贝到外置sd卡中，不过既然放置在不安全的公共目录，就会有被第三方删除或篡改的危险，那么每次启动的时候必须做一次文件校验，同时，也必须对脚本进行加密，避免程序逻辑暴露； lua自定义加载器 lua引擎提供了一个自定义加载器，当lua脚本中调用require时，会回调到自定义加载器的CFunction；利用这样特性，可以尝试取消掉脚本的运行时拷贝，而直接从应用的asset资源目录加载；自定义加载器的原理中，云风的blog中有介绍，以自定义方式加载lua模块 直接贴个代码实现 void addAssetLuaLoader(lua_State *L, lua_CFunction func) { if (!func) return; lua_getglobal(L, "package"); lua_getfield(L, -1, "loaders"); lua_pushcfunction(L, func); int i=0; for ( i ...">
+
+
+
+
+
+        <link rel="canonical" href="">
+        <link href="http://blog.aaapei.com/favicon.png" rel="shortcut icon">
+        <link href="http://blog.aaapei.com/theme/css/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+        <link href="http://blog.aaapei.com/theme/css/pygments.css" media="screen, projection" rel="stylesheet" type="text/css">
+
+        <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+        <link href="//fonts.googleapis.com/css?family=Open+Sans:400italic,400,700" rel='stylesheet' type='text/css'>
+        <link href="//fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel='stylesheet' type='text/css'>
+        <link href="//fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel='stylesheet' type='text/css'>
+
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+        <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+
+    </head>
+<body>
+	<script>
+		  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+				    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+				  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+				    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+					  ga('create', 'UA-51785732-1', 'aaapei.com');
+					    ga('send', 'pageview');
+
+		</script>
+		<div class="container">
+			<div class="left-col">
+				<div class="intrude-less">
+				<header id="header" class="inner">
+	<div class="profilepic">
+		<img src="http://www.gravatar.com/avatar/4c187c40f3f52c969742c6476ade7e44?s=160" alt="Profile Picture" style="width: 160px;" />
+	</div>
+
+<hgroup>
+	<br/>
+	<h1><a href="http://blog.aaapei.com/">I'm aaapei</a></h1>
+    <h3>少年去游荡</h3>
+</hgroup>
+<nav id="main-nav">
+
+<ul class="main-navigation">
+	        <li><a href="http://blog.aaapei.com/.">首页</a></li>
+	        <li><a href="http://blog.aaapei.com/categories.html">分类</a></li>
+	        <li><a href="http://blog.aaapei.com/tags">标签</a></li>
+	        <li><a href="http://blog.aaapei.com/pages/sui-sui-nian">碎碎念</a></li>
+</ul></nav>
+
+<nav id="sub-nav">
+	<div class="social">
+			<a class="email" href="mailto:aaapei@gmail.com" title="Email">Email</a>
+		<a class="weibo" href="http://weibo.com/a2pei" title="Weibo">Weibo</a>
+			<a class="rss" href="http://blog.aaapei.com/rss.xml" title="RSS">ATOM</a>
+	</div>
+<section id="about-me">
+  <h2>关于我</h2>
+  <p>生活@hangzhou. 工作@netease.<br/> 移动端码农. 正在减肥的胖子. 食肉. <br/>想养喵但老婆不让</p>
+</section>
+</nav>				</header>
+				</div>
+			</div>
+			<div class="mid-col">
+				<div class="mid-col-container">
+					<div id="content" class="inner">
+
+        <section id="content" class="body">
+            <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
+<div class="meta">
+    <div class="date">
+        <time datetime="2014-04-19T23:21:00.000000" itemprop="datePublished">2014-04-19</time>
+    </div>
+    <div class="tags">
+        <a href="http://blog.aaapei.com/tags/android">android</a> ,         <a href="http://blog.aaapei.com/tags/lua">lua</a>     </div>
+</div>                <h1 class="title" itemprop="name"><a href="http://blog.aaapei.com/article/2014/04/androidzhong-luajiao-ben-de-bu-shu" itemprop="url">android中lua脚本的部署</a></h1>
+                <div class="entry-content" itemprop="articleBody">
+                    <p>“愤怒的小鸟”中，lua脚本是运行时部署在应用的data目录，同时做了脚本加密；<br />
+但是如果你的lua脚本有了模块包，脚本就会有多级目录，而android的data目录下是不允许有子目录；<br />
+当然，lua脚本也可以在运行时拷贝到外置sd卡中，不过既然放置在不安全的公共目录，就会有被第三方删除或篡改的危险，那么每次启动的时候必须做一次文件校验，同时，也必须对脚本进行加密，避免程序逻辑暴露；  </p>
+<h3>lua自定义加载器</h3>
+<p>lua引擎提供了一个自定义加载器，当lua脚本中调用require时，会回调到自定义加载器的CFunction；利用这样特性，可以尝试取消掉脚本的运行时拷贝，而直接从应用的asset资源目录加载；自定义加载器的原理中，云风的blog中有介绍，<a href="http://blog.codingnow.com/2007/04/user_define_lua_loader.html">以自定义方式加载lua模块</a><br />
+直接贴个代码实现  </p>
+<div class="highlight"><pre><span class="k">void</span> <span class="nx">addAssetLuaLoader</span><span class="p">(</span><span class="nx">lua_State</span> <span class="o">*</span><span class="nx">L</span><span class="p">,</span> <span class="nx">lua_CFunction</span> <span class="nx">func</span><span class="p">)</span>
+<span class="p">{</span>
+   <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">func</span><span class="p">)</span> <span class="k">return</span><span class="p">;</span>
+
+   <span class="nx">lua_getglobal</span><span class="p">(</span><span class="nx">L</span><span class="p">,</span> <span class="s2">&quot;package&quot;</span><span class="p">);</span>                   
+   <span class="nx">lua_getfield</span><span class="p">(</span><span class="nx">L</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;loaders&quot;</span><span class="p">);</span>   
+   <span class="nx">lua_pushcfunction</span><span class="p">(</span><span class="nx">L</span><span class="p">,</span> <span class="nx">func</span><span class="p">);</span>  
+   <span class="kr">int</span> <span class="nx">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span>
+   <span class="k">for</span> <span class="p">(</span> <span class="nx">i</span> <span class="o">=</span> <span class="p">(</span><span class="kr">int</span><span class="p">)</span><span class="nx">lua_objlen</span><span class="p">(</span><span class="nx">L</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="p">;</span> <span class="o">--</span><span class="nx">i</span><span class="p">)</span>
+   <span class="p">{</span>
+      <span class="nx">lua_rawgeti</span><span class="p">(</span><span class="nx">L</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="nx">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">);</span>    
+      <span class="nx">lua_rawseti</span><span class="p">(</span><span class="nx">L</span><span class="p">,</span> <span class="o">-</span><span class="mi">3</span><span class="p">,</span> <span class="nx">i</span><span class="p">);</span>    
+   <span class="p">}</span>
+   <span class="nx">lua_rawseti</span><span class="p">(</span><span class="nx">L</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">);</span>
+   <span class="nx">lua_setfield</span><span class="p">(</span><span class="nx">L</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;loaders&quot;</span><span class="p">);</span>                       
+   <span class="nx">lua_pop</span><span class="p">(</span><span class="nx">L</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+
+
+<p>在lua引擎启动时，调用<em>addAssetLuaLoader</em>进行初始化，把你的CFunction加入到到lua的<em>package.loader</em>表中；<br />
+其中asset lua  Loader的逻辑是这样的  </p>
+<div class="highlight"><pre>    <span class="c1">//搜索路径</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">string</span> <span class="n">searchpath</span><span class="p">(</span><span class="s">&quot;?.lua;?/init.lua;&quot;</span><span class="p">);</span>
+   <span class="kt">size_t</span> <span class="n">next</span> <span class="o">=</span> <span class="n">searchpath</span><span class="p">.</span><span class="n">find_first_of</span><span class="p">(</span><span class="s">&quot;;&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+   <span class="k">do</span>
+   <span class="p">{</span>
+      <span class="k">if</span> <span class="p">(</span><span class="n">next</span> <span class="o">==</span> <span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">::</span><span class="n">npos</span><span class="p">)</span> <span class="n">next</span> <span class="o">=</span> <span class="n">searchpath</span><span class="p">.</span><span class="n">length</span><span class="p">();</span>
+      <span class="n">std</span><span class="o">::</span><span class="n">string</span> <span class="n">prefix</span> <span class="o">=</span> <span class="n">searchpath</span><span class="p">.</span><span class="n">substr</span><span class="p">(</span><span class="n">begin</span><span class="p">,</span> <span class="n">next</span><span class="o">-</span><span class="n">begin</span><span class="p">);</span>
+      <span class="k">if</span> <span class="p">(</span><span class="n">prefix</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="sc">&#39;.&#39;</span> <span class="o">&amp;&amp;</span> <span class="n">prefix</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="sc">&#39;/&#39;</span><span class="p">)</span>
+      <span class="p">{</span>
+         <span class="n">prefix</span> <span class="o">=</span> <span class="n">prefix</span><span class="p">.</span><span class="n">substr</span><span class="p">(</span><span class="mi">2</span><span class="p">);</span>
+      <span class="p">}</span>
+      <span class="n">pos</span> <span class="o">=</span> <span class="n">prefix</span><span class="p">.</span><span class="n">find</span><span class="p">(</span><span class="s">&quot;?&quot;</span><span class="p">);</span>
+      <span class="n">chunkName</span> <span class="o">=</span> <span class="n">prefix</span><span class="p">.</span><span class="n">replace</span><span class="p">(</span><span class="n">pos</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">filename</span><span class="p">);</span>
+      <span class="c1">//从asset目录读取字节流</span>
+      <span class="n">chunk</span> <span class="o">=</span>  <span class="n">getAssetData</span><span class="p">(</span><span class="n">chunkName</span><span class="p">,</span><span class="o">&amp;</span><span class="n">chunkSize</span><span class="p">);</span> 
+      <span class="k">if</span><span class="p">(</span><span class="n">chunk</span><span class="p">){</span>
+        <span class="k">break</span><span class="p">;</span>
+      <span class="p">}</span>   
+      <span class="n">begin</span> <span class="o">=</span> <span class="n">next</span> <span class="o">+</span> <span class="mi">1</span><span class="p">;</span>
+      <span class="n">next</span> <span class="o">=</span> <span class="n">searchpath</span><span class="p">.</span><span class="n">find_first_of</span><span class="p">(</span><span class="s">&quot;;&quot;</span><span class="p">,</span> <span class="n">begin</span><span class="p">);</span>
+   <span class="p">}</span> <span class="k">while</span> <span class="p">(</span><span class="n">begin</span> <span class="o">&lt;</span> <span class="p">(</span><span class="kt">int</span><span class="p">)</span><span class="n">searchpath</span><span class="p">.</span><span class="n">length</span><span class="p">());</span>
+
+   <span class="k">if</span> <span class="p">(</span><span class="n">chunk</span><span class="p">)</span>
+   <span class="p">{</span>
+    <span class="c1">// 解开加密lua</span>
+      <span class="n">loadencryrtbuffer</span><span class="p">(</span><span class="n">L</span><span class="p">,</span> <span class="p">(</span><span class="kt">char</span><span class="o">*</span><span class="p">)</span><span class="n">chunk</span><span class="p">,</span> <span class="p">(</span><span class="kt">int</span><span class="p">)</span><span class="n">chunkSize</span><span class="p">,</span> <span class="n">chunkName</span><span class="p">.</span><span class="n">c_str</span><span class="p">());</span>
+      <span class="n">delete</span> <span class="p">[]</span><span class="n">chunk</span><span class="p">;</span>
+   <span class="p">}</span>
+</pre></div>
+
+
+<p>当lua脚本中调用require时，asset lua loader就会回调得到一个fileName，将filename增补后缀名，转化成完整的asset相对文件路径，读取文件字节流；<br />
+这段字节流可以直接是经过加密的字节流，也可以是未加密的原始lua脚本，然后通过<em>luaL_loadbuffer</em>调用执行；</p>
+<h3>asset资源的读取</h3>
+<p>android2.3之后，ndk提供了直接操作asset资源的c api，可以在c中直接读取asset文件</p>
+<div class="highlight"><pre><span class="kt">unsigned</span> <span class="kt">char</span><span class="o">*</span> <span class="n">data</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+<span class="c1">//filename也就是上个代码块中的chunkName，即lua文件在asset的相对目录</span>
+    <span class="n">AAsset</span><span class="o">*</span> <span class="n">asset</span> <span class="o">=</span> <span class="n">AAssetManager_open</span><span class="p">(</span><span class="n">gAssetManager</span> <span class="p">,</span><span class="n">filename</span><span class="p">.</span><span class="n">c_str</span><span class="p">(),</span> <span class="n">AASSET_MODE_UNKNOWN</span><span class="p">);</span>
+    <span class="k">if</span><span class="p">(</span><span class="n">asset</span><span class="p">){</span>
+        <span class="kt">off_t</span> <span class="n">fileSize</span> <span class="o">=</span> <span class="n">AAsset_getLength</span><span class="p">(</span><span class="n">asset</span><span class="p">);</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="p">(</span><span class="kt">unsigned</span> <span class="kt">char</span><span class="o">*</span><span class="p">)</span> <span class="n">malloc</span><span class="p">(</span><span class="n">fileSize</span><span class="p">);</span>
+        <span class="kt">int</span> <span class="n">bytesread</span> <span class="o">=</span> <span class="n">AAsset_read</span><span class="p">(</span><span class="n">asset</span><span class="p">,</span> <span class="p">(</span><span class="kt">void</span><span class="o">*</span><span class="p">)</span><span class="n">data</span><span class="p">,</span> <span class="n">fileSize</span><span class="p">);</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">size</span><span class="p">)</span>
+        <span class="p">{</span>
+              <span class="o">*</span><span class="n">size</span> <span class="o">=</span> <span class="n">bytesread</span><span class="p">;</span>
+        <span class="p">}</span>
+        <span class="n">AAsset_close</span><span class="p">(</span><span class="n">asset</span><span class="p">);</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="n">data</span><span class="p">;</span>
+</pre></div>
+
+
+<p>不过lua脚本的位置移动asset目录后，lua脚本常用的代码热更新机制就遇到些许问题，毕竟不可能将热更新代码重新写入到dex文件中；<br />
+就时候，机可以考虑将lua脚本进行模块化拆分，需要热更新的脚本部署在sd卡中，其他固化在APK的资源包中，随版本更新进行迭代；<br />
+既然有了自定义加载器，动态代码的热更新实现就简单多了。</p>
+                </div>
+            </article>
+
+                <section id="comment">
+                    <h1 class="title">Comments</h1>
+                    <div id="disqus_thread" aria-live="polite">
+                        <script type="text/javascript">
+                            var disqus_identifier = "article/2014/04/androidzhong-luajiao-ben-de-bu-shu";
+                            (function() {
+                                var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+                                dsq.src = 'http://aaapeigithub.disqus.com/embed.js';
+                                (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+                            })();
+                        </script>
+                    </div>
+                </section>
+
+        </section>
+
+					</div>
+				</div>
+				<footer id="footer" class="inner">
+<p>Copyright &copy; 2013 - aaapei - <span class="credit">Powered by <a href="http://getpelican.com">Pelican</a></span></p>				</footer>
+			</div>
+		</div>
+	</body>
+</html>
