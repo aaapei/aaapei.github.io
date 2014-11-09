@@ -1,0 +1,218 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>I'm aaapei</title>
+        <meta name="author" content="aaapei">
+
+        <!-- http://t.co/dKP3o1e -->
+        <meta name="HandheldFriendly" content="True">
+        <meta name="MobileOptimized" content="320">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <!-- Open Graph tags -->
+
+
+                <meta property="og:type" content="article"/>
+                <meta property="og:title" content="dalvik jni解析"/>
+                <meta property="og:url" content="http://blog.aaapei.com/article/2014/11/dalvik-jnijie-xi"/>
+                <meta property="og:description" content="android开发者在移植第三方native库时，会经常使用到jni。jni(Java Native Interface )java本地接口，用于java与c/c++代码进行交互。需要了解的是，jni只是jvm的一个规范，因此各家虚拟机的实现会不一样，本文重点介绍一下dalvik中jobject reference的实现。 jobject reference type jni规范中，对jobject 定义了reference的两种类型： 全局引用（global reference） 局部引用（local reference） 在JNI Specification中的说明是: Local references are valid for the duration of a native method call, and are automatically freed after the native method returns ..."/>
+                <meta name="description" content="android开发者在移植第三方native库时，会经常使用到jni。jni(Java Native Interface )java本地接口，用于java与c/c++代码进行交互。需要了解的是，jni只是jvm的一个规范，因此各家虚拟机的实现会不一样，本文重点介绍一下dalvik中jobject reference的实现。 jobject reference type jni规范中，对jobject 定义了reference的两种类型： 全局引用（global reference） 局部引用（local reference） 在JNI Specification中的说明是: Local references are valid for the duration of a native method call, and are automatically freed after the native method returns ...">
+
+
+
+
+
+        <link rel="canonical" href="">
+        <link href="http://blog.aaapei.com/favicon.png" rel="shortcut icon">
+        <link href="http://blog.aaapei.com/theme/css/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+        <link href="http://blog.aaapei.com/theme/css/pygments.css" media="screen, projection" rel="stylesheet" type="text/css">
+
+        <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+<!--
+		<link href="//fonts.googleapis.com/css?family=Open+Sans:400italic,400,700" rel='stylesheet' type='text/css'>
+        <link href="//fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel='stylesheet' type='text/css'>
+        <link href="//fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel='stylesheet' type='text/css'>
+		-->
+        <script src="//lib.sinaapp.com/js/jquery/1.7.2/jquery.min.js"></script>
+        <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+
+    </head>
+<body>
+	<script type="text/javascript">
+		var _bdhmProtocol = (("https:" == document.location.protocol) ? " https://" : " http://");
+		document.write(unescape("%3Cscript src='" + _bdhmProtocol + "hm.baidu.com/h.js%3F42905fb57b3457075b7322a0893c5395' type='text/javascript'%3E%3C/script%3E"));
+	</script>
+		<div class="container">
+			<div class="left-col">
+				<div class="intrude-less">
+				<header id="header" class="inner">
+	<div class="profilepic">
+		<img src="http://www.gravatar.com/avatar/4c187c40f3f52c969742c6476ade7e44?s=160" alt="Profile Picture" style="width: 160px;" />
+	</div>
+
+<hgroup>
+	<br/>
+	<h1><a href="http://blog.aaapei.com/">I'm aaapei</a></h1>
+    <h3>少年去游荡</h3>
+</hgroup>
+<nav id="main-nav">
+
+<ul class="main-navigation">
+	        <li><a href="http://blog.aaapei.com/.">首页</a></li>
+	        <li><a href="http://blog.aaapei.com/categories.html">分类</a></li>
+	        <li><a href="http://blog.aaapei.com/tags">标签</a></li>
+	        <li><a href="http://blog.aaapei.com/pages/sui-sui-nian">碎碎念</a></li>
+</ul></nav>
+
+<nav id="sub-nav">
+	<div class="social">
+			<a class="email" href="mailto:aaapei@gmail.com" title="Email">Email</a>
+		<a class="weibo" href="http://weibo.com/a2pei" title="Weibo">Weibo</a>
+			<a class="rss" href="http://blog.aaapei.com/rss.xml" title="RSS">ATOM</a>
+	</div>
+<section id="about-me">
+  <h2>关于我</h2>
+  <p>生活@hangzhou. 工作@netease.<br/> 移动端码农. 正在减肥的胖子. 食肉. <br/>想养喵但老婆不让</p>
+</section>
+</nav>				</header>
+				</div>
+			</div>
+			<div class="mid-col">
+				<div class="mid-col-container">
+					<div id="content" class="inner">
+
+        <section id="content" class="body">
+            <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
+<div class="meta">
+    <div class="date">
+        <time datetime="2014-11-09T00:00:00.000000" itemprop="datePublished">2014-11-09</time>
+    </div>
+    <div class="tags">
+        <a href="http://blog.aaapei.com/tags/dalvik">dalvik</a> ,         <a href="http://blog.aaapei.com/tags/jni">jni</a>     </div>
+</div>                <h1 class="title" itemprop="name"><a href="http://blog.aaapei.com/article/2014/11/dalvik-jnijie-xi" itemprop="url">dalvik jni解析</a></h1>
+                <div class="entry-content" itemprop="articleBody">
+                    <p>android开发者在移植第三方native库时，会经常使用到jni。jni(Java Native Interface )java本地接口，用于java与c/c++代码进行交互。需要了解的是，jni只是jvm的一个规范，因此各家虚拟机的实现会不一样，本文重点介绍一下dalvik中jobject reference的实现。</p>
+<h3>jobject reference type</h3>
+<p>jni规范中，对jobject 定义了reference的两种类型：</p>
+<ul>
+<li>全局引用（global reference）</li>
+<li>局部引用（local reference）</li>
+</ul>
+<p>在JNI Specification中的说明是:</p>
+<blockquote>
+<p>Local references are valid for the duration of a native method call, and are automatically freed after the native method returns. Global references remain valid until they are explicitly freed</p>
+</blockquote>
+<p>局部引用的生命周期只在当前native函数上下文中有效；全局引用则虚拟机全局生效，直置开发者显式释放；
+dalvik额外定义了weak global reference，弱全局引用的<em>weak</em>与java层面中weak reference概念一致：在gc时，会被自动回收；</p>
+<p>android版本升级到4.x之后，android官方blog发布了这样一篇文章<a href="http://android-developers.blogspot.com/2011/11/jni-local-reference-changes-in-ics.html">jni local reference changes in ics</a></p>
+<blockquote>
+<p>The best garbage collectors move objects around. This lets them offer very cheap allocation and bulk deallocation, avoids heap fragmentation, and may improve locality. Moving objects around is a problem if you’ve handed out pointers to them to native code. JNI uses types such as jobject to solve this problem: rather than handing out direct pointers, you’re given an opaque handle that can be traded in for a pointer when necessary. By using handles, when the garbage collector moves an object, it just has to update the handle table to point to the object’s new location. </p>
+</blockquote>
+<p>意思是说，为了避免内存碎片，虚拟机在gc过程中应该对堆对象进行内存整理，将堆中分散的指针压缩集中在一处；在之前的版本中，jobject是一个直接指针，直接指向了堆中的内存地址，因此无法使用压缩算法；又由于jobject是一个直接指针，因此之前的版本也未能实现<em>GetObjectRefType</em>接口；所以，我们现在采用对象句柄间接指向堆对像，解决了以上的问题；</p>
+<p>那么问题来了，何为对象句柄？ 对象句柄又如何区分reference类型？</p>
+<h3>IndirectRefTable</h3>
+<p>首先明确一下几个类型的定义:</p>
+<div class="highlight"><pre><span class="k">typedef</span> <span class="kt">void</span><span class="o">*</span>           <span class="n">jobject</span><span class="p">;</span>
+</pre></div>
+
+
+<p>jobject是一个void指针,arm下,即32位</p>
+<div class="highlight"><pre><span class="k">typedef</span> <span class="kt">uint16_t</span>            <span class="n">u2</span><span class="p">;</span>
+<span class="k">typedef</span> <span class="kt">uint32_t</span>            <span class="n">u4</span><span class="p">;</span>
+</pre></div>
+
+
+<p>dalvik虚拟机几个内部类型的定义，u4代表无符号32位</p>
+<blockquote>
+<p>By using handles, when the garbage collector moves an object, it just has to update the handle table to point to the object’s new location. </p>
+</blockquote>
+<p>官方博客的文章中提到的handle table,对应到dalvik的实现，就是是<em>IndirectRefTable</em>
+虚拟机维护了一个全局引用表jniGlobalRefTable，为每一个线程都维护一个局部引用表jniLocalRefTaable，两者采用此相同的数据结构。IndirectRefTable的表元素称之为<em>IndirectRefSlot</em></p>
+<div class="highlight"><pre><span class="k">struct</span> <span class="n">IndirectRefSlot</span> <span class="p">{</span>
+   <span class="n">Object</span><span class="o">*</span> <span class="n">obj</span><span class="p">;</span>    <span class="cm">/* object pointer itself, NULL if the slot is unused */</span>
+   <span class="n">u4</span>  <span class="n">serial</span><span class="p">;</span>     <span class="cm">/* slot serial number */</span>
+<span class="p">};</span>
+</pre></div>
+
+
+<p>IndirectRefSlot只有两个字段，obj即直接对象指针，serail是一个自增的无符号数，主要用于校验对比；
+jni.h中将jobject定义成void指针，在虚拟机内部，jobject被表示为<em>IndirectRef</em>，仍然是一个void指针，不过虚拟机并不关心其类型，只需要明确的是，void指针有32位长；</p>
+<div class="highlight"><pre><span class="k">typedef</span> <span class="kt">void</span><span class="o">*</span> <span class="n">IndirectRef</span><span class="p">;</span>
+</pre></div>
+
+
+<p>基于以上几个定义，在jni代码中，获取一个jobject的流程可以转换成:构造一个IndirectRefSlot对象，添加到IndirectTable表中，获取索引，并最终返回IndirectRef指针。</p>
+<p>索引转换成IndirectRef的函数实现如下：</p>
+<div class="highlight"><pre> <span class="nx">static</span> <span class="k">inline</span> <span class="nx">IndirectRef</span> <span class="nx">toIndirectRef</span><span class="p">(</span><span class="nx">u4</span> <span class="nb">index</span><span class="p">,</span> <span class="nx">u4</span> <span class="nx">serial</span><span class="p">,</span> <span class="nx">IndirectRefKind</span> <span class="nx">kind</span><span class="p">)</span> <span class="p">{</span>
+         <span class="k">return</span> <span class="nx">reinterpret_cast</span><span class="o">&lt;</span><span class="nx">IndirectRef</span><span class="o">&gt;</span><span class="p">((</span><span class="nx">serial</span> <span class="o">&lt;&lt;</span> <span class="mi">20</span><span class="p">)</span> <span class="o">|</span> <span class="p">(</span><span class="nb">index</span> <span class="o">&lt;&lt;</span> <span class="mi">2</span><span class="p">)</span> <span class="o">|</span> <span class="nx">kind</span><span class="p">);</span>
+  <span class="p">}</span>
+</pre></div>
+
+
+<p>参数IndirectRefKind,即global/local/weak global,占最后2位;中间index索引，占18位;最前则是serial校验位；通过这样一个位移运算，将对象类型和对象指针放到一个32位指针中;
+当获取一个jobject对象类型时，可以直接判断jobject最后两位，但当操作jobject对象时，则需要额外的寻址操作，句柄的装包解包其实也是jni效率低下的原因之一。</p>
+<p>有表的添加，自然有表对象的移除，当在IndirectRefTable表中删除一个jni引用时候，会将对应IndirectRefSlot的obj对象置为null,二次添加时，优先添加到空位IndirectRefSlot。</p>
+<h3>IndirectRefTable的压栈出栈</h3>
+<p>既然有jni本地方法，虚拟栈也分为java栈和jni栈。虚拟机在编译期就可以确定java method中局部变量的个数，当一个java栈被压栈时，压栈的内存大小为栈<em>StackSaveArea</em>本身大小以及局部变量的内存大小；</p>
+<p>而jni栈，虚拟机并不知道栈中会有多少个局部变量,jni栈只包含<em>StackSaveArea</em>的内存大小，jobject统一交给IndirectRefTable管理，因此，IndirectRefTable也需要压栈出栈的概念；</p>
+<p>StackSaveArea有一个xtra union变量</p>
+<div class="highlight"><pre><span class="k">struct</span> <span class="n">StackSaveArea</span><span class="p">;</span>
+<span class="p">....</span>
+  <span class="k">union</span> <span class="p">{</span>
+        <span class="cm">/* for JNI native methods: bottom of local reference segment */</span>
+        <span class="n">u4</span>          <span class="n">localRefCookie</span><span class="p">;</span>
+
+        <span class="cm">/* for interpreted methods: saved current PC, for exception stack</span>
+<span class="cm">          * traces and debugger traces */</span>
+        <span class="k">const</span> <span class="n">u2</span><span class="o">*</span>   <span class="n">currentPc</span><span class="p">;</span>
+       <span class="p">}</span> <span class="n">xtra</span><span class="p">;</span>
+  <span class="p">...</span>
+</pre></div>
+
+
+<p>从注释可以看出，java method模式下，xtra用于表示解释器的pc值；jni method，用于表示<em>bottom of local reference segment</em>
+对于segment，我们可以理解成一个与栈类似的结构，IndirectRefTable在压栈时，会将IndirectRefTable的<em>IRTSegmentState</em>变量，赋值给xtra.localRefCookie</p>
+<div class="highlight"><pre><span class="k">union</span> <span class="n">IRTSegmentState</span> <span class="p">{</span>
+  <span class="n">u4</span>          <span class="n">all</span><span class="p">;</span>
+  <span class="k">struct</span> <span class="p">{</span>
+         <span class="n">u4</span>      <span class="n">topIndex</span><span class="o">:</span><span class="mi">16</span><span class="p">;</span>            <span class="cm">/* index of first unused entry */</span>
+         <span class="n">u4</span>      <span class="n">numHoles</span><span class="o">:</span><span class="mi">16</span><span class="p">;</span>            <span class="cm">/* #of holes in entire table */</span>
+   <span class="p">}</span> <span class="n">parts</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+
+
+<p>注意<em>IRTSegmentState</em>是一个32位长的union，从注释可以看出，前16位用于记录当前IndirectRefTable的索引位，后16位用于记录当前栈之前，IndirectRefTable的空位个数。
+采取这种设计的因＝原因是为了快速的出栈，虚拟机可以直接从StackSaveArea中取到上一个栈的topIndex，重置回IndirectRefTable表，而不需要逐一回退。</p>
+<p>jni api有一对pushLocalFrame/popLocalFrame函数，也是利用<em>IRTSegmentState</em>进行本地引用的批量删除。</p>
+<h3>GC</h3>
+<p>虽然在官方blog中说明采取间接指针的目的是为了进行内存压缩，但在最后几个dalvik版本中，采取的仍是mark-sweep算法(art模式采取mark-copy，真正实现了对堆内存的整理)。mark过程中，虚拟机会分别在mark rootSet以及Mark Thread root阶段对jniGlobalRefTable和jniLocalRefTable进行标记，避免GC回收。</p>
+                </div>
+            </article>
+			<!-- 多说评论框 start -->
+				<div class="ds-thread" data-thread-key="请将此处替换成文章在你的站点中的ID" data-title="请替换成文章的标题" data-url="请替换成文章的网址"></div>
+				<!-- 多说评论框 end -->
+				<!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+				<script type="text/javascript">
+					var duoshuoQuery = {short_name:"aaapei"};
+						(function() {
+								var ds = document.createElement('script');
+								ds.type = 'text/javascript';ds.async = true;
+								ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+								ds.charset = 'UTF-8';
+								(document.getElementsByTagName('head')[0]  || document.getElementsByTagName('body')[0]).appendChild(ds);
+							})();
+					</script>
+			<!-- 多说公共JS代码 end -->
+
+        </section>
+
+					</div>
+				</div>
+				<footer id="footer" class="inner">
+<p>Copyright &copy; 2013 - aaapei - <span class="credit">Powered by <a href="http://getpelican.com">Pelican</a></span></p>				</footer>
+			</div>
+		</div>
+	</body>
+</html>
