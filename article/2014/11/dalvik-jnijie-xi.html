@@ -128,7 +128,7 @@ android4.0版本发布之后,android官方博客有这样一篇文章<a href="ht
 <blockquote>
 <p>By using handles, when the garbage collector moves an object, it just has to update the handle table to point to the object’s new location. </p>
 </blockquote>
-<p>官方博客的文章中提到的handle table,对应到dalvik的实现,就是<em>IndirectRefTable</em>
+<p>官方博客的文章中提到的handle table,对应到dalvik的实现,就是<em>IndirectRefTable</em><br />
 虚拟机维护了一个全局引用表jniGlobalRefTable,为每一个线程都维护一个局部引用表jniLocalRefTable,两者采用此相同的数据结构.IndirectRefTable的表元素称之为<em>IndirectRefSlot</em>  </p>
 <div class="highlight"><pre><span class="k">struct</span> <span class="n">IndirectRefSlot</span> <span class="p">{</span>
    <span class="n">Object</span><span class="o">*</span> <span class="n">obj</span><span class="p">;</span>    <span class="cm">/* object pointer itself, NULL if the slot is unused */</span>
@@ -137,7 +137,7 @@ android4.0版本发布之后,android官方博客有这样一篇文章<a href="ht
 </pre></div>
 
 
-<p>IndirectRefSlot只有两个字段,obj即直接对象指针,serial是一个自增的无符号数,主要用于校验对比;
+<p>IndirectRefSlot只有两个字段,obj即直接对象指针,serial是一个自增的无符号数,主要用于校验对比;<br />
 jni.h中将jobject定义成void指针,在虚拟机内部,jobject被表示为<em>IndirectRef</em>,仍然是一个void指针,不过虚拟机并不关心其类型,只需要明确的是,void指针有32位长;</p>
 <div class="highlight"><pre><span class="k">typedef</span> <span class="kt">void</span><span class="o">*</span> <span class="n">IndirectRef</span><span class="p">;</span>
 </pre></div>
@@ -157,23 +157,23 @@ jni.h中将jobject定义成void指针,在虚拟机内部,jobject被表示为<em>
 <li>index索引 占18位;</li>
 <li>serial 校验位</li>
 </ul>
-<p>通过这样一个位移运算,对象类型和对象表索引放到一个32位指针中;
+<p>通过这样一个位移运算,对象类型和对象表索引放到一个32位指针中;<br />
 当获取一个jobject对象类型时,可以直接判断jobject最后两位,但当操作jobject对象时,则需要额外的寻址操作,句柄的装包解包其实也是jni效率低下的原因之一.<br />
 有表的添加,自然有表对象的移除,当在IndirectRefTable表中删除一个jni引用时候,会将对应IndirectRefSlot的obj对象置为null,二次添加时,优先添加到空位IndirectRefSlot.</p>
 <h3>IndirectRefTable的压栈出栈</h3>
-<p>java函数分为普通函数和本地函数,虚拟机栈也分为普通栈和jni栈.虚拟机在编译期可以确定普通函数中局部变量的个数,当一个普通栈被压栈时,压栈的内存大小为栈<em>StackSaveArea</em>本身大小以及局部变量的内存大小;<br />
-而jni栈,虚拟机并不知道栈中会有多少个局部变量,jni栈只包含<em>StackSaveArea</em>的内存大小,jobject统一交给IndirectRefTable管理,因此,IndirectRefTable也需要压栈出栈的概念;<br />
+<p>java函数分为普通函数和本地函数,虚拟机栈也分为普通栈和jni栈.虚拟机在编译期可以确定普通函数中局部变量的个数,当一个普通栈被压栈时,压栈的内存大小为栈<em>StackSaveArea</em>本身大小以及局部变量的内存大小; <br />
+而jni栈,虚拟机并不知道栈中会有多少个局部变量,jni栈只包含<em>StackSaveArea</em>的内存大小,jobject统一交给IndirectRefTable管理,因此,IndirectRefTable也需要压栈出栈的概念; <br />
 StackSaveArea有一个xtra union变量:</p>
 <div class="highlight"><pre><span class="k">struct</span> <span class="n">StackSaveArea</span><span class="p">;</span>
 <span class="p">....</span>
-  <span class="k">union</span> <span class="p">{</span>
+<span class="k">union</span> <span class="p">{</span>
         <span class="cm">/* for JNI native methods: bottom of local reference segment */</span>
         <span class="n">u4</span>          <span class="n">localRefCookie</span><span class="p">;</span>
 
         <span class="cm">/* for interpreted methods: saved current PC, for exception stack</span>
 <span class="cm">          * traces and debugger traces */</span>
         <span class="k">const</span> <span class="n">u2</span><span class="o">*</span>   <span class="n">currentPc</span><span class="p">;</span>
-       <span class="p">}</span> <span class="n">xtra</span><span class="p">;</span>
+<span class="p">}</span> <span class="n">xtra</span><span class="p">;</span>
   <span class="p">...</span>
 </pre></div>
 

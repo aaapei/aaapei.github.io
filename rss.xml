@@ -35,7 +35,7 @@ android4.0版本发布之后,android官方博客有这样一篇文章&lt;a href=
 &lt;blockquote&gt;
 &lt;p&gt;By using handles, when the garbage collector moves an object, it just has to update the handle table to point to the object’s new location. &lt;/p&gt;
 &lt;/blockquote&gt;
-&lt;p&gt;官方博客的文章中提到的handle table,对应到dalvik的实现,就是&lt;em&gt;IndirectRefTable&lt;/em&gt;
+&lt;p&gt;官方博客的文章中提到的handle table,对应到dalvik的实现,就是&lt;em&gt;IndirectRefTable&lt;/em&gt;&lt;br /&gt;
 虚拟机维护了一个全局引用表jniGlobalRefTable,为每一个线程都维护一个局部引用表jniLocalRefTable,两者采用此相同的数据结构.IndirectRefTable的表元素称之为&lt;em&gt;IndirectRefSlot&lt;/em&gt;  &lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="k"&gt;struct&lt;/span&gt; &lt;span class="n"&gt;IndirectRefSlot&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
    &lt;span class="n"&gt;Object&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="n"&gt;obj&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;    &lt;span class="cm"&gt;/* object pointer itself, NULL if the slot is unused */&lt;/span&gt;
@@ -44,7 +44,7 @@ android4.0版本发布之后,android官方博客有这样一篇文章&lt;a href=
 &lt;/pre&gt;&lt;/div&gt;
 
 
-&lt;p&gt;IndirectRefSlot只有两个字段,obj即直接对象指针,serial是一个自增的无符号数,主要用于校验对比;
+&lt;p&gt;IndirectRefSlot只有两个字段,obj即直接对象指针,serial是一个自增的无符号数,主要用于校验对比;&lt;br /&gt;
 jni.h中将jobject定义成void指针,在虚拟机内部,jobject被表示为&lt;em&gt;IndirectRef&lt;/em&gt;,仍然是一个void指针,不过虚拟机并不关心其类型,只需要明确的是,void指针有32位长;&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="k"&gt;typedef&lt;/span&gt; &lt;span class="kt"&gt;void&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="n"&gt;IndirectRef&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
@@ -64,23 +64,23 @@ jni.h中将jobject定义成void指针,在虚拟机内部,jobject被表示为&lt;
 &lt;li&gt;index索引 占18位;&lt;/li&gt;
 &lt;li&gt;serial 校验位&lt;/li&gt;
 &lt;/ul&gt;
-&lt;p&gt;通过这样一个位移运算,对象类型和对象表索引放到一个32位指针中;
+&lt;p&gt;通过这样一个位移运算,对象类型和对象表索引放到一个32位指针中;&lt;br /&gt;
 当获取一个jobject对象类型时,可以直接判断jobject最后两位,但当操作jobject对象时,则需要额外的寻址操作,句柄的装包解包其实也是jni效率低下的原因之一.&lt;br /&gt;
 有表的添加,自然有表对象的移除,当在IndirectRefTable表中删除一个jni引用时候,会将对应IndirectRefSlot的obj对象置为null,二次添加时,优先添加到空位IndirectRefSlot.&lt;/p&gt;
 &lt;h3&gt;IndirectRefTable的压栈出栈&lt;/h3&gt;
-&lt;p&gt;java函数分为普通函数和本地函数,虚拟机栈也分为普通栈和jni栈.虚拟机在编译期可以确定普通函数中局部变量的个数,当一个普通栈被压栈时,压栈的内存大小为栈&lt;em&gt;StackSaveArea&lt;/em&gt;本身大小以及局部变量的内存大小;&lt;br /&gt;
-而jni栈,虚拟机并不知道栈中会有多少个局部变量,jni栈只包含&lt;em&gt;StackSaveArea&lt;/em&gt;的内存大小,jobject统一交给IndirectRefTable管理,因此,IndirectRefTable也需要压栈出栈的概念;&lt;br /&gt;
+&lt;p&gt;java函数分为普通函数和本地函数,虚拟机栈也分为普通栈和jni栈.虚拟机在编译期可以确定普通函数中局部变量的个数,当一个普通栈被压栈时,压栈的内存大小为栈&lt;em&gt;StackSaveArea&lt;/em&gt;本身大小以及局部变量的内存大小; &lt;br /&gt;
+而jni栈,虚拟机并不知道栈中会有多少个局部变量,jni栈只包含&lt;em&gt;StackSaveArea&lt;/em&gt;的内存大小,jobject统一交给IndirectRefTable管理,因此,IndirectRefTable也需要压栈出栈的概念; &lt;br /&gt;
 StackSaveArea有一个xtra union变量:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="k"&gt;struct&lt;/span&gt; &lt;span class="n"&gt;StackSaveArea&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
 &lt;span class="p"&gt;....&lt;/span&gt;
-  &lt;span class="k"&gt;union&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+&lt;span class="k"&gt;union&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
         &lt;span class="cm"&gt;/* for JNI native methods: bottom of local reference segment */&lt;/span&gt;
         &lt;span class="n"&gt;u4&lt;/span&gt;          &lt;span class="n"&gt;localRefCookie&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
 
         &lt;span class="cm"&gt;/* for interpreted methods: saved current PC, for exception stack&lt;/span&gt;
 &lt;span class="cm"&gt;          * traces and debugger traces */&lt;/span&gt;
         &lt;span class="k"&gt;const&lt;/span&gt; &lt;span class="n"&gt;u2&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;   &lt;span class="n"&gt;currentPc&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
-       &lt;span class="p"&gt;}&lt;/span&gt; &lt;span class="n"&gt;xtra&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt; &lt;span class="n"&gt;xtra&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
   &lt;span class="p"&gt;...&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 
