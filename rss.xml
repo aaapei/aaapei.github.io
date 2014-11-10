@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>I'm aaapei</title><link>http://blog.aaapei.com/</link><description></description><atom:link href="http://blog.aaapei.com/rss.xml" rel="self"></atom:link><lastBuildDate>Sun, 09 Nov 2014 00:00:00 +0800</lastBuildDate><item><title>dalvik jni解析</title><link>http://blog.aaapei.com/article/2014/11/dalvik-jnijie-xi</link><description>&lt;p&gt;android开发者在移植第三方native库时,会经常使用到jni. &lt;br /&gt;
-Java Native Interface(java本地接口),用于java与c/c++代码进行交互.需要了解的是,jni只是jvm的一个规范,因此各家虚拟机的实现会不一样,本文重点介绍一下dalvik中jobject reference的实现.&lt;/p&gt;
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>I'm aaapei</title><link>http://blog.aaapei.com/</link><description></description><atom:link href="http://blog.aaapei.com/rss.xml" rel="self"></atom:link><lastBuildDate>Sun, 09 Nov 2014 00:00:00 +0800</lastBuildDate><item><title>dalvik jni解析</title><link>http://blog.aaapei.com/article/2014/11/dalvik-jnijie-xi</link><description>&lt;p&gt;android开发者在移植第三方native库时,经常会使用到jni. &lt;br /&gt;
+Java Native Interface(java本地接口),用于java与c/c++代码进行交互.需要了解的是,jni只是jvm的一个规范,各家虚拟机有各自的实现,本文分享一下dalvik中jobject reference的实现.&lt;/p&gt;
 &lt;h3&gt;jobject reference type&lt;/h3&gt;
-&lt;p&gt;jni规范中,对jobject 定义了reference的两种类型:&lt;/p&gt;
+&lt;p&gt;jni规范中,对jobject定义了两种reference类型:&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;全局引用（global reference）&lt;/li&gt;
 &lt;li&gt;局部引用（local reference）&lt;/li&gt;
@@ -13,11 +13,11 @@ Java Native Interface(java本地接口),用于java与c/c++代码进行交互.需
 &lt;/blockquote&gt;
 &lt;p&gt;局部引用的生命周期只在当前native函数上下文中有效;全局引用则虚拟机全局生效,直置开发者显式释放;
 dalvik额外定义了weak global reference,弱全局引用的&lt;em&gt;weak&lt;/em&gt;与java层面中weak reference概念一致:在gc时,会被自动回收;
-android版本升级到4.x之后,android官方blog发布了这样一篇文章&lt;a href="http://android-developers.blogspot.com/2011/11/jni-local-reference-changes-in-ics.html"&gt;jni local reference changes in ics&lt;/a&gt;&lt;/p&gt;
+android4.0版本发布之后,android官方博客有这样一篇文章&lt;a href="http://android-developers.blogspot.com/2011/11/jni-local-reference-changes-in-ics.html"&gt;jni local reference changes in ics&lt;/a&gt;&lt;/p&gt;
 &lt;blockquote&gt;
 &lt;p&gt;The best garbage collectors move objects around. This lets them offer very cheap allocation and bulk deallocation, avoids heap fragmentation, and may improve locality. Moving objects around is a problem if you’ve handed out pointers to them to native code. JNI uses types such as jobject to solve this problem: rather than handing out direct pointers, you’re given an opaque handle that can be traded in for a pointer when necessary. By using handles, when the garbage collector moves an object, it just has to update the handle table to point to the object’s new location. &lt;/p&gt;
 &lt;/blockquote&gt;
-&lt;p&gt;意思是说,为了避免内存碎片,虚拟机在gc过程中应该对堆对象进行内存整理,将堆中分散的指针压缩集中在一处;在之前的版本中,jobject是一个直接指针,直接指向了堆中的内存地址,因此无法使用压缩算法;又由于jobject是一个直接指针,因此之前的版本也未能实现&lt;em&gt;GetObjectRefType&lt;/em&gt;接口;所以,我们现在采用对象句柄间接指向堆对像,解决了以上的问题;&lt;br /&gt;
+&lt;p&gt;意思是说,为了避免内存碎片,虚拟机在gc过程中应该对堆对象进行内存整理,将堆中分散的指针压缩集中在一处;在之前的版本中,jobject是一个直接指针,直接指向了堆中的内存地址,因此无法采用压缩算法;又由于jobject是一个直接指针,之前的版本也未能实现&lt;em&gt;GetObjectRefType&lt;/em&gt;接口;所以,我们现在采用对象句柄间接指向堆对像,解决了以上的问题;&lt;br /&gt;
 那么问题来了,何为对象句柄？ 对象句柄又如何区分reference类型？&lt;/p&gt;
 &lt;h3&gt;IndirectRefTable&lt;/h3&gt;
 &lt;p&gt;首先明确几个类型的定义:&lt;/p&gt;
@@ -25,7 +25,7 @@ android版本升级到4.x之后,android官方blog发布了这样一篇文章&lt;
 &lt;/pre&gt;&lt;/div&gt;
 
 
-&lt;p&gt;jobject是一个void指针,arm下,即32位&lt;/p&gt;
+&lt;p&gt;jobject是一个void指针,在arm下,长32位&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="k"&gt;typedef&lt;/span&gt; &lt;span class="kt"&gt;uint16_t&lt;/span&gt;            &lt;span class="n"&gt;u2&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
 &lt;span class="k"&gt;typedef&lt;/span&gt; &lt;span class="kt"&gt;uint32_t&lt;/span&gt;            &lt;span class="n"&gt;u4&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
@@ -35,8 +35,8 @@ android版本升级到4.x之后,android官方blog发布了这样一篇文章&lt;
 &lt;blockquote&gt;
 &lt;p&gt;By using handles, when the garbage collector moves an object, it just has to update the handle table to point to the object’s new location. &lt;/p&gt;
 &lt;/blockquote&gt;
-&lt;p&gt;官方博客的文章中提到的handle table,对应到dalvik的实现,就是是&lt;em&gt;IndirectRefTable&lt;/em&gt;
-虚拟机维护了一个全局引用表jniGlobalRefTable,为每一个线程都维护一个局部引用表jniLocalRefTaable,两者采用此相同的数据结构.IndirectRefTable的表元素称之为&lt;em&gt;IndirectRefSlot&lt;/em&gt;  &lt;/p&gt;
+&lt;p&gt;官方博客的文章中提到的handle table,对应到dalvik的实现,就是&lt;em&gt;IndirectRefTable&lt;/em&gt;
+虚拟机维护了一个全局引用表jniGlobalRefTable,为每一个线程都维护一个局部引用表jniLocalRefTable,两者采用此相同的数据结构.IndirectRefTable的表元素称之为&lt;em&gt;IndirectRefSlot&lt;/em&gt;  &lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="k"&gt;struct&lt;/span&gt; &lt;span class="n"&gt;IndirectRefSlot&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
    &lt;span class="n"&gt;Object&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="n"&gt;obj&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;    &lt;span class="cm"&gt;/* object pointer itself, NULL if the slot is unused */&lt;/span&gt;
    &lt;span class="n"&gt;u4&lt;/span&gt;  &lt;span class="n"&gt;serial&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;     &lt;span class="cm"&gt;/* slot serial number */&lt;/span&gt;
@@ -44,13 +44,13 @@ android版本升级到4.x之后,android官方blog发布了这样一篇文章&lt;
 &lt;/pre&gt;&lt;/div&gt;
 
 
-&lt;p&gt;IndirectRefSlot只有两个字段,obj即直接对象指针,serail是一个自增的无符号数,主要用于校验对比;
+&lt;p&gt;IndirectRefSlot只有两个字段,obj即直接对象指针,serial是一个自增的无符号数,主要用于校验对比;
 jni.h中将jobject定义成void指针,在虚拟机内部,jobject被表示为&lt;em&gt;IndirectRef&lt;/em&gt;,仍然是一个void指针,不过虚拟机并不关心其类型,只需要明确的是,void指针有32位长;&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="k"&gt;typedef&lt;/span&gt; &lt;span class="kt"&gt;void&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="n"&gt;IndirectRef&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 
 
-&lt;p&gt;基于以上几个定义,获取一个jobject的流程可以转换成:构造一个IndirectRefSlot对象,添加到IndirectTable表中,获取索引,并最终返回IndirectRef指针.&lt;br /&gt;
+&lt;p&gt;基于以上几个定义,获取一个jobject的流程可以转换成:构造一个IndirectRefSlot对象,添加到IndirectTable表中,获取索引值,并最终返回IndirectRef指针.&lt;br /&gt;
 索引转换成IndirectRef的函数实现如下:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt; &lt;span class="nx"&gt;static&lt;/span&gt; &lt;span class="k"&gt;inline&lt;/span&gt; &lt;span class="nx"&gt;IndirectRef&lt;/span&gt; &lt;span class="nx"&gt;toIndirectRef&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;u4&lt;/span&gt; &lt;span class="nb"&gt;index&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;u4&lt;/span&gt; &lt;span class="nx"&gt;serial&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;IndirectRefKind&lt;/span&gt; &lt;span class="nx"&gt;kind&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
          &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="nx"&gt;reinterpret_cast&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="nx"&gt;IndirectRef&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;&lt;span class="p"&gt;((&lt;/span&gt;&lt;span class="nx"&gt;serial&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&amp;lt;&lt;/span&gt; &lt;span class="mi"&gt;20&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;|&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;index&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&amp;lt;&lt;/span&gt; &lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;|&lt;/span&gt; &lt;span class="nx"&gt;kind&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
@@ -68,7 +68,7 @@ jni.h中将jobject定义成void指针,在虚拟机内部,jobject被表示为&lt;
 当获取一个jobject对象类型时,可以直接判断jobject最后两位,但当操作jobject对象时,则需要额外的寻址操作,句柄的装包解包其实也是jni效率低下的原因之一.&lt;br /&gt;
 有表的添加,自然有表对象的移除,当在IndirectRefTable表中删除一个jni引用时候,会将对应IndirectRefSlot的obj对象置为null,二次添加时,优先添加到空位IndirectRefSlot.&lt;/p&gt;
 &lt;h3&gt;IndirectRefTable的压栈出栈&lt;/h3&gt;
-&lt;p&gt;既然有jni本地方法,虚拟栈也分为java栈和jni栈.虚拟机在编译期就可以确定java method中局部变量的个数,当一个java栈被压栈时,压栈的内存大小为栈&lt;em&gt;StackSaveArea&lt;/em&gt;本身大小以及局部变量的内存大小;&lt;br /&gt;
+&lt;p&gt;java函数分为普通函数和本地函数,虚拟机栈也分为普通栈和jni栈.虚拟机在编译期可以确定普通函数中局部变量的个数,当一个普通栈被压栈时,压栈的内存大小为栈&lt;em&gt;StackSaveArea&lt;/em&gt;本身大小以及局部变量的内存大小;&lt;br /&gt;
 而jni栈,虚拟机并不知道栈中会有多少个局部变量,jni栈只包含&lt;em&gt;StackSaveArea&lt;/em&gt;的内存大小,jobject统一交给IndirectRefTable管理,因此,IndirectRefTable也需要压栈出栈的概念;&lt;br /&gt;
 StackSaveArea有一个xtra union变量:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="k"&gt;struct&lt;/span&gt; &lt;span class="n"&gt;StackSaveArea&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
@@ -98,9 +98,9 @@ StackSaveArea有一个xtra union变量:&lt;/p&gt;
 
 
 &lt;p&gt;注意&lt;em&gt;IRTSegmentState&lt;/em&gt;是一个32位长的union,从注释可以看出,前16位用于记录当前IndirectRefTable的索引位,后16位用于记录当前栈之前,IndirectRefTable的空位个数.
-采取这种设计的因＝原因是为了快速的出栈,虚拟机可以直接从StackSaveArea中取到上一个栈的topIndex,重置回IndirectRefTable表,而不需要逐一回退.&lt;br /&gt;
-jni api有一对pushLocalFrame/popLocalFrame函数,也是利用&lt;em&gt;IRTSegmentState&lt;/em&gt;进行本地引用的批量删除.&lt;/p&gt;
-&lt;h3&gt;GC&lt;/h3&gt;
+采取这种设计的原因是为了快速的出栈,虚拟机可以直接从StackSaveArea中取到上一个栈的topIndex,重置回IndirectRefTable表,而不需要逐一回退.&lt;br /&gt;
+jni api有一对pushLocalFrame/popLocalFrame函数,也是利用了&lt;em&gt;IRTSegmentState&lt;/em&gt;进行本地引用的批量删除.&lt;/p&gt;
+&lt;h3&gt;垃圾回收&lt;/h3&gt;
 &lt;p&gt;虽然在官方blog中说明采取间接指针的目的是为了进行内存压缩,但在最后几个dalvik版本中,采取的仍是mark-sweep算法(art模式采取mark-copy,真正实现了对堆内存的整理).mark过程中,虚拟机会分别在mark rootSet以及Mark Thread root阶段对jniGlobalRefTable和jniLocalRefTable进行标记,避免GC回收.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">zhengwen</dc:creator><pubDate>Sun, 09 Nov 2014 00:00:00 +0800</pubDate><guid>tag:blog.aaapei.com,2014-11-09:article/2014/11/dalvik-jnijie-xi</guid><category>jni</category><category>dalvik</category></item><item><title>blog.aaapei.com</title><link>http://blog.aaapei.com/article/2014/08/blogaaapeicom</link><description>&lt;p&gt;前端时间为了科学上网买了个vps，准备用aaapei这个主域名收回来，用在vps跑一些试验性服务，blog切到二级子域名 blog.aaapei.com&lt;/p&gt;
 &lt;p&gt;最近一两个月会将aaapei.com的80端口重定向到blog子域名，顺便扯一句，godaddy的重定向服务在国内被禁，所以在vps上又跑了个tornado实例，专门做重定向；google analytics上看月pv也就几百，我一定是想多了 :&amp;lt;&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">zhengwen</dc:creator><pubDate>Sat, 09 Aug 2014 00:00:00 +0800</pubDate><guid>tag:blog.aaapei.com,2014-08-09:article/2014/08/blogaaapeicom</guid><category>域名</category></item><item><title>android中lua脚本的部署</title><link>http://blog.aaapei.com/article/2014/04/androidzhong-luajiao-ben-de-bu-shu</link><description>&lt;p&gt;“愤怒的小鸟”中，lua脚本是运行时部署在应用的data目录，同时做了脚本加密；&lt;br /&gt;
 但是如果你的lua脚本有了模块包，脚本就会有多级目录，而android的data目录下是不允许有子目录；&lt;br /&gt;

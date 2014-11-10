@@ -16,8 +16,8 @@
                 <meta property="og:type" content="article"/>
                 <meta property="og:title" content="dalvik jni解析"/>
                 <meta property="og:url" content="http://blog.aaapei.com/article/2014/11/dalvik-jnijie-xi"/>
-                <meta property="og:description" content="android开发者在移植第三方native库时,会经常使用到jni. Java Native Interface(java本地接口),用于java与c/c++代码进行交互.需要了解的是,jni只是jvm的一个规范,因此各家虚拟机的实现会不一样,本文重点介绍一下dalvik中jobject reference的实现. jobject reference type jni规范中,对jobject 定义了reference的两种类型: 全局引用（global reference） 局部引用（local reference） 在JNI Specification中的说明是: Local references are valid for the duration of a native method call, and are automatically freed after the native method returns. Global ..."/>
-                <meta name="description" content="android开发者在移植第三方native库时,会经常使用到jni. Java Native Interface(java本地接口),用于java与c/c++代码进行交互.需要了解的是,jni只是jvm的一个规范,因此各家虚拟机的实现会不一样,本文重点介绍一下dalvik中jobject reference的实现. jobject reference type jni规范中,对jobject 定义了reference的两种类型: 全局引用（global reference） 局部引用（local reference） 在JNI Specification中的说明是: Local references are valid for the duration of a native method call, and are automatically freed after the native method returns. Global ...">
+                <meta property="og:description" content="android开发者在移植第三方native库时,经常会使用到jni. Java Native Interface(java本地接口),用于java与c/c++代码进行交互.需要了解的是,jni只是jvm的一个规范,各家虚拟机有各自的实现,本文分享一下dalvik中jobject reference的实现. jobject reference type jni规范中,对jobject定义了两种reference类型: 全局引用（global reference） 局部引用（local reference） 在JNI Specification中的说明是: Local references are valid for the duration of a native method call, and are automatically freed after the native method returns. Global references ..."/>
+                <meta name="description" content="android开发者在移植第三方native库时,经常会使用到jni. Java Native Interface(java本地接口),用于java与c/c++代码进行交互.需要了解的是,jni只是jvm的一个规范,各家虚拟机有各自的实现,本文分享一下dalvik中jobject reference的实现. jobject reference type jni规范中,对jobject定义了两种reference类型: 全局引用（global reference） 局部引用（local reference） 在JNI Specification中的说明是: Local references are valid for the duration of a native method call, and are automatically freed after the native method returns. Global references ...">
 
 
 
@@ -92,10 +92,10 @@
         <a href="http://blog.aaapei.com/tags/dalvik">dalvik</a> ,         <a href="http://blog.aaapei.com/tags/jni">jni</a>     </div>
 </div>                <h1 class="title" itemprop="name"><a href="http://blog.aaapei.com/article/2014/11/dalvik-jnijie-xi" itemprop="url">dalvik jni解析</a></h1>
                 <div class="entry-content" itemprop="articleBody">
-                    <p>android开发者在移植第三方native库时,会经常使用到jni. <br />
-Java Native Interface(java本地接口),用于java与c/c++代码进行交互.需要了解的是,jni只是jvm的一个规范,因此各家虚拟机的实现会不一样,本文重点介绍一下dalvik中jobject reference的实现.</p>
+                    <p>android开发者在移植第三方native库时,经常会使用到jni. <br />
+Java Native Interface(java本地接口),用于java与c/c++代码进行交互.需要了解的是,jni只是jvm的一个规范,各家虚拟机有各自的实现,本文分享一下dalvik中jobject reference的实现.</p>
 <h3>jobject reference type</h3>
-<p>jni规范中,对jobject 定义了reference的两种类型:</p>
+<p>jni规范中,对jobject定义了两种reference类型:</p>
 <ul>
 <li>全局引用（global reference）</li>
 <li>局部引用（local reference）</li>
@@ -106,11 +106,11 @@ Java Native Interface(java本地接口),用于java与c/c++代码进行交互.需
 </blockquote>
 <p>局部引用的生命周期只在当前native函数上下文中有效;全局引用则虚拟机全局生效,直置开发者显式释放;
 dalvik额外定义了weak global reference,弱全局引用的<em>weak</em>与java层面中weak reference概念一致:在gc时,会被自动回收;
-android版本升级到4.x之后,android官方blog发布了这样一篇文章<a href="http://android-developers.blogspot.com/2011/11/jni-local-reference-changes-in-ics.html">jni local reference changes in ics</a></p>
+android4.0版本发布之后,android官方博客有这样一篇文章<a href="http://android-developers.blogspot.com/2011/11/jni-local-reference-changes-in-ics.html">jni local reference changes in ics</a></p>
 <blockquote>
 <p>The best garbage collectors move objects around. This lets them offer very cheap allocation and bulk deallocation, avoids heap fragmentation, and may improve locality. Moving objects around is a problem if you’ve handed out pointers to them to native code. JNI uses types such as jobject to solve this problem: rather than handing out direct pointers, you’re given an opaque handle that can be traded in for a pointer when necessary. By using handles, when the garbage collector moves an object, it just has to update the handle table to point to the object’s new location. </p>
 </blockquote>
-<p>意思是说,为了避免内存碎片,虚拟机在gc过程中应该对堆对象进行内存整理,将堆中分散的指针压缩集中在一处;在之前的版本中,jobject是一个直接指针,直接指向了堆中的内存地址,因此无法使用压缩算法;又由于jobject是一个直接指针,因此之前的版本也未能实现<em>GetObjectRefType</em>接口;所以,我们现在采用对象句柄间接指向堆对像,解决了以上的问题;<br />
+<p>意思是说,为了避免内存碎片,虚拟机在gc过程中应该对堆对象进行内存整理,将堆中分散的指针压缩集中在一处;在之前的版本中,jobject是一个直接指针,直接指向了堆中的内存地址,因此无法采用压缩算法;又由于jobject是一个直接指针,之前的版本也未能实现<em>GetObjectRefType</em>接口;所以,我们现在采用对象句柄间接指向堆对像,解决了以上的问题;<br />
 那么问题来了,何为对象句柄？ 对象句柄又如何区分reference类型？</p>
 <h3>IndirectRefTable</h3>
 <p>首先明确几个类型的定义:</p>
@@ -118,7 +118,7 @@ android版本升级到4.x之后,android官方blog发布了这样一篇文章<a h
 </pre></div>
 
 
-<p>jobject是一个void指针,arm下,即32位</p>
+<p>jobject是一个void指针,在arm下,长32位</p>
 <div class="highlight"><pre><span class="k">typedef</span> <span class="kt">uint16_t</span>            <span class="n">u2</span><span class="p">;</span>
 <span class="k">typedef</span> <span class="kt">uint32_t</span>            <span class="n">u4</span><span class="p">;</span>
 </pre></div>
@@ -128,8 +128,8 @@ android版本升级到4.x之后,android官方blog发布了这样一篇文章<a h
 <blockquote>
 <p>By using handles, when the garbage collector moves an object, it just has to update the handle table to point to the object’s new location. </p>
 </blockquote>
-<p>官方博客的文章中提到的handle table,对应到dalvik的实现,就是是<em>IndirectRefTable</em>
-虚拟机维护了一个全局引用表jniGlobalRefTable,为每一个线程都维护一个局部引用表jniLocalRefTaable,两者采用此相同的数据结构.IndirectRefTable的表元素称之为<em>IndirectRefSlot</em>  </p>
+<p>官方博客的文章中提到的handle table,对应到dalvik的实现,就是<em>IndirectRefTable</em>
+虚拟机维护了一个全局引用表jniGlobalRefTable,为每一个线程都维护一个局部引用表jniLocalRefTable,两者采用此相同的数据结构.IndirectRefTable的表元素称之为<em>IndirectRefSlot</em>  </p>
 <div class="highlight"><pre><span class="k">struct</span> <span class="n">IndirectRefSlot</span> <span class="p">{</span>
    <span class="n">Object</span><span class="o">*</span> <span class="n">obj</span><span class="p">;</span>    <span class="cm">/* object pointer itself, NULL if the slot is unused */</span>
    <span class="n">u4</span>  <span class="n">serial</span><span class="p">;</span>     <span class="cm">/* slot serial number */</span>
@@ -137,13 +137,13 @@ android版本升级到4.x之后,android官方blog发布了这样一篇文章<a h
 </pre></div>
 
 
-<p>IndirectRefSlot只有两个字段,obj即直接对象指针,serail是一个自增的无符号数,主要用于校验对比;
+<p>IndirectRefSlot只有两个字段,obj即直接对象指针,serial是一个自增的无符号数,主要用于校验对比;
 jni.h中将jobject定义成void指针,在虚拟机内部,jobject被表示为<em>IndirectRef</em>,仍然是一个void指针,不过虚拟机并不关心其类型,只需要明确的是,void指针有32位长;</p>
 <div class="highlight"><pre><span class="k">typedef</span> <span class="kt">void</span><span class="o">*</span> <span class="n">IndirectRef</span><span class="p">;</span>
 </pre></div>
 
 
-<p>基于以上几个定义,获取一个jobject的流程可以转换成:构造一个IndirectRefSlot对象,添加到IndirectTable表中,获取索引,并最终返回IndirectRef指针.<br />
+<p>基于以上几个定义,获取一个jobject的流程可以转换成:构造一个IndirectRefSlot对象,添加到IndirectTable表中,获取索引值,并最终返回IndirectRef指针.<br />
 索引转换成IndirectRef的函数实现如下:</p>
 <div class="highlight"><pre> <span class="nx">static</span> <span class="k">inline</span> <span class="nx">IndirectRef</span> <span class="nx">toIndirectRef</span><span class="p">(</span><span class="nx">u4</span> <span class="nb">index</span><span class="p">,</span> <span class="nx">u4</span> <span class="nx">serial</span><span class="p">,</span> <span class="nx">IndirectRefKind</span> <span class="nx">kind</span><span class="p">)</span> <span class="p">{</span>
          <span class="k">return</span> <span class="nx">reinterpret_cast</span><span class="o">&lt;</span><span class="nx">IndirectRef</span><span class="o">&gt;</span><span class="p">((</span><span class="nx">serial</span> <span class="o">&lt;&lt;</span> <span class="mi">20</span><span class="p">)</span> <span class="o">|</span> <span class="p">(</span><span class="nb">index</span> <span class="o">&lt;&lt;</span> <span class="mi">2</span><span class="p">)</span> <span class="o">|</span> <span class="nx">kind</span><span class="p">);</span>
@@ -161,7 +161,7 @@ jni.h中将jobject定义成void指针,在虚拟机内部,jobject被表示为<em>
 当获取一个jobject对象类型时,可以直接判断jobject最后两位,但当操作jobject对象时,则需要额外的寻址操作,句柄的装包解包其实也是jni效率低下的原因之一.<br />
 有表的添加,自然有表对象的移除,当在IndirectRefTable表中删除一个jni引用时候,会将对应IndirectRefSlot的obj对象置为null,二次添加时,优先添加到空位IndirectRefSlot.</p>
 <h3>IndirectRefTable的压栈出栈</h3>
-<p>既然有jni本地方法,虚拟栈也分为java栈和jni栈.虚拟机在编译期就可以确定java method中局部变量的个数,当一个java栈被压栈时,压栈的内存大小为栈<em>StackSaveArea</em>本身大小以及局部变量的内存大小;<br />
+<p>java函数分为普通函数和本地函数,虚拟机栈也分为普通栈和jni栈.虚拟机在编译期可以确定普通函数中局部变量的个数,当一个普通栈被压栈时,压栈的内存大小为栈<em>StackSaveArea</em>本身大小以及局部变量的内存大小;<br />
 而jni栈,虚拟机并不知道栈中会有多少个局部变量,jni栈只包含<em>StackSaveArea</em>的内存大小,jobject统一交给IndirectRefTable管理,因此,IndirectRefTable也需要压栈出栈的概念;<br />
 StackSaveArea有一个xtra union变量:</p>
 <div class="highlight"><pre><span class="k">struct</span> <span class="n">StackSaveArea</span><span class="p">;</span>
@@ -191,9 +191,9 @@ StackSaveArea有一个xtra union变量:</p>
 
 
 <p>注意<em>IRTSegmentState</em>是一个32位长的union,从注释可以看出,前16位用于记录当前IndirectRefTable的索引位,后16位用于记录当前栈之前,IndirectRefTable的空位个数.
-采取这种设计的因＝原因是为了快速的出栈,虚拟机可以直接从StackSaveArea中取到上一个栈的topIndex,重置回IndirectRefTable表,而不需要逐一回退.<br />
-jni api有一对pushLocalFrame/popLocalFrame函数,也是利用<em>IRTSegmentState</em>进行本地引用的批量删除.</p>
-<h3>GC</h3>
+采取这种设计的原因是为了快速的出栈,虚拟机可以直接从StackSaveArea中取到上一个栈的topIndex,重置回IndirectRefTable表,而不需要逐一回退.<br />
+jni api有一对pushLocalFrame/popLocalFrame函数,也是利用了<em>IRTSegmentState</em>进行本地引用的批量删除.</p>
+<h3>垃圾回收</h3>
 <p>虽然在官方blog中说明采取间接指针的目的是为了进行内存压缩,但在最后几个dalvik版本中,采取的仍是mark-sweep算法(art模式采取mark-copy,真正实现了对堆内存的整理).mark过程中,虚拟机会分别在mark rootSet以及Mark Thread root阶段对jniGlobalRefTable和jniLocalRefTable进行标记,避免GC回收.</p>
                 </div>
             </article>
