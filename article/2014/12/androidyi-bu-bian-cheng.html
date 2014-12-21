@@ -1,0 +1,230 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>I'm aaapei</title>
+        <meta name="author" content="aaapei">
+
+        <!-- http://t.co/dKP3o1e -->
+        <meta name="HandheldFriendly" content="True">
+        <meta name="MobileOptimized" content="320">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <!-- Open Graph tags -->
+
+
+                <meta property="og:type" content="article"/>
+                <meta property="og:title" content="android异步编程"/>
+                <meta property="og:url" content="http://blog.aaapei.com/article/2014/12/androidyi-bu-bian-cheng"/>
+                <meta property="og:description" content="在android开发中，有两条很重要的编程准则 不要堵塞ui线程 不要在非ui线程操作ui控件 开发者必须这两个遵守单线程模型的的准则，将耗时的逻辑转移到非ui线程进行，得出计算结果后，通知ui线程进行数据的展现。本文介绍一下android的异步编程。 android线程模型 如同spothot虚拟机一样，在daivlk虚拟机中，采取的是一对一的线程模型，每一个android thread对应一个Native Linux thread；linux内核通过cfs（completely fair scheduler）来进行线程调度，在cfs中着影响一个线程时间分配的因素有两个： thread priority thread group thread group 线程的thread group是动态改变的，在android framework层面，android的应用有5个等级，分别是 foreground process visible process service process backgroud process empty process 它们的thread group如图， 在实际的分配中，系统会将90 ..."/>
+                <meta name="description" content="在android开发中，有两条很重要的编程准则 不要堵塞ui线程 不要在非ui线程操作ui控件 开发者必须这两个遵守单线程模型的的准则，将耗时的逻辑转移到非ui线程进行，得出计算结果后，通知ui线程进行数据的展现。本文介绍一下android的异步编程。 android线程模型 如同spothot虚拟机一样，在daivlk虚拟机中，采取的是一对一的线程模型，每一个android thread对应一个Native Linux thread；linux内核通过cfs（completely fair scheduler）来进行线程调度，在cfs中着影响一个线程时间分配的因素有两个： thread priority thread group thread group 线程的thread group是动态改变的，在android framework层面，android的应用有5个等级，分别是 foreground process visible process service process backgroud process empty process 它们的thread group如图， 在实际的分配中，系统会将90 ...">
+
+
+
+
+
+        <link rel="canonical" href="">
+        <link href="http://blog.aaapei.com/favicon.png" rel="shortcut icon">
+        <link href="http://blog.aaapei.com/theme/css/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+        <link href="http://blog.aaapei.com/theme/css/pygments.css" media="screen, projection" rel="stylesheet" type="text/css">
+
+        <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+<!--
+		<link href="//fonts.googleapis.com/css?family=Open+Sans:400italic,400,700" rel='stylesheet' type='text/css'>
+        <link href="//fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel='stylesheet' type='text/css'>
+        <link href="//fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel='stylesheet' type='text/css'>
+		-->
+        <script src="//lib.sinaapp.com/js/jquery/1.7.2/jquery.min.js"></script>
+        <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+
+    </head>
+<body>
+	<script type="text/javascript">
+		var _bdhmProtocol = (("https:" == document.location.protocol) ? " https://" : " http://");
+		document.write(unescape("%3Cscript src='" + _bdhmProtocol + "hm.baidu.com/h.js%3F42905fb57b3457075b7322a0893c5395' type='text/javascript'%3E%3C/script%3E"));
+	</script>
+		<div class="container">
+			<div class="left-col">
+				<div class="intrude-less">
+				<header id="header" class="inner">
+	<div class="profilepic">
+		<img src="http://www.gravatar.com/avatar/4c187c40f3f52c969742c6476ade7e44?s=160" alt="Profile Picture" style="width: 160px;" />
+	</div>
+
+<hgroup>
+	<br/>
+	<h1><a href="http://blog.aaapei.com/">I'm aaapei</a></h1>
+    <h3>少年去游荡</h3>
+</hgroup>
+<nav id="main-nav">
+
+<ul class="main-navigation">
+	        <li><a href="http://blog.aaapei.com/.">首页</a></li>
+	        <li><a href="http://blog.aaapei.com/categories.html">分类</a></li>
+	        <li><a href="http://blog.aaapei.com/tags">标签</a></li>
+	        <li><a href="http://blog.aaapei.com/pages/sui-sui-nian">碎碎念</a></li>
+</ul></nav>
+
+<nav id="sub-nav">
+	<div class="social">
+			<a class="email" href="mailto:aaapei@gmail.com" title="Email">Email</a>
+		<a class="weibo" href="http://weibo.com/a2pei" title="Weibo">Weibo</a>
+			<a class="rss" href="http://blog.aaapei.com/rss.xml" title="RSS">ATOM</a>
+	</div>
+<section id="about-me">
+  <h2>关于我</h2>
+  <p>生活@hangzhou. 工作@netease.<br/> 移动端码农. 正在减肥的胖子. 食肉. <br/>想养喵但老婆不让</p>
+</section>
+</nav>				</header>
+				</div>
+			</div>
+			<div class="mid-col">
+				<div class="mid-col-container">
+					<div id="content" class="inner">
+
+        <section id="content" class="body">
+            <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
+<div class="meta">
+    <div class="date">
+        <time datetime="2014-12-21T00:00:00.000000" itemprop="datePublished">2014-12-21</time>
+    </div>
+    <div class="tags">
+        <a href="http://blog.aaapei.com/tags/android">android</a> ,         <a href="http://blog.aaapei.com/tags/yi-bu">异步</a>     </div>
+</div>                <h1 class="title" itemprop="name"><a href="http://blog.aaapei.com/article/2014/12/androidyi-bu-bian-cheng" itemprop="url">android异步编程</a></h1>
+                <div class="entry-content" itemprop="articleBody">
+                    <p>在android开发中，有两条很重要的<a href="http://developer.android.com/guide/components/processes-and-threads.html">编程准则</a></p>
+<ul>
+<li>不要堵塞ui线程</li>
+<li>不要在非ui线程操作ui控件</li>
+</ul>
+<p>开发者必须这两个遵守单线程模型的的准则，将耗时的逻辑转移到非ui线程进行，得出计算结果后，通知ui线程进行数据的展现。本文介绍一下android的异步编程。</p>
+<h3>android线程模型</h3>
+<p>如同spothot虚拟机一样，在daivlk虚拟机中，采取的是一对一的线程模型，每一个android thread对应一个Native Linux thread；linux内核通过cfs（completely fair scheduler）来进行线程调度，在cfs中着影响一个线程时间分配的因素有两个：</p>
+<ul>
+<li>thread priority</li>
+<li>thread group</li>
+</ul>
+<h4>thread group</h4>
+<p>线程的thread group是动态改变的，在android framework层面，android的应用有5个等级，分别是</p>
+<ul>
+<li>foreground process</li>
+<li>visible process</li>
+<li>service process</li>
+<li>backgroud process</li>
+<li>empty process  </li>
+</ul>
+<p>它们的thread group如图，<br />
+<img alt="Alt pic" src="http://nos.netease.com/knowledge/e2d1dc53-5724-4b1e-b93e-74325a0d70f5" />   </p>
+<p>在实际的分配中，系统会将90%的cpu时间分配给foregroud thread group，
+如果某个应用处于foreground或visible level，那么它创建的子thread都属于foreground group
+当应用的可见状态被改变时，例如按home健被切入到后台运用，应用从foregroud process变成了backgroud process，应用对应的的thread group也切换到了backgroud group</p>
+<h4>thread priority</h4>
+<p>线程的优先级通过Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND)设置；</p>
+<h3>线程分类</h3>
+<p>在一个android应用中，存在三种类型的线程：</p>
+<ul>
+<li>UIThread,即工作主线程</li>
+<li>
+<p>Binder Thread：与其他进程进行binder通信的线程，通过一个线程池进行维护；
+每个进程维护了一个线程池用于与其他进程的通信，binder thread隐藏在后台，开发者一般不需要关心；</p>
+</li>
+<li>
+<p>backgroud thread,即后台线程；</p>
+</li>
+</ul>
+<p>注意每一个后台线程都是UIThread的子线程，意味着他的线程优先级和ui thread是完全相同的，同时由于他们处在同一个thread group中，那么linux内核对ui线程和后台线程一时同仁；</p>
+<p>dalvik有一个最大线程个数的限制，但不意味着应用可以随意生成低于这个限制值的线程个数；由于linux内核平等的对待ui线程和后台线程，一旦滥用后台，当ui线程不能抢占到足够的cpu时间片时，也抛出anr异常；另一方面，由于thread是gc mark的root，过多的线程也会对gc造成影响。</p>
+<h3>Thread&amp;&amp;Executor</h3>
+<p>Thread和Executor都是jdk原生的异步机制，不再赘述。在使用时，原生的Thread的存在两个缺陷： </p>
+<ul>
+<li>不可复用，线程的创建、销毁都需要时间开销以及空间开销</li>
+<li>无原生的cancel机制，你需要额外的工作去管理的thread生命周期</li>
+</ul>
+<p>而Executor线程池，解决Thread不可复用，减少thread的重复创建。</p>
+<h3>HandlerThread</h3>
+<p>HandlerThread是Thread的子类，内部封装了Message/Looper,Message/Looper是一个顺序执行的队列，开发者可以利用这一特性进行异步逻辑之间的组合及交互,因此非常适合做一个状态机：最典型的例子即条码处理库<a href="https://github.com/zxing/zxing/">zxing</a>，摄像头扫描过程中每一个状态都通过Message同步给了ui线程；同样使用HandlerThread，另一个使用度非常高的<a href="https://github.com/loopj/android-async-http">android-async-http</a>则是一个典型的反例，async-http是一个异步网络库，它以callback作为数据协同的方式，导致的结果是代码充斥了不可读的callback嵌套callback。</p>
+<h5>适用场景</h5>
+<ul>
+<li>需要一个长期运行的thread</li>
+<li>顺序执行的消息loop<ul>
+<li>避免多个按钮同时点击</li>
+<li>状态机</li>
+<li>细粒度的消息控制</li>
+</ul>
+</li>
+</ul>
+<h3>AsyncTask</h3>
+<p>AsyncTask是android中最常用的并发机制，api非常简洁，开发者只需简单的继承AsyncTask即可完成异步逻辑以及数据协同,
+数据的协同，内部通过Handler/Message进行，异步逻辑doInBackground则利用Executor完成。
+必须要了解是，AysncTask是一个全局行为，在不同的组件中创建Asynctask，最终的执行都会在同一个Executor中：</p>
+<p><img alt="Alt pic" src="http://nos.netease.com/knowledge/42dccf78-0a92-4d5f-9463-1e77174ca076" /> </p>
+<p>作为最常用的异步编程解决方案，AsyncTask也是被批评最多的异步机制，原因是其在不同android版本中的不同表现，
+在1.6版本之前，AsyncTask的Executor是一个单线程，所有AsyncTaskd都是顺序执行；
+在1.6到3.0版本中，Executor维护了一个最多线程池并发执行
+android版本发展到3.0后，默认的线程修改成了单线程task，同时提供了一个executeOneExecutor api支持多个并行task，
+ 但这不表示的在3.x版本之后，你的task是默认一定是顺序执行的，它还受taregetSdkVersion的影响，AcitivityThread.java中有这样一段代码</p>
+<p>```
+// If the app is Honeycomb MR1 or earlier, switch its AsyncTask
+// implementation to use the pool executor.  Normally, we use the
+// serialized executor as the default. This has to happen in the
+// main thread so the main looper is set right.
+if (data.appInfo.targetSdkVersion &lt;= android.os.Build.VERSION_CODES.HONEYCOMB_MR1) {
+    AsyncTask.setDefaultExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+}</p>
+<p>```</p>
+<p>如果targetSDKVersion低于3.2版本，AsyncTask是并行执行的，否则将会被顺序执行，考虑不同版本的表现，在使用AsyncTask时需要考虑你的task之间是否需要应该有相互依赖的顺序；</p>
+<p>另一个经常被批评的点是AsyncTask的全局行为，在组件中使用Asynctask时，经常会将他定义在一个匿名的内部类，这时候一个潜在的内存泄漏就产生了，由于Asynctask的生命周期可能比它关联的组件对象长，导致其关联的主角对象无法被回收，幸运的是，asynctask提供了cancel机制。在组件生命周期结束后及时调用cancel api,在asynctask未被执行时，可以将asynctask从队列去除；cancel有一个mayInterruptIfRunning参数：cancel(true) == cancel(false)+interrpt</p>
+<h3>IntentService</h3>
+<p>IntentService为Service的子类，其内部实现包含了一个HandlerThread，它兼具了service/message looper/hanlder的优势，android官方文档将其列为后台任务的最佳实践（http://developer.android.com/training/best-background.html）</p>
+<p>不同与Service，当一个intent被提交，系统会将intent提交到HandlerThread中顺序执行，而非在ui线程执行;
+IntentService中工作队列不能被打断，必须等待所有的intent被处理完成之后，intentservcie自动关闭；官方建议通过broadcast机制来进行协同，避免产生耦合；</p>
+<h3>Loader/AsyncQueryHandler</h3>
+<p>将Loader和AsyncQueryHandler放在一起，主要是因为他们api适合做为数据加载的接口
+区别在与Loader内部利用AsyncTask，AsyncQueryHandler使用ThreadHandler
+Loader机制在api 11中引入，通过support包的方式支持已有版本，两者都支持：</p>
+<ul>
+<li>后台加载数据</li>
+<li>数据改变时候的回调</li>
+<li>生命周期自动管理</li>
+</ul>
+<h3>延伸阅读</h3>
+<p>一些现有的解决方案  </p>
+<ul>
+<li>
+<p><a href="https://github.com/ReactiveX/RxAndroid">rxandroid</a> 函数式响应框架，rxjava的android版本，主要贡献者是<em>JakeWharton</em>大神，提供了异步逻辑的组合、过滤，不过目前暂不适合在生产环境使用，建议关注</p>
+</li>
+<li>
+<p><a href="http://androidannotations.org/">android anotation</a> 如名，基于java注解，提供了一个简化的线程模型，提供编程效率</p>
+</li>
+<li>
+<p><a href="https://github.com/greenrobot/EventBus">EventBus</a>:基于生产/消费者模型的优雅实现</p>
+</li>
+</ul>
+                </div>
+            </article>
+			<!-- 多说评论框 start -->
+				<div class="ds-thread" data-thread-key="请将此处替换成文章在你的站点中的ID" data-title="请替换成文章的标题" data-url="请替换成文章的网址"></div>
+				<!-- 多说评论框 end -->
+				<!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+				<script type="text/javascript">
+					var duoshuoQuery = {short_name:"aaapei"};
+						(function() {
+								var ds = document.createElement('script');
+								ds.type = 'text/javascript';ds.async = true;
+								ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+								ds.charset = 'UTF-8';
+								(document.getElementsByTagName('head')[0]  || document.getElementsByTagName('body')[0]).appendChild(ds);
+							})();
+					</script>
+			<!-- 多说公共JS代码 end -->
+
+        </section>
+
+					</div>
+				</div>
+				<footer id="footer" class="inner">
+<p>Copyright &copy; 2013 - aaapei - <span class="credit">Powered by <a href="http://getpelican.com">Pelican</a></span></p>				</footer>
+			</div>
+		</div>
+	</body>
+</html>

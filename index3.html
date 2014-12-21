@@ -80,66 +80,41 @@
 			<div class="mid-col">
 				<div class="mid-col-container">
 					<div id="content" class="inner">
-		<section id="tags">
-		<h1 class="tags">标签:</h1>
-		<br/>
-				<div class="tag">
+            <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
+<div class="meta">
+    <div class="date">
+        <time datetime="2013-12-02T20:20:00.000000" itemprop="datePublished">2013-12-02</time>
+    </div>
+    <div class="tags">
+        <a href="http://blog.aaapei.com/tags/android">android</a> ,         <a href="http://blog.aaapei.com/tags/lua">lua</a>     </div>
+</div>                <h1 class="title" itemprop="name"><a href="http://blog.aaapei.com/article/2013/12/luajavaxing-neng-you-hua" itemprop="url">luajava性能优化</a></h1>
+                <div class="entry-content" itemprop="description"><p>最近在做一个lua的android项目,对于lua的生态环境完全陌生,所以选用了个文档资料最全的lua bridge:<em>luajava</em><br />
+luajava目前只支持到lua5.1,不过升级到5.2困难不大,主要是一些宏开关以及静态变量;然而实际运行的时候发现卡的很不行,ui频繁掉祯,profile后发现90%+的cpu耗时在luajava中  </p>
+<p>看了一下luajava本身代码量不大;索性就追了一下,luajava的native层就一个luajava.c,java层,除了LuaJavaApi.java,其他java类都是Value Object</p>
+<h3>lua逻辑分析</h3>
+<p>先看lua创建java object的代码,luajava.c中</p>
+<div class="highlight"><pre><span class="kt">int</span> <span class="nf">javaNewInstance</span><span class="p">(</span> <span class="n">lua_State</span> <span class="o">*</span> <span class="n">L</span> <span class="p">)</span>
+<span class="p">{</span>     
+    <span class="c1">//some code …..</span>
+    <span class="n">method</span>  <span class="o">=</span> <span class="p">(</span> <span class="o">*</span><span class="n">javaEnv</span> <span class="p">)</span><span class="o">-&gt;</span><span class="n">GetStaticMethodID</span><span class="p">(</span> <span class="n">javaEnv</span> <span class="p">,</span> <span class="n">luajava_api_class</span> <span class="p">,</span> <span class="s">&quot;javaNewInstance&quot;</span> <span class="p">,</span><span class="s">&quot;(ILjava/lang/String;)I&quot;</span> <span class="p">);</span>
+     <span class="c1">//先调用java层创建javaobject</span>
+    <span class="n">javaClassName</span> <span class="o">=</span> <span class="p">(</span> <span class="o">*</span><span class="n">javaEnv</span> <span class="p">)</span><span class="o">-&gt;</span><span class="n">NewStringUTF</span><span class="p">(</span> <span class="n">javaEnv</span> <span class="p">,</span> <span class="n">className ...</span></pre></div>
+					<br/ >
+					<a href="http://blog.aaapei.com/article/2013/12/luajavaxing-neng-you-hua">查看全文</a>
+                </div>
+                <div class="meta">
+                    <span class="author">Posted by <a href="http://blog.aaapei.com/author/zhengwen.html">zhengwen</a></span>
+                </div>
+            </article>
+            <hr/>
 
-					<a href="http://blog.aaapei.com/tags/android">android</a>
-				<!--	
-					<a href="/blog/tags/android">android</a>
-					-->
-				</div>
-				<div class="tag">
+        <nav id="pagenavi">
+                <a href="http://blog.aaapei.com/index2.html" class="prev">Prev</a>
 
-					<a href="http://blog.aaapei.com/tags/dalvik">dalvik</a>
-				<!--	
-					<a href="/blog/tags/dalvik">dalvik</a>
-					-->
-				</div>
-				<div class="tag">
 
-					<a href="http://blog.aaapei.com/tags/jni">jni</a>
-				<!--	
-					<a href="/blog/tags/jni">jni</a>
-					-->
-				</div>
-				<div class="tag">
+            <a href="http://blog.aaapei.com" class="center">文章列表</a>
 
-					<a href="http://blog.aaapei.com/tags/lua">lua</a>
-				<!--	
-					<a href="/blog/tags/lua">lua</a>
-					-->
-				</div>
-				<div class="tag">
-
-					<a href="http://blog.aaapei.com/tags/luajava">luajava</a>
-				<!--	
-					<a href="/blog/tags/luajava">luajava</a>
-					-->
-				</div>
-				<div class="tag">
-
-					<a href="http://blog.aaapei.com/tags/wei-xin">微信</a>
-				<!--	
-					<a href="/blog/tags/微信">微信</a>
-					-->
-				</div>
-				<div class="tag">
-
-					<a href="http://blog.aaapei.com/tags/yi-bu">异步</a>
-				<!--	
-					<a href="/blog/tags/异步">异步</a>
-					-->
-				</div>
-				<div class="tag">
-
-					<a href="http://blog.aaapei.com/tags/yu-ming">域名</a>
-				<!--	
-					<a href="/blog/tags/域名">域名</a>
-					-->
-				</div>
-		</section>
+        </nav>
 					</div>
 				</div>
 				<footer id="footer" class="inner">

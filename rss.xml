@@ -1,5 +1,112 @@
 <?xml version="1.0" encoding="utf-8"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>I'm aaapei</title><link>http://blog.aaapei.com/</link><description></description><atom:link href="http://blog.aaapei.com/rss.xml" rel="self"></atom:link><lastBuildDate>Sun, 09 Nov 2014 00:00:00 +0800</lastBuildDate><item><title>dalvik jni解析</title><link>http://blog.aaapei.com/article/2014/11/dalvik-jnijie-xi</link><description>&lt;p&gt;android开发者在移植第三方native库时,经常会使用到jni. &lt;br /&gt;
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>I'm aaapei</title><link>http://blog.aaapei.com/</link><description></description><atom:link href="http://blog.aaapei.com/rss.xml" rel="self"></atom:link><lastBuildDate>Sun, 21 Dec 2014 00:00:00 +0800</lastBuildDate><item><title>android异步编程</title><link>http://blog.aaapei.com/article/2014/12/androidyi-bu-bian-cheng</link><description>&lt;p&gt;在android开发中，有两条很重要的&lt;a href="http://developer.android.com/guide/components/processes-and-threads.html"&gt;编程准则&lt;/a&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;不要堵塞ui线程&lt;/li&gt;
+&lt;li&gt;不要在非ui线程操作ui控件&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;开发者必须这两个遵守单线程模型的的准则，将耗时的逻辑转移到非ui线程进行，得出计算结果后，通知ui线程进行数据的展现。本文介绍一下android的异步编程。&lt;/p&gt;
+&lt;h3&gt;android线程模型&lt;/h3&gt;
+&lt;p&gt;如同spothot虚拟机一样，在daivlk虚拟机中，采取的是一对一的线程模型，每一个android thread对应一个Native Linux thread；linux内核通过cfs（completely fair scheduler）来进行线程调度，在cfs中着影响一个线程时间分配的因素有两个：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;thread priority&lt;/li&gt;
+&lt;li&gt;thread group&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4&gt;thread group&lt;/h4&gt;
+&lt;p&gt;线程的thread group是动态改变的，在android framework层面，android的应用有5个等级，分别是&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;foreground process&lt;/li&gt;
+&lt;li&gt;visible process&lt;/li&gt;
+&lt;li&gt;service process&lt;/li&gt;
+&lt;li&gt;backgroud process&lt;/li&gt;
+&lt;li&gt;empty process  &lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;它们的thread group如图，&lt;br /&gt;
+&lt;img alt="Alt pic" src="http://nos.netease.com/knowledge/e2d1dc53-5724-4b1e-b93e-74325a0d70f5" /&gt;   &lt;/p&gt;
+&lt;p&gt;在实际的分配中，系统会将90%的cpu时间分配给foregroud thread group，
+如果某个应用处于foreground或visible level，那么它创建的子thread都属于foreground group
+当应用的可见状态被改变时，例如按home健被切入到后台运用，应用从foregroud process变成了backgroud process，应用对应的的thread group也切换到了backgroud group&lt;/p&gt;
+&lt;h4&gt;thread priority&lt;/h4&gt;
+&lt;p&gt;线程的优先级通过Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND)设置；&lt;/p&gt;
+&lt;h3&gt;线程分类&lt;/h3&gt;
+&lt;p&gt;在一个android应用中，存在三种类型的线程：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;UIThread,即工作主线程&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Binder Thread：与其他进程进行binder通信的线程，通过一个线程池进行维护；
+每个进程维护了一个线程池用于与其他进程的通信，binder thread隐藏在后台，开发者一般不需要关心；&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;backgroud thread,即后台线程；&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;注意每一个后台线程都是UIThread的子线程，意味着他的线程优先级和ui thread是完全相同的，同时由于他们处在同一个thread group中，那么linux内核对ui线程和后台线程一时同仁；&lt;/p&gt;
+&lt;p&gt;dalvik有一个最大线程个数的限制，但不意味着应用可以随意生成低于这个限制值的线程个数；由于linux内核平等的对待ui线程和后台线程，一旦滥用后台，当ui线程不能抢占到足够的cpu时间片时，也抛出anr异常；另一方面，由于thread是gc mark的root，过多的线程也会对gc造成影响。&lt;/p&gt;
+&lt;h3&gt;Thread&amp;amp;&amp;amp;Executor&lt;/h3&gt;
+&lt;p&gt;Thread和Executor都是jdk原生的异步机制，不再赘述。在使用时，原生的Thread的存在两个缺陷： &lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;不可复用，线程的创建、销毁都需要时间开销以及空间开销&lt;/li&gt;
+&lt;li&gt;无原生的cancel机制，你需要额外的工作去管理的thread生命周期&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;而Executor线程池，解决Thread不可复用，减少thread的重复创建。&lt;/p&gt;
+&lt;h3&gt;HandlerThread&lt;/h3&gt;
+&lt;p&gt;HandlerThread是Thread的子类，内部封装了Message/Looper,Message/Looper是一个顺序执行的队列，开发者可以利用这一特性进行异步逻辑之间的组合及交互,因此非常适合做一个状态机：最典型的例子即条码处理库&lt;a href="https://github.com/zxing/zxing/"&gt;zxing&lt;/a&gt;，摄像头扫描过程中每一个状态都通过Message同步给了ui线程；同样使用HandlerThread，另一个使用度非常高的&lt;a href="https://github.com/loopj/android-async-http"&gt;android-async-http&lt;/a&gt;则是一个典型的反例，async-http是一个异步网络库，它以callback作为数据协同的方式，导致的结果是代码充斥了不可读的callback嵌套callback。&lt;/p&gt;
+&lt;h5&gt;适用场景&lt;/h5&gt;
+&lt;ul&gt;
+&lt;li&gt;需要一个长期运行的thread&lt;/li&gt;
+&lt;li&gt;顺序执行的消息loop&lt;ul&gt;
+&lt;li&gt;避免多个按钮同时点击&lt;/li&gt;
+&lt;li&gt;状态机&lt;/li&gt;
+&lt;li&gt;细粒度的消息控制&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3&gt;AsyncTask&lt;/h3&gt;
+&lt;p&gt;AsyncTask是android中最常用的并发机制，api非常简洁，开发者只需简单的继承AsyncTask即可完成异步逻辑以及数据协同,
+数据的协同，内部通过Handler/Message进行，异步逻辑doInBackground则利用Executor完成。
+必须要了解是，AysncTask是一个全局行为，在不同的组件中创建Asynctask，最终的执行都会在同一个Executor中：&lt;/p&gt;
+&lt;p&gt;&lt;img alt="Alt pic" src="http://nos.netease.com/knowledge/42dccf78-0a92-4d5f-9463-1e77174ca076" /&gt; &lt;/p&gt;
+&lt;p&gt;作为最常用的异步编程解决方案，AsyncTask也是被批评最多的异步机制，原因是其在不同android版本中的不同表现，
+在1.6版本之前，AsyncTask的Executor是一个单线程，所有AsyncTaskd都是顺序执行；
+在1.6到3.0版本中，Executor维护了一个最多线程池并发执行
+android版本发展到3.0后，默认的线程修改成了单线程task，同时提供了一个executeOneExecutor api支持多个并行task，
+ 但这不表示的在3.x版本之后，你的task是默认一定是顺序执行的，它还受taregetSdkVersion的影响，AcitivityThread.java中有这样一段代码&lt;/p&gt;
+&lt;p&gt;```
+// If the app is Honeycomb MR1 or earlier, switch its AsyncTask
+// implementation to use the pool executor.  Normally, we use the
+// serialized executor as the default. This has to happen in the
+// main thread so the main looper is set right.
+if (data.appInfo.targetSdkVersion &amp;lt;= android.os.Build.VERSION_CODES.HONEYCOMB_MR1) {
+    AsyncTask.setDefaultExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+}&lt;/p&gt;
+&lt;p&gt;```&lt;/p&gt;
+&lt;p&gt;如果targetSDKVersion低于3.2版本，AsyncTask是并行执行的，否则将会被顺序执行，考虑不同版本的表现，在使用AsyncTask时需要考虑你的task之间是否需要应该有相互依赖的顺序；&lt;/p&gt;
+&lt;p&gt;另一个经常被批评的点是AsyncTask的全局行为，在组件中使用Asynctask时，经常会将他定义在一个匿名的内部类，这时候一个潜在的内存泄漏就产生了，由于Asynctask的生命周期可能比它关联的组件对象长，导致其关联的主角对象无法被回收，幸运的是，asynctask提供了cancel机制。在组件生命周期结束后及时调用cancel api,在asynctask未被执行时，可以将asynctask从队列去除；cancel有一个mayInterruptIfRunning参数：cancel(true) == cancel(false)+interrpt&lt;/p&gt;
+&lt;h3&gt;IntentService&lt;/h3&gt;
+&lt;p&gt;IntentService为Service的子类，其内部实现包含了一个HandlerThread，它兼具了service/message looper/hanlder的优势，android官方文档将其列为后台任务的最佳实践（http://developer.android.com/training/best-background.html）&lt;/p&gt;
+&lt;p&gt;不同与Service，当一个intent被提交，系统会将intent提交到HandlerThread中顺序执行，而非在ui线程执行;
+IntentService中工作队列不能被打断，必须等待所有的intent被处理完成之后，intentservcie自动关闭；官方建议通过broadcast机制来进行协同，避免产生耦合；&lt;/p&gt;
+&lt;h3&gt;Loader/AsyncQueryHandler&lt;/h3&gt;
+&lt;p&gt;将Loader和AsyncQueryHandler放在一起，主要是因为他们api适合做为数据加载的接口
+区别在与Loader内部利用AsyncTask，AsyncQueryHandler使用ThreadHandler
+Loader机制在api 11中引入，通过support包的方式支持已有版本，两者都支持：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;后台加载数据&lt;/li&gt;
+&lt;li&gt;数据改变时候的回调&lt;/li&gt;
+&lt;li&gt;生命周期自动管理&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3&gt;延伸阅读&lt;/h3&gt;
+&lt;p&gt;一些现有的解决方案  &lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;a href="https://github.com/ReactiveX/RxAndroid"&gt;rxandroid&lt;/a&gt; 函数式响应框架，rxjava的android版本，主要贡献者是&lt;em&gt;JakeWharton&lt;/em&gt;大神，提供了异步逻辑的组合、过滤，不过目前暂不适合在生产环境使用，建议关注&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;a href="http://androidannotations.org/"&gt;android anotation&lt;/a&gt; 如名，基于java注解，提供了一个简化的线程模型，提供编程效率&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;a href="https://github.com/greenrobot/EventBus"&gt;EventBus&lt;/a&gt;:基于生产/消费者模型的优雅实现&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">zhengwen</dc:creator><pubDate>Sun, 21 Dec 2014 00:00:00 +0800</pubDate><guid>tag:blog.aaapei.com,2014-12-21:article/2014/12/androidyi-bu-bian-cheng</guid><category>异步</category><category>android</category></item><item><title>dalvik jni解析</title><link>http://blog.aaapei.com/article/2014/11/dalvik-jnijie-xi</link><description>&lt;p&gt;android开发者在移植第三方native库时,经常会使用到jni. &lt;br /&gt;
 Java Native Interface(java本地接口),用于java与c/c++代码进行交互.需要了解的是,jni只是jvm的一个规范,各家虚拟机有各自的实现,本文分享一下dalvik中jobject reference的实现.&lt;/p&gt;
 &lt;h3&gt;jobject reference type&lt;/h3&gt;
 &lt;p&gt;jni规范中,对jobject定义了两种reference类型:&lt;/p&gt;
