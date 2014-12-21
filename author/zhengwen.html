@@ -93,7 +93,7 @@
 <li>不要堵塞ui线程</li>
 <li>不要在非ui线程操作ui控件</li>
 </ul>
-<p>开发者必须这两个遵守单线程模型的的准则，将耗时的逻辑转移到非ui线程进行，得出计算结果后，通知ui线程进行数据的展现。本文介绍一下android的异步编程。</p>
+<p>开发者必须这两个遵守单线程模型的准则，将耗时的逻辑转移到非ui线程进行，得出计算结果后，通知ui线程进行数据的展现。本文介绍一下android的异步编程。</p>
 <h3>android线程模型</h3>
 <p>如同spothot虚拟机一样，在daivlk虚拟机中，采取的是一对一的线程模型，每一个android thread对应一个Native Linux thread；linux内核通过cfs（completely fair scheduler）来进行线程调度，在cfs中着影响一个线程时间分配的因素有两个：</p>
 <ul>

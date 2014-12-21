@@ -4,7 +4,7 @@
 &lt;li&gt;不要堵塞ui线程&lt;/li&gt;
 &lt;li&gt;不要在非ui线程操作ui控件&lt;/li&gt;
 &lt;/ul&gt;
-&lt;p&gt;开发者必须这两个遵守单线程模型的的准则，将耗时的逻辑转移到非ui线程进行，得出计算结果后，通知ui线程进行数据的展现。本文介绍一下android的异步编程。&lt;/p&gt;
+&lt;p&gt;开发者必须这两个遵守单线程模型的准则，将耗时的逻辑转移到非ui线程进行，得出计算结果后，通知ui线程进行数据的展现。本文介绍一下android的异步编程。&lt;/p&gt;
 &lt;h3&gt;android线程模型&lt;/h3&gt;
 &lt;p&gt;如同spothot虚拟机一样，在daivlk虚拟机中，采取的是一对一的线程模型，每一个android thread对应一个Native Linux thread；linux内核通过cfs（completely fair scheduler）来进行线程调度，在cfs中着影响一个线程时间分配的因素有两个：&lt;/p&gt;
 &lt;ul&gt;
@@ -23,7 +23,7 @@
 &lt;p&gt;它们的thread group如图，&lt;br /&gt;
 &lt;img alt="Alt pic" src="http://nos.netease.com/knowledge/e2d1dc53-5724-4b1e-b93e-74325a0d70f5" /&gt;   &lt;/p&gt;
 &lt;p&gt;在实际的分配中，系统会将90%的cpu时间分配给foregroud thread group，
-如果某个应用处于foreground或visible level，那么它创建的子thread都属于foreground group
+如果某个应用处于foreground或visible level，那么它创建的所有thread都属于foreground group
 当应用的可见状态被改变时，例如按home健被切入到后台运用，应用从foregroud process变成了backgroud process，应用对应的的thread group也切换到了backgroud group&lt;/p&gt;
 &lt;h4&gt;thread priority&lt;/h4&gt;
 &lt;p&gt;线程的优先级通过Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND)设置；&lt;/p&gt;
@@ -70,16 +70,17 @@
 在1.6到3.0版本中，Executor维护了一个最多线程池并发执行
 android版本发展到3.0后，默认的线程修改成了单线程task，同时提供了一个executeOneExecutor api支持多个并行task，
  但这不表示的在3.x版本之后，你的task是默认一定是顺序执行的，它还受taregetSdkVersion的影响，AcitivityThread.java中有这样一段代码&lt;/p&gt;
-&lt;p&gt;```
-// If the app is Honeycomb MR1 or earlier, switch its AsyncTask
-// implementation to use the pool executor.  Normally, we use the
-// serialized executor as the default. This has to happen in the
-// main thread so the main looper is set right.
-if (data.appInfo.targetSdkVersion &amp;lt;= android.os.Build.VERSION_CODES.HONEYCOMB_MR1) {
-    AsyncTask.setDefaultExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-}&lt;/p&gt;
-&lt;p&gt;```&lt;/p&gt;
-&lt;p&gt;如果targetSDKVersion低于3.2版本，AsyncTask是并行执行的，否则将会被顺序执行，考虑不同版本的表现，在使用AsyncTask时需要考虑你的task之间是否需要应该有相互依赖的顺序；&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="c1"&gt;// If the app is Honeycomb MR1 or earlier, switch its AsyncTask&lt;/span&gt;
+&lt;span class="c1"&gt;// implementation to use the pool executor.  Normally, we use the&lt;/span&gt;
+&lt;span class="c1"&gt;// serialized executor as the default. This has to happen in the&lt;/span&gt;
+&lt;span class="c1"&gt;// main thread so the main looper is set right.&lt;/span&gt;
+&lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;data&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;appInfo&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;targetSdkVersion&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;=&lt;/span&gt; &lt;span class="n"&gt;android&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;os&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;Build&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="no"&gt;VERSION_CODES&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="no"&gt;HONEYCOMB_MR1&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+     &lt;span class="n"&gt;AsyncTask&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;setDefaultExecutor&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;AsyncTask&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="no"&gt;THREAD_POOL_EXECUTOR&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;如果targetSDKVersion低于3.2版本，AsyncTask是并行执行的，否则将会被顺序执行，考虑不同版本的表现，在使用AsyncTask时需要规避task之间有依赖执行顺序的逻辑；&lt;/p&gt;
 &lt;p&gt;另一个经常被批评的点是AsyncTask的全局行为，在组件中使用Asynctask时，经常会将他定义在一个匿名的内部类，这时候一个潜在的内存泄漏就产生了，由于Asynctask的生命周期可能比它关联的组件对象长，导致其关联的主角对象无法被回收，幸运的是，asynctask提供了cancel机制。在组件生命周期结束后及时调用cancel api,在asynctask未被执行时，可以将asynctask从队列去除；cancel有一个mayInterruptIfRunning参数：cancel(true) == cancel(false)+interrpt&lt;/p&gt;
 &lt;h3&gt;IntentService&lt;/h3&gt;
 &lt;p&gt;IntentService为Service的子类，其内部实现包含了一个HandlerThread，它兼具了service/message looper/hanlder的优势，android官方文档将其列为后台任务的最佳实践（http://developer.android.com/training/best-background.html）&lt;/p&gt;
@@ -98,10 +99,10 @@ Loader机制在api 11中引入，通过support包的方式支持已有版本，�
 &lt;p&gt;一些现有的解决方案  &lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;
-&lt;p&gt;&lt;a href="https://github.com/ReactiveX/RxAndroid"&gt;rxandroid&lt;/a&gt; 函数式响应框架，rxjava的android版本，主要贡献者是&lt;em&gt;JakeWharton&lt;/em&gt;大神，提供了异步逻辑的组合、过滤，不过目前暂不适合在生产环境使用，建议关注&lt;/p&gt;
+&lt;p&gt;&lt;a href="https://github.com/ReactiveX/RxAndroid"&gt;rxandroid&lt;/a&gt;:函数式响应框架，rxjava的android版本，主要贡献者是&lt;em&gt;JakeWharton&lt;/em&gt;大神，提供了异步逻辑的组合、过滤，不过目前暂不适合在生产环境使用，建议关注&lt;/p&gt;
 &lt;/li&gt;
 &lt;li&gt;
-&lt;p&gt;&lt;a href="http://androidannotations.org/"&gt;android anotation&lt;/a&gt; 如名，基于java注解，提供了一个简化的线程模型，提供编程效率&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://androidannotations.org/"&gt;android anotation&lt;/a&gt;:如名，基于java注解，提供了一个简化的线程模型，提供编程效率&lt;/p&gt;
 &lt;/li&gt;
 &lt;li&gt;
 &lt;p&gt;&lt;a href="https://github.com/greenrobot/EventBus"&gt;EventBus&lt;/a&gt;:基于生产/消费者模型的优雅实现&lt;/p&gt;
