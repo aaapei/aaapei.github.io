@@ -83,6 +83,30 @@
             <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
 <div class="meta">
     <div class="date">
+        <time datetime="2015-02-01T00:00:00.000000" itemprop="datePublished">2015-02-01</time>
+    </div>
+    <div class="tags">
+        <a href="http://blog.aaapei.com/tags/listviewxing-neng-you-hua">listview，性能优化</a>     </div>
+</div>                <h1 class="title" itemprop="name"><a href="http://blog.aaapei.com/article/2015/02/facebookxin-wen-ye-listviewxing-neng-you-hua" itemprop="url">FaceBook新闻页ListView性能优化</a></h1>
+                <div class="entry-content" itemprop="description"><h3>引言</h3>
+<p>原文链接：<a href="https://code.facebook.com/posts/879498888759525/fast-rendering-news-feed-on-android/">https://code.facebook.com/posts/879498888759525/fast-rendering-news-feed-on-android/</a> 
+透漏的信息量不大，而且估计大多数项目不会遇到FaceBook这种ListView场景，不过可以拓展下思路：逻辑单元不一定是视图单元；移动端不要死搬MVC的架构，在市场上仍是中低端机型为主时，还是应该多考虑性能；附上rebbit的关于本文的<a href="http://www.reddit.com/r/androiddev/comments/2tzrqe/fast_rendering_news_feed_on_android/">讨论</a>，可以一看</p>
+<h3>基础知识</h3>
+<p>android系统每隔16.7ms发出一个渲染信号，通知ui线程进行界面的渲染。为了达到流畅的体验，应用程序需要在这个时间内完成应用逻辑，使系统达到60fps。当一个Listview被添加到布局时，其关联的adapter的getView方法将会被回调。在16.7毫秒这样一个时间单元内，可见listitem单元的getView方法将被按照顺序执行。在大多数情况下，由于其他绘图行为的存在，例如measure和draw，getVIew实际分配到执行时间远低于16ms。一旦listview包含复杂控件时，在16毫秒内完成渲染就变的非常困难，这时就发生了掉帧。</p>
+<h3>Facebook新闻页介绍</h3>
+<p>Facebook的新闻页是一个复杂的listview控件，如何使它获得流畅的滚动体验一直困扰我们。
+首先，新闻页的每一条新闻的可见区域非常大，包含一系列的文本以及照片；其次，新闻的展现类型也很多样，除了文本以及照片，新闻的附件还可包含链接、音频、视频等 ...</p>
+					<br/ >
+					<a href="http://blog.aaapei.com/article/2015/02/facebookxin-wen-ye-listviewxing-neng-you-hua">查看全文</a>
+                </div>
+                <div class="meta">
+                    <span class="author">Posted by <a href="http://blog.aaapei.com/author/zhengwen.html">zhengwen</a></span>
+                </div>
+            </article>
+            <hr/>
+            <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
+<div class="meta">
+    <div class="date">
         <time datetime="2014-12-21T00:00:00.000000" itemprop="datePublished">2014-12-21</time>
     </div>
     <div class="tags">
@@ -95,7 +119,7 @@
 </ul>
 <p>开发者必须这两个遵守单线程模型的准则，将耗时的逻辑转移到非ui线程进行，得出计算结果后，通知ui线程进行数据的展现。本文介绍一下android的异步编程。</p>
 <h3>android线程模型</h3>
-<p>如同spothot虚拟机一样，在daivlk虚拟机中，采取的是一对一的线程模型，每一个android thread对应一个Native Linux thread；linux内核通过cfs（completely fair scheduler）来进行线程调度，在cfs中着影响一个线程时间分配的因素有两个：</p>
+<p>同hotspot vm一样，在daivlk vm中，采取的是1：1线程模型，每一个android thread对应一个Native Linux thread；linux内核通过cfs（completely fair scheduler）来进行线程调度，在cfs中着影响一个线程时间分配的因素有两个：</p>
 <ul>
 <li>thread priority</li>
 <li>thread group</li>
@@ -109,9 +133,7 @@
 <li>backgroud process</li>
 <li>empty process  </li>
 </ul>
-<p>它们的thread group如图，<br />
-<img alt="Alt pic" src="http://nos.netease.com/knowledge/e2d1dc53-5724-4b1e-b93e-74325a0d70f5" />   </p>
-<p>在实际的分配中，系统会将90 ...</p>
+<p>它们的thread ...</p>
 					<br/ >
 					<a href="http://blog.aaapei.com/article/2014/12/androidyi-bu-bian-cheng">查看全文</a>
                 </div>
@@ -159,37 +181,6 @@ Java Native Interface(java本地接口),用于java与c/c++代码进行交互.需
 <p>最近一两个月会将aaapei.com的80端口重定向到blog子域名，顺便扯一句，godaddy的重定向服务在国内被禁，所以在vps上又跑了个tornado实例，专门做重定向；google analytics上看月pv也就几百，我一定是想多了 :&lt;</p>
 					<br/ >
 					<a href="http://blog.aaapei.com/article/2014/08/blogaaapeicom">查看全文</a>
-                </div>
-                <div class="meta">
-                    <span class="author">Posted by <a href="http://blog.aaapei.com/author/zhengwen.html">zhengwen</a></span>
-                </div>
-            </article>
-            <hr/>
-            <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
-<div class="meta">
-    <div class="date">
-        <time datetime="2014-04-19T23:21:00.000000" itemprop="datePublished">2014-04-19</time>
-    </div>
-    <div class="tags">
-        <a href="http://blog.aaapei.com/tags/android">android</a> ,         <a href="http://blog.aaapei.com/tags/lua">lua</a>     </div>
-</div>                <h1 class="title" itemprop="name"><a href="http://blog.aaapei.com/article/2014/04/androidzhong-luajiao-ben-de-bu-shu" itemprop="url">android中lua脚本的部署</a></h1>
-                <div class="entry-content" itemprop="description"><p>“愤怒的小鸟”中，lua脚本是运行时部署在应用的data目录，同时做了脚本加密；<br />
-但是如果你的lua脚本有了模块包，脚本就会有多级目录，而android的data目录下是不允许有子目录；<br />
-当然，lua脚本也可以在运行时拷贝到外置sd卡中，不过既然放置在不安全的公共目录，就会有被第三方删除或篡改的危险，那么每次启动的时候必须做一次文件校验，同时，也必须对脚本进行加密，避免程序逻辑暴露；  </p>
-<h3>lua自定义加载器</h3>
-<p>lua引擎提供了一个自定义加载器，当lua脚本中调用require时，会回调到自定义加载器的CFunction；利用这样特性，可以尝试取消掉脚本的运行时拷贝，而直接从应用的asset资源目录加载；自定义加载器的原理中，云风的blog中有介绍，<a href="http://blog.codingnow.com/2007/04/user_define_lua_loader.html">以自定义方式加载lua模块</a><br />
-直接贴个代码实现  </p>
-<div class="highlight"><pre><span class="k">void</span> <span class="nx">addAssetLuaLoader</span><span class="p">(</span><span class="nx">lua_State</span> <span class="o">*</span><span class="nx">L</span><span class="p">,</span> <span class="nx">lua_CFunction</span> <span class="nx">func</span><span class="p">)</span>
-<span class="p">{</span>
-   <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">func</span><span class="p">)</span> <span class="k">return</span><span class="p">;</span>
-
-   <span class="nx">lua_getglobal</span><span class="p">(</span><span class="nx">L</span><span class="p">,</span> <span class="s2">&quot;package&quot;</span><span class="p">);</span>                   
-   <span class="nx">lua_getfield</span><span class="p">(</span><span class="nx">L</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;loaders&quot;</span><span class="p">);</span>   
-   <span class="nx">lua_pushcfunction</span><span class="p">(</span><span class="nx">L</span><span class="p">,</span> <span class="nx">func</span><span class="p">);</span>  
-   <span class="kr">int</span> <span class="nx">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span>
-   <span class="k">for</span> <span class="p">(</span> <span class="nx">i ...</span></pre></div>
-					<br/ >
-					<a href="http://blog.aaapei.com/article/2014/04/androidzhong-luajiao-ben-de-bu-shu">查看全文</a>
                 </div>
                 <div class="meta">
                     <span class="author">Posted by <a href="http://blog.aaapei.com/author/zhengwen.html">zhengwen</a></span>

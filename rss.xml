@@ -1,12 +1,57 @@
 <?xml version="1.0" encoding="utf-8"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>I'm aaapei</title><link>http://blog.aaapei.com/</link><description></description><atom:link href="http://blog.aaapei.com/rss.xml" rel="self"></atom:link><lastBuildDate>Sun, 21 Dec 2014 00:00:00 +0800</lastBuildDate><item><title>android异步编程</title><link>http://blog.aaapei.com/article/2014/12/androidyi-bu-bian-cheng</link><description>&lt;p&gt;在android开发中，有两条很重要的&lt;a href="http://developer.android.com/guide/components/processes-and-threads.html"&gt;编程准则&lt;/a&gt;&lt;/p&gt;
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>I'm aaapei</title><link>http://blog.aaapei.com/</link><description></description><atom:link href="http://blog.aaapei.com/rss.xml" rel="self"></atom:link><lastBuildDate>Sun, 01 Feb 2015 00:00:00 +0800</lastBuildDate><item><title>FaceBook新闻页ListView性能优化</title><link>http://blog.aaapei.com/article/2015/02/facebookxin-wen-ye-listviewxing-neng-you-hua</link><description>&lt;h3&gt;引言&lt;/h3&gt;
+&lt;p&gt;原文链接：&lt;a href="https://code.facebook.com/posts/879498888759525/fast-rendering-news-feed-on-android/"&gt;https://code.facebook.com/posts/879498888759525/fast-rendering-news-feed-on-android/&lt;/a&gt; 
+透漏的信息量不大，而且估计大多数项目不会遇到FaceBook这种ListView场景，不过可以拓展下思路：逻辑单元不一定是视图单元；移动端不要死搬MVC的架构，在市场上仍是中低端机型为主时，还是应该多考虑性能；附上rebbit的关于本文的&lt;a href="http://www.reddit.com/r/androiddev/comments/2tzrqe/fast_rendering_news_feed_on_android/"&gt;讨论&lt;/a&gt;，可以一看&lt;/p&gt;
+&lt;h3&gt;基础知识&lt;/h3&gt;
+&lt;p&gt;android系统每隔16.7ms发出一个渲染信号，通知ui线程进行界面的渲染。为了达到流畅的体验，应用程序需要在这个时间内完成应用逻辑，使系统达到60fps。当一个Listview被添加到布局时，其关联的adapter的getView方法将会被回调。在16.7毫秒这样一个时间单元内，可见listitem单元的getView方法将被按照顺序执行。在大多数情况下，由于其他绘图行为的存在，例如measure和draw，getVIew实际分配到执行时间远低于16ms。一旦listview包含复杂控件时，在16毫秒内完成渲染就变的非常困难，这时就发生了掉帧。&lt;/p&gt;
+&lt;h3&gt;Facebook新闻页介绍&lt;/h3&gt;
+&lt;p&gt;Facebook的新闻页是一个复杂的listview控件，如何使它获得流畅的滚动体验一直困扰我们。
+首先，新闻页的每一条新闻的可见区域非常大，包含一系列的文本以及照片；其次，新闻的展现类型也很多样，除了文本以及照片，新闻的附件还可包含链接、音频、视频等。除此之外，新闻还可以被点赞、被转载，导致一个新闻会被其他新闻包含在内。当新闻被大量用户转载时，甚至会出现一条新闻占据两个屏幕的情况。加上android用户的机型多为中低端设备，这使我们在16.7ms内完成新闻页的渲染变的非常困难。&lt;/p&gt;
+&lt;p&gt;&lt;img alt="" src="https://fbcdn-dragon-a.akamaihd.net/hphotos-ak-xpa1/t39.2365-6/10935993_1534797460105141_1373600061_n.png" /&gt;&lt;/p&gt;
+&lt;h3&gt;新闻页最初架构&lt;/h3&gt;
+&lt;p&gt;在2012年，我们将新闻页从web-view转化成本地控件，在最初的那个版本中，基于View-Model-Binder设计模型，我们为新闻listitem创建了一个自定义StoryView类，这个类有一个bindModel方法，该方法用于和数据进行绑定。代码是这样的：&lt;/p&gt;
+&lt;p&gt;&lt;img alt="" src="https://fbcdn-dragon-a.akamaihd.net/hphotos-ak-xap1/t39.2365-6/10935990_1412843022342801_1297058886_n.png" /&gt;
+StoryView的包含的子控件都会有一个bindModel方法，例如HeadVIew通过该方法与其相关的数据进行绑定。    &lt;/p&gt;
+&lt;p&gt;这种设计，代码非常直观清晰，但他的缺点也很明显：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;listview复用机制不能有效的工作，每一个item都是StoryView，新闻内容不同，展现也不同，当一个StoryView被复用时，就需要重新设置视图的属性；&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;逻辑嵌套：采用bindModel绑定控件和数据，业务逻辑与视图逻辑耦合，导致逻辑类层次非常深；&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;布局嵌套非常深：不但导致低效的视图渲染，例如新闻被不停的转载的极端场景下还会导致栈溢出；&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;bindModel方法逻辑过重：bindModel方法在当用户滚动列表时被ui线程回调，由于所有的数据解析都在这个方法内，导致该方法耗时&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;以上这些问题虽有他们单独的解决方法，例如我们可以自己设计一套回收机制解决storyView复用问题。但基于维护成本和开发时间考虑，我们决定进行一次重构。&lt;/p&gt;
+&lt;h3&gt;重构方案&lt;/h3&gt;
+&lt;p&gt;重构工作大约是一年之前开始的，为了解决前一个架构的问题，首先我们决定将一条新闻分隔成多个listview item。例如，新闻的headerview将是一个独立的listitem。这样，我们可以利用android回收机制，HeaderView新闻子控件将被不同的新闻复用。另外，切分成小view也使得内存占用更小，在之前的架构中，Storyview部分的可见会导致这个Storyview被加载到内存中，而现在，粒度更小，只有可见的子控件才会被加载。&lt;/p&gt;
+&lt;p&gt;&lt;img alt="" src="https://fbcdn-dragon-a.akamaihd.net/hphotos-ak-xap1/t39.2365-6/10935983_984256741587871_980206636_n.png" /&gt;&lt;/p&gt;
+&lt;p&gt;另一个大的修改是，我们将视图逻辑和数据逻辑分离，StoryView被分离成两个类：
+只负责展现的视图类，以及一个Binder类。视图类仅包含set方法（例如HeaderView包含了setTitle，setSubTitle。setProfiePic等等）。Binder类包含了原来的bindMethod的逻辑，binder类包含三个方法：prepare，bind，unbind。
+bind方法调用view的set方法设置数据，unbind清理视图数据，prepare方法在cpu空闲期间做一些预初始化工作，例如进行click事件绑定、数据格式化、创建spannable等等，它会在getView方法之前被调用
+&lt;img alt="" src="https://fbcdn-dragon-a.akamaihd.net/hphotos-ak-xfp1/t39.2365-6/10956894_918624611495337_1619622974_n.png" /&gt;&lt;/p&gt;
+&lt;p&gt;我们遇到的技术难点是Binder的设计，由于StoryView被拆分不同的子控件，一条新闻可能会包含多个不同的Binder。而在之前，我们只需要根据视图的树结构进行结构化赋值。因此，我们引进了&lt;em&gt;PartDefinition&lt;/em&gt;类，PartDefinition负责维护一条新闻包含哪些子控件、包含Binder的类型以及为新闻创建Binder类，有两种类型的PartDefinition：单个PartDefinition以及PartDefinition集合。&lt;/p&gt;
+&lt;p&gt;&lt;img alt="" src="https://fbcdn-dragon-a.akamaihd.net/hphotos-ak-xfa1/t39.2365-6/10935981_1536551233276267_1103658334_n.png" /&gt;&lt;/p&gt;
+&lt;p&gt;一个新闻在重构之后的PartDefinition结构是这样的：&lt;/p&gt;
+&lt;p&gt;&lt;img alt="" src="https://fbcdn-dragon-a.akamaihd.net/hphotos-ak-xaf1/t39.2365-6/10935975_856616717694467_1297407005_n.png" /&gt;&lt;/p&gt;
+&lt;h3&gt;结论&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;采取新的内存错误减少了17%，总crash率减少了8%，彻底解决涨溢出问题&lt;/li&gt;
+&lt;li&gt;渲染时间减少了10%，大新闻不再掉帧，回收机制的代码精简&lt;/li&gt;
+&lt;li&gt;利用重构增加了单元测试&lt;/li&gt;
+&lt;/ul&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">zhengwen</dc:creator><pubDate>Sun, 01 Feb 2015 00:00:00 +0800</pubDate><guid>tag:blog.aaapei.com,2015-02-01:article/2015/02/facebookxin-wen-ye-listviewxing-neng-you-hua</guid><category>listview，性能优化</category></item><item><title>android异步编程</title><link>http://blog.aaapei.com/article/2014/12/androidyi-bu-bian-cheng</link><description>&lt;p&gt;在android开发中，有两条很重要的&lt;a href="http://developer.android.com/guide/components/processes-and-threads.html"&gt;编程准则&lt;/a&gt;&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;不要堵塞ui线程&lt;/li&gt;
 &lt;li&gt;不要在非ui线程操作ui控件&lt;/li&gt;
 &lt;/ul&gt;
 &lt;p&gt;开发者必须这两个遵守单线程模型的准则，将耗时的逻辑转移到非ui线程进行，得出计算结果后，通知ui线程进行数据的展现。本文介绍一下android的异步编程。&lt;/p&gt;
 &lt;h3&gt;android线程模型&lt;/h3&gt;
-&lt;p&gt;如同spothot虚拟机一样，在daivlk虚拟机中，采取的是一对一的线程模型，每一个android thread对应一个Native Linux thread；linux内核通过cfs（completely fair scheduler）来进行线程调度，在cfs中着影响一个线程时间分配的因素有两个：&lt;/p&gt;
+&lt;p&gt;同hotspot vm一样，在daivlk vm中，采取的是1：1线程模型，每一个android thread对应一个Native Linux thread；linux内核通过cfs（completely fair scheduler）来进行线程调度，在cfs中着影响一个线程时间分配的因素有两个：&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;thread priority&lt;/li&gt;
 &lt;li&gt;thread group&lt;/li&gt;
@@ -23,7 +68,7 @@
 &lt;p&gt;它们的thread group如图，&lt;br /&gt;
 &lt;img alt="Alt pic" src="http://nos.netease.com/knowledge/e2d1dc53-5724-4b1e-b93e-74325a0d70f5" /&gt;   &lt;/p&gt;
 &lt;p&gt;在实际的分配中，系统会将90%的cpu时间分配给foregroud thread group，
-如果某个应用处于foreground或visible level，那么它创建的所有thread都属于foreground group
+如果某个应用处于foreground或visible level，那么它创建的所有thread都属于foreground group。
 当应用的可见状态被改变时，例如按home健被切入到后台运用，应用从foregroud process变成了backgroud process，应用对应的的thread group也切换到了backgroud group&lt;/p&gt;
 &lt;h4&gt;thread priority&lt;/h4&gt;
 &lt;p&gt;线程的优先级通过Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND)设置；&lt;/p&gt;
@@ -39,7 +84,7 @@
 &lt;p&gt;backgroud thread,即后台线程；&lt;/p&gt;
 &lt;/li&gt;
 &lt;/ul&gt;
-&lt;p&gt;注意每一个后台线程都是UIThread的子线程，意味着他的线程优先级和ui thread是完全相同的，同时由于他们处在同一个thread group中，那么linux内核对ui线程和后台线程一时同仁；&lt;/p&gt;
+&lt;p&gt;注意每一个后台线程都是UIThread的子线程，意味着他的线程优先级和ui thread是完全相同的，同时由于他们处在同一个thread group中，那么linux内核对ui线程和后台线程一视同仁；&lt;/p&gt;
 &lt;p&gt;dalvik有一个最大线程个数的限制，但不意味着应用可以随意生成低于这个限制值的线程个数；由于linux内核平等的对待ui线程和后台线程，一旦滥用后台，当ui线程不能抢占到足够的cpu时间片时，也抛出anr异常；另一方面，由于thread是gc mark的root，过多的线程也会对gc造成影响。&lt;/p&gt;
 &lt;h3&gt;Thread&amp;amp;&amp;amp;Executor&lt;/h3&gt;
 &lt;p&gt;Thread和Executor都是jdk原生的异步机制，不再赘述。在使用时，原生的Thread的存在两个缺陷： &lt;/p&gt;
@@ -81,7 +126,7 @@ android版本发展到3.0后，默认的线程修改成了单线程task，同时
 
 
 &lt;p&gt;如果targetSDKVersion低于3.2版本，AsyncTask是并行执行的，否则将会被顺序执行，考虑不同版本的表现，在使用AsyncTask时需要规避task之间有依赖执行顺序的逻辑；&lt;/p&gt;
-&lt;p&gt;另一个经常被批评的点是AsyncTask的全局行为，在组件中使用Asynctask时，经常会将他定义在一个匿名的内部类，这时候一个潜在的内存泄漏就产生了，由于Asynctask的生命周期可能比它关联的组件对象长，导致其关联的主角对象无法被回收，幸运的是，asynctask提供了cancel机制。在组件生命周期结束后及时调用cancel api,在asynctask未被执行时，可以将asynctask从队列去除；cancel有一个mayInterruptIfRunning参数：cancel(true) == cancel(false)+interrpt&lt;/p&gt;
+&lt;p&gt;另一个经常被批评的点是AsyncTask的全局行为，在组件中使用Asynctask时，经常会将他定义在一个匿名的内部类，这时候一个潜在的内存泄漏就产生了，由于Asynctask的生命周期可能比它关联的组件对象长，导致其关联的组件无法被回收，幸运的是，asynctask提供了cancel机制。在组件生命周期结束后及时调用cancel api,在asynctask未被执行时，可以将asynctask从队列去除；cancel api有一个mayInterruptIfRunning参数：cancel(true) == cancel(false)+interrpt&lt;/p&gt;
 &lt;h3&gt;IntentService&lt;/h3&gt;
 &lt;p&gt;IntentService为Service的子类，其内部实现包含了一个HandlerThread，它兼具了service/message looper/hanlder的优势，android官方文档将其列为后台任务的最佳实践（http://developer.android.com/training/best-background.html）&lt;/p&gt;
 &lt;p&gt;不同与Service，当一个intent被提交，系统会将intent提交到HandlerThread中顺序执行，而非在ui线程执行;

@@ -16,8 +16,8 @@
                 <meta property="og:type" content="article"/>
                 <meta property="og:title" content="android异步编程"/>
                 <meta property="og:url" content="http://blog.aaapei.com/article/2014/12/androidyi-bu-bian-cheng"/>
-                <meta property="og:description" content="在android开发中，有两条很重要的编程准则 不要堵塞ui线程 不要在非ui线程操作ui控件 开发者必须这两个遵守单线程模型的准则，将耗时的逻辑转移到非ui线程进行，得出计算结果后，通知ui线程进行数据的展现。本文介绍一下android的异步编程。 android线程模型 如同spothot虚拟机一样，在daivlk虚拟机中，采取的是一对一的线程模型，每一个android thread对应一个Native Linux thread；linux内核通过cfs（completely fair scheduler）来进行线程调度，在cfs中着影响一个线程时间分配的因素有两个： thread priority thread group thread group 线程的thread group是动态改变的，在android framework层面，android的应用有5个等级，分别是 foreground process visible process service process backgroud process empty process 它们的thread group如图， 在实际的分配中，系统会将90 ..."/>
-                <meta name="description" content="在android开发中，有两条很重要的编程准则 不要堵塞ui线程 不要在非ui线程操作ui控件 开发者必须这两个遵守单线程模型的准则，将耗时的逻辑转移到非ui线程进行，得出计算结果后，通知ui线程进行数据的展现。本文介绍一下android的异步编程。 android线程模型 如同spothot虚拟机一样，在daivlk虚拟机中，采取的是一对一的线程模型，每一个android thread对应一个Native Linux thread；linux内核通过cfs（completely fair scheduler）来进行线程调度，在cfs中着影响一个线程时间分配的因素有两个： thread priority thread group thread group 线程的thread group是动态改变的，在android framework层面，android的应用有5个等级，分别是 foreground process visible process service process backgroud process empty process 它们的thread group如图， 在实际的分配中，系统会将90 ...">
+                <meta property="og:description" content="在android开发中，有两条很重要的编程准则 不要堵塞ui线程 不要在非ui线程操作ui控件 开发者必须这两个遵守单线程模型的准则，将耗时的逻辑转移到非ui线程进行，得出计算结果后，通知ui线程进行数据的展现。本文介绍一下android的异步编程。 android线程模型 同hotspot vm一样，在daivlk vm中，采取的是1：1线程模型，每一个android thread对应一个Native Linux thread；linux内核通过cfs（completely fair scheduler）来进行线程调度，在cfs中着影响一个线程时间分配的因素有两个： thread priority thread group thread group 线程的thread group是动态改变的，在android framework层面，android的应用有5个等级，分别是 foreground process visible process service process backgroud process empty process 它们的thread ..."/>
+                <meta name="description" content="在android开发中，有两条很重要的编程准则 不要堵塞ui线程 不要在非ui线程操作ui控件 开发者必须这两个遵守单线程模型的准则，将耗时的逻辑转移到非ui线程进行，得出计算结果后，通知ui线程进行数据的展现。本文介绍一下android的异步编程。 android线程模型 同hotspot vm一样，在daivlk vm中，采取的是1：1线程模型，每一个android thread对应一个Native Linux thread；linux内核通过cfs（completely fair scheduler）来进行线程调度，在cfs中着影响一个线程时间分配的因素有两个： thread priority thread group thread group 线程的thread group是动态改变的，在android framework层面，android的应用有5个等级，分别是 foreground process visible process service process backgroud process empty process 它们的thread ...">
 
 
 
@@ -99,7 +99,7 @@
 </ul>
 <p>开发者必须这两个遵守单线程模型的准则，将耗时的逻辑转移到非ui线程进行，得出计算结果后，通知ui线程进行数据的展现。本文介绍一下android的异步编程。</p>
 <h3>android线程模型</h3>
-<p>如同spothot虚拟机一样，在daivlk虚拟机中，采取的是一对一的线程模型，每一个android thread对应一个Native Linux thread；linux内核通过cfs（completely fair scheduler）来进行线程调度，在cfs中着影响一个线程时间分配的因素有两个：</p>
+<p>同hotspot vm一样，在daivlk vm中，采取的是1：1线程模型，每一个android thread对应一个Native Linux thread；linux内核通过cfs（completely fair scheduler）来进行线程调度，在cfs中着影响一个线程时间分配的因素有两个：</p>
 <ul>
 <li>thread priority</li>
 <li>thread group</li>
@@ -116,7 +116,7 @@
 <p>它们的thread group如图，<br />
 <img alt="Alt pic" src="http://nos.netease.com/knowledge/e2d1dc53-5724-4b1e-b93e-74325a0d70f5" />   </p>
 <p>在实际的分配中，系统会将90%的cpu时间分配给foregroud thread group，
-如果某个应用处于foreground或visible level，那么它创建的所有thread都属于foreground group
+如果某个应用处于foreground或visible level，那么它创建的所有thread都属于foreground group。
 当应用的可见状态被改变时，例如按home健被切入到后台运用，应用从foregroud process变成了backgroud process，应用对应的的thread group也切换到了backgroud group</p>
 <h4>thread priority</h4>
 <p>线程的优先级通过Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND)设置；</p>
@@ -132,7 +132,7 @@
 <p>backgroud thread,即后台线程；</p>
 </li>
 </ul>
-<p>注意每一个后台线程都是UIThread的子线程，意味着他的线程优先级和ui thread是完全相同的，同时由于他们处在同一个thread group中，那么linux内核对ui线程和后台线程一时同仁；</p>
+<p>注意每一个后台线程都是UIThread的子线程，意味着他的线程优先级和ui thread是完全相同的，同时由于他们处在同一个thread group中，那么linux内核对ui线程和后台线程一视同仁；</p>
 <p>dalvik有一个最大线程个数的限制，但不意味着应用可以随意生成低于这个限制值的线程个数；由于linux内核平等的对待ui线程和后台线程，一旦滥用后台，当ui线程不能抢占到足够的cpu时间片时，也抛出anr异常；另一方面，由于thread是gc mark的root，过多的线程也会对gc造成影响。</p>
 <h3>Thread&amp;&amp;Executor</h3>
 <p>Thread和Executor都是jdk原生的异步机制，不再赘述。在使用时，原生的Thread的存在两个缺陷： </p>
@@ -174,7 +174,7 @@ android版本发展到3.0后，默认的线程修改成了单线程task，同时
 
 
 <p>如果targetSDKVersion低于3.2版本，AsyncTask是并行执行的，否则将会被顺序执行，考虑不同版本的表现，在使用AsyncTask时需要规避task之间有依赖执行顺序的逻辑；</p>
-<p>另一个经常被批评的点是AsyncTask的全局行为，在组件中使用Asynctask时，经常会将他定义在一个匿名的内部类，这时候一个潜在的内存泄漏就产生了，由于Asynctask的生命周期可能比它关联的组件对象长，导致其关联的主角对象无法被回收，幸运的是，asynctask提供了cancel机制。在组件生命周期结束后及时调用cancel api,在asynctask未被执行时，可以将asynctask从队列去除；cancel有一个mayInterruptIfRunning参数：cancel(true) == cancel(false)+interrpt</p>
+<p>另一个经常被批评的点是AsyncTask的全局行为，在组件中使用Asynctask时，经常会将他定义在一个匿名的内部类，这时候一个潜在的内存泄漏就产生了，由于Asynctask的生命周期可能比它关联的组件对象长，导致其关联的组件无法被回收，幸运的是，asynctask提供了cancel机制。在组件生命周期结束后及时调用cancel api,在asynctask未被执行时，可以将asynctask从队列去除；cancel api有一个mayInterruptIfRunning参数：cancel(true) == cancel(false)+interrpt</p>
 <h3>IntentService</h3>
 <p>IntentService为Service的子类，其内部实现包含了一个HandlerThread，它兼具了service/message looper/hanlder的优势，android官方文档将其列为后台任务的最佳实践（http://developer.android.com/training/best-background.html）</p>
 <p>不同与Service，当一个intent被提交，系统会将intent提交到HandlerThread中顺序执行，而非在ui线程执行;
