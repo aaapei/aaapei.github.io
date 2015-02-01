@@ -197,21 +197,19 @@ jni api有一对pushLocalFrame/popLocalFrame函数,也是利用了<em>IRTSegment
 <p>虽然在官方blog中说明采取间接指针的目的是为了进行内存压缩,但在最后几个dalvik版本中,采取的仍是mark-sweep算法(art模式采取mark-copy,真正实现了对堆内存的整理).mark过程中,虚拟机会分别在mark rootSet以及Mark Thread root阶段对jniGlobalRefTable和jniLocalRefTable进行标记,避免GC回收.</p>
                 </div>
             </article>
-			<!-- 多说评论框 start -->
-				<div class="ds-thread" data-thread-key="请将此处替换成文章在你的站点中的ID" data-title="请替换成文章的标题" data-url="请替换成文章的网址"></div>
-				<!-- 多说评论框 end -->
-				<!-- 多说公共JS代码 start (一个网页只需插入一次) -->
-				<script type="text/javascript">
-					var duoshuoQuery = {short_name:"aaapei"};
-						(function() {
-								var ds = document.createElement('script');
-								ds.type = 'text/javascript';ds.async = true;
-								ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
-								ds.charset = 'UTF-8';
-								(document.getElementsByTagName('head')[0]  || document.getElementsByTagName('body')[0]).appendChild(ds);
-							})();
-					</script>
-			<!-- 多说公共JS代码 end -->
+                <section id="comment">
+                    <h1 class="title">Comments</h1>
+                    <div id="disqus_thread" aria-live="polite">
+                        <script type="text/javascript">
+                            var disqus_identifier = "article/2014/11/dalvik-jnijie-xi";
+                            (function() {
+                                var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+                                dsq.src = 'http://aaapeigithub.disqus.com/embed.js';
+                                (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+                            })();
+                        </script>
+                    </div>
+                </section>
 
         </section>
 
