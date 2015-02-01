@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>I'm aaapei</title><link href="http://blog.aaapei.com/" rel="alternate"></link><link href="http://blog.aaapei.com/atom.xml" rel="self"></link><id>http://blog.aaapei.com/</id><updated>2015-02-01T00:00:00+08:00</updated><entry><title>FaceBook新闻页ListView性能优化</title><link href="http://blog.aaapei.com/article/2015/02/facebookxin-wen-ye-listviewxing-neng-you-hua" rel="alternate"></link><updated>2015-02-01T00:00:00+08:00</updated><author><name>zhengwen</name></author><id>tag:blog.aaapei.com,2015-02-01:article/2015/02/facebookxin-wen-ye-listviewxing-neng-you-hua</id><summary type="html">&lt;h3&gt;引言&lt;/h3&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>I'm aaapei</title><link href="http://blog.aaapei.com/" rel="alternate"></link><link href="http://blog.aaapei.com/atom.xml" rel="self"></link><id>http://blog.aaapei.com/</id><updated>2015-02-01T00:00:00+08:00</updated><entry><title>facebook新闻页ListView优化</title><link href="http://blog.aaapei.com/article/2015/02/facebookxin-wen-ye-listviewyou-hua" rel="alternate"></link><updated>2015-02-01T00:00:00+08:00</updated><author><name>zhengwen</name></author><id>tag:blog.aaapei.com,2015-02-01:article/2015/02/facebookxin-wen-ye-listviewyou-hua</id><summary type="html">&lt;h3&gt;引言&lt;/h3&gt;
 &lt;p&gt;原文链接：&lt;a href="https://code.facebook.com/posts/879498888759525/fast-rendering-news-feed-on-android/"&gt;https://code.facebook.com/posts/879498888759525/fast-rendering-news-feed-on-android/&lt;/a&gt; 
-透漏的信息量不大，而且估计大多数项目不会遇到FaceBook这种ListView场景，不过可以拓展下思路：逻辑单元不一定是视图单元；移动端不要死搬MVC的架构，在市场上仍是中低端机型为主时，还是应该多考虑性能；附上rebbit的关于本文的&lt;a href="http://www.reddit.com/r/androiddev/comments/2tzrqe/fast_rendering_news_feed_on_android/"&gt;讨论&lt;/a&gt;，可以一看&lt;/p&gt;
+透漏的信息量不大，且大多数项目并不会遇到facebook这种ListView的场景，不过可以拓展下思路：逻辑单元不一定是视图单元；移动端不要死搬MVC的架构，在市场上仍是中低端机型为主时，还是应该多考虑性能；附上rebbit的关于本文的&lt;a href="http://www.reddit.com/r/androiddev/comments/2tzrqe/fast_rendering_news_feed_on_android/"&gt;讨论&lt;/a&gt;，有些干货 :)&lt;/p&gt;
 &lt;h3&gt;基础知识&lt;/h3&gt;
-&lt;p&gt;android系统每隔16.7ms发出一个渲染信号，通知ui线程进行界面的渲染。为了达到流畅的体验，应用程序需要在这个时间内完成应用逻辑，使系统达到60fps。当一个Listview被添加到布局时，其关联的adapter的getView方法将会被回调。在16.7毫秒这样一个时间单元内，可见listitem单元的getView方法将被按照顺序执行。在大多数情况下，由于其他绘图行为的存在，例如measure和draw，getVIew实际分配到执行时间远低于16ms。一旦listview包含复杂控件时，在16毫秒内完成渲染就变的非常困难，这时就发生了掉帧。&lt;/p&gt;
+&lt;p&gt;android系统每隔16.7ms发出一个渲染信号，通知ui线程进行界面的渲染。为了达到流畅的体验，应用程序需要在这个时间内完成应用逻辑，使系统达到60fps。当一个Listview被添加到布局时，其关联的adapter的getView方法将会被回调。在16.7毫秒这样一个时间单元内，可见listitem单元的getView方法将被按照顺序执行。在大多数情况下，由于其他绘图行为的存在，例如measure和draw，getVIew实际分配到执行时间远低于16ms。一旦listview包含复杂控件时，在16毫秒内不能完成渲染，用户只能看到上一祯的结果，这时就发生了掉帧。&lt;/p&gt;
 &lt;h3&gt;Facebook新闻页介绍&lt;/h3&gt;
 &lt;p&gt;Facebook的新闻页是一个复杂的listview控件，如何使它获得流畅的滚动体验一直困扰我们。
 首先，新闻页的每一条新闻的可见区域非常大，包含一系列的文本以及照片；其次，新闻的展现类型也很多样，除了文本以及照片，新闻的附件还可包含链接、音频、视频等。除此之外，新闻还可以被点赞、被转载，导致一个新闻会被其他新闻包含在内。当新闻被大量用户转载时，甚至会出现一条新闻占据两个屏幕的情况。加上android用户的机型多为中低端设备，这使我们在16.7ms内完成新闻页的渲染变的非常困难。&lt;/p&gt;
@@ -41,9 +41,9 @@ bind方法调用view的set方法设置数据，unbind清理视图数据，prepar
 &lt;p&gt;&lt;img alt="" src="https://fbcdn-dragon-a.akamaihd.net/hphotos-ak-xaf1/t39.2365-6/10935975_856616717694467_1297407005_n.png" /&gt;&lt;/p&gt;
 &lt;h3&gt;结论&lt;/h3&gt;
 &lt;ul&gt;
-&lt;li&gt;采取新的内存错误减少了17%，总crash率减少了8%，彻底解决涨溢出问题&lt;/li&gt;
-&lt;li&gt;渲染时间减少了10%，大新闻不再掉帧，回收机制的代码精简&lt;/li&gt;
-&lt;li&gt;利用重构增加了单元测试&lt;/li&gt;
+&lt;li&gt;采取新的架构，内存错误减少了17%，总crash率减少了8%，彻底解决涨溢出问题&lt;/li&gt;
+&lt;li&gt;渲染时间减少了10%，大新闻场景不再掉帧&lt;/li&gt;
+&lt;li&gt;精简了原来的自定义回收机制，同时在重构过程中增加了单元测试&lt;/li&gt;
 &lt;/ul&gt;</summary><category term="listview，性能优化"></category></entry><entry><title>android异步编程</title><link href="http://blog.aaapei.com/article/2014/12/androidyi-bu-bian-cheng" rel="alternate"></link><updated>2014-12-21T00:00:00+08:00</updated><author><name>zhengwen</name></author><id>tag:blog.aaapei.com,2014-12-21:article/2014/12/androidyi-bu-bian-cheng</id><summary type="html">&lt;p&gt;在android开发中，有两条很重要的&lt;a href="http://developer.android.com/guide/components/processes-and-threads.html"&gt;编程准则&lt;/a&gt;&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;不要堵塞ui线程&lt;/li&gt;
