@@ -108,7 +108,7 @@ StoryView的包含的子控件都会有一个bindModel方法，例如HeadVIew通
 <p>这种设计，代码非常直观清晰，但他的缺点也很明显：</p>
 <ul>
 <li>
-<p>listview复用机制不能有效的工作，每一个item都是StoryView，新闻内容不同，展现也不同，当一个StoryView被复用时，就需要重新设置视图的属性；</p>
+<p>listview复用机制不能有效的工作,Android's recycling mechanism does not work well in this case: Every item in the ListView was usually a StoryView, but once bound to a story, two StoryViews would be radically different and recycling one into the other wasn't effective.（这一段存疑，直接放原文）</p>
 </li>
 <li>
 <p>逻辑嵌套：采用bindModel绑定控件和数据，业务逻辑与视图逻辑耦合，导致逻辑类层次非常深；</p>
