@@ -1,5 +1,161 @@
 <?xml version="1.0" encoding="utf-8"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>I'm aaapei</title><link>http://blog.aaapei.com/</link><description></description><atom:link href="http://blog.aaapei.com/rss.xml" rel="self"></atom:link><lastBuildDate>Sun, 01 Feb 2015 00:00:00 +0800</lastBuildDate><item><title>facebook新闻页ListView优化</title><link>http://blog.aaapei.com/article/2015/02/facebookxin-wen-ye-listviewyou-hua</link><description>&lt;h3&gt;引言&lt;/h3&gt;
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>I'm aaapei</title><link>http://blog.aaapei.com/</link><description></description><atom:link href="http://blog.aaapei.com/rss.xml" rel="self"></atom:link><lastBuildDate>Thu, 19 Feb 2015 00:00:00 +0800</lastBuildDate><item><title>booking.com android客户端的bitmap复用</title><link>http://blog.aaapei.com/article/2015/02/bookingcom-androidke-hu-duan-de-bitmapfu-yong</link><description>&lt;h3&gt;前言&lt;/h3&gt;
+&lt;p&gt;被鞭炮吵得睡不着觉，rss中找一篇简单的文档翻译下，原文链接：http://blog.booking.com/android-reuse-bitmaps.html，大部分团队应该都做过这个bitmap优化，不过估计设置过BitmapFactory.Options.inTempStorage参数的应该不多 :)&lt;/p&gt;
+&lt;p&gt;booking.com android客户端在新版本的增加了一个新功能：酒店的图片集合&lt;/p&gt;
+&lt;p&gt;&lt;img alt="此处输入图片的描述" src="http://blog.booking.com/static/android-reuse-bitmaps/hotel_photo_header.png" /&gt;&lt;/p&gt;
+&lt;p&gt;不幸的是，增加了这个新功能后，发现这个应用的内存消耗增长了20%。图片集的界面的滑动有明显的卡顿，经定位，我们发现viewpager加载图片时的gc问题造成了以上的问题。由于应用的图片资源多；控件布局层次复杂；数据量较大，造成内存的申请很容易触发GC。&lt;/p&gt;
+&lt;p&gt;当申请bitmap内存时，logcat输出信息如下：&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="n"&gt;GC_FOR_ALLOC&lt;/span&gt; &lt;span class="n"&gt;freed&lt;/span&gt; &lt;span class="mi"&gt;3255&lt;/span&gt;&lt;span class="n"&gt;K&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;20&lt;/span&gt;&lt;span class="o"&gt;%&lt;/span&gt; &lt;span class="n"&gt;free&lt;/span&gt; &lt;span class="mi"&gt;21813&lt;/span&gt;&lt;span class="n"&gt;K&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="mi"&gt;26980&lt;/span&gt;&lt;span class="n"&gt;K&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;paused&lt;/span&gt; &lt;span class="mi"&gt;62&lt;/span&gt;&lt;span class="n"&gt;ms&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;total&lt;/span&gt; &lt;span class="mi"&gt;62&lt;/span&gt;&lt;span class="n"&gt;ms&lt;/span&gt;
+&lt;span class="n"&gt;GC_FOR_ALLOC&lt;/span&gt; &lt;span class="n"&gt;freed&lt;/span&gt; &lt;span class="mi"&gt;710&lt;/span&gt;&lt;span class="n"&gt;K&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;20&lt;/span&gt;&lt;span class="o"&gt;%&lt;/span&gt; &lt;span class="n"&gt;free&lt;/span&gt; &lt;span class="mi"&gt;30242&lt;/span&gt;&lt;span class="n"&gt;K&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="mi"&gt;37740&lt;/span&gt;&lt;span class="n"&gt;K&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;paused&lt;/span&gt; &lt;span class="mi"&gt;72&lt;/span&gt;&lt;span class="n"&gt;ms&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;total&lt;/span&gt; &lt;span class="mi"&gt;72&lt;/span&gt;&lt;span class="n"&gt;ms&lt;/span&gt;
+&lt;span class="n"&gt;GC_FOR_ALLOC&lt;/span&gt; &lt;span class="n"&gt;freed&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="n"&gt;K&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;20&lt;/span&gt;&lt;span class="o"&gt;%&lt;/span&gt; &lt;span class="n"&gt;free&lt;/span&gt; &lt;span class="mi"&gt;31778&lt;/span&gt;&lt;span class="n"&gt;K&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="mi"&gt;39280&lt;/span&gt;&lt;span class="n"&gt;K&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;paused&lt;/span&gt; &lt;span class="mi"&gt;74&lt;/span&gt;&lt;span class="n"&gt;ms&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;total&lt;/span&gt; &lt;span class="mi"&gt;74&lt;/span&gt;&lt;span class="n"&gt;ms&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;通过日志信息可以知道，一个bitmap图片的申请，造成应用约70ms的gc停顿，导致应用程序掉5次左右的帧。为了保证应用的流畅体验，必须保证gc停顿的时间降到16ms以下。
+我们决定利用&lt;a href="https://developer.android.com/training/displaying-bitmaps/manage-memory.html#inBitmap"&gt;inBitmap&lt;/a&gt;参数进行图片资源的复用，不过这个参数必须保证图片的大小一致；幸好，在android4.4之后，二次复用的图片不需要严格遵守这个规则，只需保证不比原图片资源大即可。&lt;/p&gt;
+&lt;p&gt;基于这个api，我们在viewpager adapter中抽象了一个图片池管理图片复用。当一个imageview移除屏幕以外时，apater管理bitmap的生命周期，将其关联的bitmap buffer内存放置到图片池中而不是直接销毁。&lt;/p&gt;
+&lt;h3&gt;bitmap的生命周期管理&lt;/h3&gt;
+&lt;p&gt;为了管理bitmap内存，需要为bitmap进行引用计数，引用技术的接口是这样的；
+&lt;img alt="此处输入图片的描述" src="http://blog.booking.com/static/android-reuse-bitmaps/bitmap_pool_uml.png" /&gt;&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="n"&gt;package&lt;/span&gt; &lt;span class="n"&gt;com&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;booking&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;util&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;bitmap&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+
+&lt;span class="n"&gt;import&lt;/span&gt; &lt;span class="n"&gt;android&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;graphics&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;Bitmap&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+
+&lt;span class="cm"&gt;/**&lt;/span&gt;
+&lt;span class="cm"&gt; * A reference-counted Bitmap object. The Bitmap is not really recycled&lt;/span&gt;
+&lt;span class="cm"&gt; * until the reference counter drops to zero.&lt;/span&gt;
+&lt;span class="cm"&gt; */&lt;/span&gt;
+&lt;span class="n"&gt;public&lt;/span&gt; &lt;span class="n"&gt;interface&lt;/span&gt; &lt;span class="n"&gt;IManagedBitmap&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+
+    &lt;span class="cm"&gt;/**&lt;/span&gt;
+&lt;span class="cm"&gt;     * Get the underlying {@link Bitmap} object.&lt;/span&gt;
+&lt;span class="cm"&gt;     * NEVER call Bitmap.recycle() on this object.&lt;/span&gt;
+&lt;span class="cm"&gt;     */&lt;/span&gt;
+    &lt;span class="n"&gt;Bitmap&lt;/span&gt; &lt;span class="n"&gt;getBitmap&lt;/span&gt;&lt;span class="p"&gt;();&lt;/span&gt;
+
+    &lt;span class="cm"&gt;/**&lt;/span&gt;
+&lt;span class="cm"&gt;     * Decrease the reference counter and recycle the underlying Bitmap&lt;/span&gt;
+&lt;span class="cm"&gt;     * if there are no more references.&lt;/span&gt;
+&lt;span class="cm"&gt;     */&lt;/span&gt;
+    &lt;span class="kt"&gt;void&lt;/span&gt; &lt;span class="nf"&gt;recycle&lt;/span&gt;&lt;span class="p"&gt;();&lt;/span&gt;
+
+    &lt;span class="cm"&gt;/**&lt;/span&gt;
+&lt;span class="cm"&gt;     * Increase the reference counter.&lt;/span&gt;
+&lt;span class="cm"&gt;     * @return self&lt;/span&gt;
+&lt;span class="cm"&gt;     */&lt;/span&gt;
+    &lt;span class="n"&gt;IManagedBitmap&lt;/span&gt; &lt;span class="nf"&gt;retain&lt;/span&gt;&lt;span class="p"&gt;();&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;其中bitmappool类管理bitmap集合，当不存在bitmap内存时，或新申请，或复用已有内存。
+bitmapPool类不直接引用bitmap，而通过IManagedBitmap进行bitmap的引用计数。&lt;/p&gt;
+&lt;p&gt;由于我们只在主线程进行imageview的创建和销毁，我们被未对BitmapPool进行线程安全同步，如果你需要在后台线程申请位图资源，请自行进行线程同步。&lt;/p&gt;
+&lt;p&gt;BitmapPool的代码片段是这样的:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="nx"&gt;package&lt;/span&gt; &lt;span class="nx"&gt;com.booking.util.bitmap&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+
+&lt;span class="k"&gt;import&lt;/span&gt; &lt;span class="nx"&gt;java.util.Stack&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+
+&lt;span class="k"&gt;import&lt;/span&gt; &lt;span class="nx"&gt;android.graphics.Bitmap&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="k"&gt;import&lt;/span&gt; &lt;span class="nx"&gt;android.os.Handler&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+
+&lt;span class="cm"&gt;/**&lt;/span&gt;
+&lt;span class="cm"&gt; * A pool of fixed-size Bitmaps. Leases a managed Bitmap object&lt;/span&gt;
+&lt;span class="cm"&gt; * which is tied to this pool. Bitmaps are put back to the pool&lt;/span&gt;
+&lt;span class="cm"&gt; * instead of actual recycling.&lt;/span&gt;
+&lt;span class="cm"&gt; *&lt;/span&gt;
+&lt;span class="cm"&gt; * WARNING: This class is NOT thread safe, intended for use&lt;/span&gt;
+&lt;span class="cm"&gt; *          from the main thread only.&lt;/span&gt;
+&lt;span class="cm"&gt; */&lt;/span&gt;
+&lt;span class="k"&gt;public&lt;/span&gt; &lt;span class="nf"&gt;class&lt;/span&gt; &lt;span class="nx"&gt;BitmapPool&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="k"&gt;private&lt;/span&gt; &lt;span class="nf"&gt;final&lt;/span&gt; &lt;span class="nx"&gt;int&lt;/span&gt; &lt;span class="nb"&gt;width&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+    &lt;span class="k"&gt;private&lt;/span&gt; &lt;span class="nf"&gt;final&lt;/span&gt; &lt;span class="nx"&gt;int&lt;/span&gt; &lt;span class="nb"&gt;height&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+    &lt;span class="k"&gt;private&lt;/span&gt; &lt;span class="nf"&gt;final&lt;/span&gt; &lt;span class="nx"&gt;Bitmap.Config&lt;/span&gt; &lt;span class="nx"&gt;config&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+    &lt;span class="k"&gt;private&lt;/span&gt; &lt;span class="nf"&gt;final&lt;/span&gt; &lt;span class="nb"&gt;Stack&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="nx"&gt;Bitmap&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;bitmaps&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nb"&gt;new&lt;/span&gt; &lt;span class="nb"&gt;Stack&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="nx"&gt;Bitmap&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;&lt;span class="p"&gt;();&lt;/span&gt;
+    &lt;span class="k"&gt;private&lt;/span&gt; &lt;span class="nf"&gt;boolean&lt;/span&gt; &lt;span class="nx"&gt;isRecycled&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+
+    &lt;span class="k"&gt;private&lt;/span&gt; &lt;span class="nf"&gt;final&lt;/span&gt; &lt;span class="nx"&gt;Handler&lt;/span&gt; &lt;span class="n"&gt;handler&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nb"&gt;new&lt;/span&gt; &lt;span class="nx"&gt;Handler&lt;/span&gt;&lt;span class="p"&gt;();&lt;/span&gt;
+
+    &lt;span class="cm"&gt;/**&lt;/span&gt;
+&lt;span class="cm"&gt;     * Construct a Bitmap pool with desired Bitmap parameters&lt;/span&gt;
+&lt;span class="cm"&gt;     */&lt;/span&gt;
+    &lt;span class="k"&gt;public&lt;/span&gt; &lt;span class="nf"&gt;BitmapPool&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="na"&gt;int&lt;/span&gt; &lt;span class="nx"&gt;bitmapWidth&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+                      &lt;span class="na"&gt;int&lt;/span&gt; &lt;span class="nx"&gt;bitmapHeight&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+                      &lt;span class="na"&gt;Bitmap.Config&lt;/span&gt; &lt;span class="nx"&gt;config&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="p"&gt;{&lt;/span&gt;
+        &lt;span class="n"&gt;this.width&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nx"&gt;bitmapWidth&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+        &lt;span class="n"&gt;this.height&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nx"&gt;bitmapHeight&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+        &lt;span class="n"&gt;this.config&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nx"&gt;config&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+    &lt;span class="p"&gt;}&lt;/span&gt;
+
+    &lt;span class="cm"&gt;/**&lt;/span&gt;
+&lt;span class="cm"&gt;     * Destroy the pool. Any leased IManagedBitmap items remain valid&lt;/span&gt;
+&lt;span class="cm"&gt;     * until they are recycled.&lt;/span&gt;
+&lt;span class="cm"&gt;     */&lt;/span&gt;
+    &lt;span class="k"&gt;public&lt;/span&gt; &lt;span class="nf"&gt;void&lt;/span&gt; &lt;span class="nx"&gt;recycle&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+        &lt;span class="n"&gt;isRecycled&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="kc"&gt;true&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+        &lt;span class="nb"&gt;for&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;Bitmap&lt;/span&gt; &lt;span class="nx"&gt;bitmap&lt;/span&gt; &lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="nx"&gt;bitmaps&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+            &lt;span class="nx"&gt;bitmap.recycle&lt;/span&gt;&lt;span class="p"&gt;();&lt;/span&gt;
+        &lt;span class="p"&gt;}&lt;/span&gt;
+        &lt;span class="nx"&gt;bitmaps.clear&lt;/span&gt;&lt;span class="p"&gt;();&lt;/span&gt;
+    &lt;span class="p"&gt;}&lt;/span&gt;
+
+    &lt;span class="cm"&gt;/**&lt;/span&gt;
+&lt;span class="cm"&gt;     * Get a Bitmap from the pool or create a new one.&lt;/span&gt;
+&lt;span class="cm"&gt;     * @return a managed Bitmap tied to this pool&lt;/span&gt;
+&lt;span class="cm"&gt;     */&lt;/span&gt;
+    &lt;span class="k"&gt;public&lt;/span&gt; &lt;span class="nf"&gt;IManagedBitmap&lt;/span&gt; &lt;span class="nx"&gt;getBitmap&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+        &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="nb"&gt;new&lt;/span&gt; &lt;span class="nx"&gt;LeasedBitmap&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;bitmaps.isEmpty&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+            &lt;span class="o"&gt;?&lt;/span&gt; &lt;span class="nx"&gt;Bitmap.createBitmap&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;width&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nb"&gt;height&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;config&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="nx"&gt;bitmaps.pop&lt;/span&gt;&lt;span class="p"&gt;());&lt;/span&gt;
+    &lt;span class="p"&gt;}&lt;/span&gt;
+
+    &lt;span class="k"&gt;private&lt;/span&gt; &lt;span class="nf"&gt;class&lt;/span&gt; &lt;span class="nx"&gt;LeasedBitmap&lt;/span&gt; &lt;span class="nx"&gt;implements&lt;/span&gt; &lt;span class="nx"&gt;IManagedBitmap&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+        &lt;span class="k"&gt;private&lt;/span&gt; &lt;span class="nf"&gt;int&lt;/span&gt; &lt;span class="n"&gt;referenceCounter&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+        &lt;span class="k"&gt;private&lt;/span&gt; &lt;span class="nf"&gt;final&lt;/span&gt; &lt;span class="nx"&gt;Bitmap&lt;/span&gt; &lt;span class="nx"&gt;bitmap&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+
+        &lt;span class="k"&gt;private&lt;/span&gt; &lt;span class="nf"&gt;LeasedBitmap&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="na"&gt;Bitmap&lt;/span&gt; &lt;span class="nx"&gt;bitmap&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+            &lt;span class="n"&gt;this.bitmap&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nx"&gt;bitmap&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+        &lt;span class="p"&gt;}&lt;/span&gt;
+
+        &lt;span class="p"&gt;@&lt;/span&gt;&lt;span class="nx"&gt;Override&lt;/span&gt;
+        &lt;span class="k"&gt;public&lt;/span&gt; &lt;span class="nf"&gt;Bitmap&lt;/span&gt; &lt;span class="nx"&gt;getBitmap&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+            &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="nx"&gt;bitmap&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+        &lt;span class="p"&gt;}&lt;/span&gt;
+
+        &lt;span class="p"&gt;@&lt;/span&gt;&lt;span class="nx"&gt;Override&lt;/span&gt;
+        &lt;span class="k"&gt;public&lt;/span&gt; &lt;span class="nf"&gt;void&lt;/span&gt; &lt;span class="nx"&gt;recycle&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+            &lt;span class="nx"&gt;handler.post&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;new&lt;/span&gt; &lt;span class="nx"&gt;Runnable&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+                &lt;span class="p"&gt;@&lt;/span&gt;&lt;span class="nx"&gt;Override&lt;/span&gt;
+                &lt;span class="k"&gt;public&lt;/span&gt; &lt;span class="nf"&gt;void&lt;/span&gt; &lt;span class="nb"&gt;run&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+                    &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="o"&gt;--&lt;/span&gt;&lt;span class="nx"&gt;referenceCounter&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+                        &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;isRecycled&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+                            &lt;span class="nx"&gt;bitmap.recycle&lt;/span&gt;&lt;span class="p"&gt;();&lt;/span&gt;
+                        &lt;span class="p"&gt;}&lt;/span&gt; &lt;span class="k"&gt;else&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+                            &lt;span class="nx"&gt;bitmaps.push&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;bitmap&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+                        &lt;span class="p"&gt;}&lt;/span&gt;
+                    &lt;span class="p"&gt;}&lt;/span&gt;
+                &lt;span class="p"&gt;}&lt;/span&gt;
+            &lt;span class="p"&gt;});&lt;/span&gt;
+        &lt;span class="p"&gt;}&lt;/span&gt;
+
+        &lt;span class="p"&gt;@&lt;/span&gt;&lt;span class="nx"&gt;Override&lt;/span&gt;
+        &lt;span class="k"&gt;public&lt;/span&gt; &lt;span class="nf"&gt;IManagedBitmap&lt;/span&gt; &lt;span class="nx"&gt;retain&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+            &lt;span class="o"&gt;++&lt;/span&gt;&lt;span class="nx"&gt;referenceCounter&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+            &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="nx"&gt;this&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+        &lt;span class="p"&gt;}&lt;/span&gt;
+    &lt;span class="p"&gt;}&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h3&gt;网络层&lt;/h3&gt;
+&lt;p&gt;Booking.com客户端的网络通信层使用Vollery框架，默认情况下，Volley通过ImageRequest进行网络图片的bitmap的获取，为了和ImagePool集成，我们实现了一个自定义的ImageRequest（ReusableImageRequest）,ReusableImageRequest内部持有一个IManagedBitmap进行bitmap的解码。
+为了避免内存泄漏，当ReusableImageRequest被取消时，需要有机制通知IManagedBitmap进行引用释放，因此，我们为ReusableImageRequest扩展了一个onFinished方法。&lt;/p&gt;
+&lt;p&gt;与volley的结构图是这样的：&lt;/p&gt;
+&lt;p&gt;&lt;img alt="此处输入图片的描述" src="http://blog.booking.com/static/android-reuse-bitmaps/volley_uml.png" /&gt;&lt;/p&gt;
+&lt;h3&gt;其他工作&lt;/h3&gt;
+&lt;p&gt;当我们实现了一个自定义的ImageRequest时，我们还利用 
+&lt;a href="http://developer.android.com/reference/android/graphics/BitmapFactory.Options.html#inTempStorage"&gt;BitmapFactory.Options.inTempStorage&lt;/a&gt;. 参数进行了图片解码的优化。inTempStorege可以预申请一块内存，对所有解码过程中指定相同的内存，以达到减少临时内存的目的。&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">zhengwen</dc:creator><pubDate>Thu, 19 Feb 2015 00:00:00 +0800</pubDate><guid>tag:blog.aaapei.com,2015-02-19:article/2015/02/bookingcom-androidke-hu-duan-de-bitmapfu-yong</guid><category>bitmap，性能优化</category></item><item><title>facebook新闻页ListView优化</title><link>http://blog.aaapei.com/article/2015/02/facebookxin-wen-ye-listviewyou-hua</link><description>&lt;h3&gt;引言&lt;/h3&gt;
 &lt;p&gt;原文链接：&lt;a href="https://code.facebook.com/posts/879498888759525/fast-rendering-news-feed-on-android/"&gt;https://code.facebook.com/posts/879498888759525/fast-rendering-news-feed-on-android/&lt;/a&gt; 
 透漏的信息量不大，且大多数项目并不会遇到facebook这种ListView的场景，不过可以拓展下思路：逻辑单元不一定是视图单元；移动端不要死搬MVC的架构，在市场上仍是中低端机型为主时，还是应该多考虑性能；附上rebbit的关于本文的&lt;a href="http://www.reddit.com/r/androiddev/comments/2tzrqe/fast_rendering_news_feed_on_android/"&gt;讨论&lt;/a&gt;，有些干货 :)&lt;/p&gt;
 &lt;h3&gt;基础知识&lt;/h3&gt;
