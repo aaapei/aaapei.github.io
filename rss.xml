@@ -1,5 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>I'm aaapei</title><link>http://blog.aaapei.com/</link><description></description><atom:link href="http://blog.aaapei.com/rss.xml" rel="self"></atom:link><lastBuildDate>Thu, 19 Feb 2015 00:00:00 +0800</lastBuildDate><item><title>booking.com android客户端的bitmap复用</title><link>http://blog.aaapei.com/article/2015/02/bookingcom-androidke-hu-duan-de-bitmapfu-yong</link><description>&lt;h3&gt;前言&lt;/h3&gt;
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>I'm aaapei</title><link>http://blog.aaapei.com/</link><description></description><atom:link href="http://blog.aaapei.com/rss.xml" rel="self"></atom:link><lastBuildDate>Tue, 03 Mar 2015 00:00:00 +0800</lastBuildDate><item><title>网易杭州研究院招聘</title><link>http://blog.aaapei.com/article/2015/03/wang-yi-hang-zhou-yan-jiu-yuan-zhao-pin</link><description>&lt;p&gt;原来是blog被androidweekly.cn转发了，机智的发个招聘小广告&lt;/p&gt;
+&lt;h3&gt;网易杭州研究院招聘&lt;/h3&gt;
+&lt;p&gt;&lt;a href="http://hr.163.com/getPositionById.do?id=3183"&gt;前端开发工程师&lt;/a&gt; &lt;/p&gt;
+&lt;p&gt;&lt;a href="http://hr.163.com/getPositionById.do?id=3336"&gt;Node.js开发工程师&lt;/a&gt; &lt;/p&gt;
+&lt;p&gt;&lt;a href="http://hr.163.com/getPositionById.do?id=1603"&gt;ios开发工程师&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://hr.163.com/getPositionById.do?id=1604"&gt;android开发工程师&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://hr.163.com/getPositionById.do?id=3321"&gt;数据可视化工程师&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://hr.163.com/getPositionById.do?id=3335"&gt;数据产品专员&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://hr.163.com/getPositionById.do?id=2737"&gt;交互设计师&lt;/a&gt;&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">zhengwen</dc:creator><pubDate>Tue, 03 Mar 2015 00:00:00 +0800</pubDate><guid>tag:blog.aaapei.com,2015-03-03:article/2015/03/wang-yi-hang-zhou-yan-jiu-yuan-zhao-pin</guid></item><item><title>booking.com android客户端的bitmap复用</title><link>http://blog.aaapei.com/article/2015/02/bookingcom-androidke-hu-duan-de-bitmapfu-yong</link><description>&lt;h3&gt;前言&lt;/h3&gt;
 &lt;p&gt;被鞭炮吵得睡不着觉，rss中找一篇简单的文档翻译下，原文链接：http://blog.booking.com/android-reuse-bitmaps.html，大部分团队应该都做过这个bitmap优化，不过估计设置过BitmapFactory.Options.inTempStorage参数的应该不多 :)&lt;/p&gt;
 &lt;p&gt;booking.com android客户端在新版本的增加了一个新功能：酒店的图片集合&lt;/p&gt;
 &lt;p&gt;&lt;img alt="此处输入图片的描述" src="http://blog.booking.com/static/android-reuse-bitmaps/hotel_photo_header.png" /&gt;&lt;/p&gt;
