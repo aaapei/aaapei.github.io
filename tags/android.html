@@ -83,6 +83,33 @@
             <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
 <div class="meta">
     <div class="date">
+        <time datetime="2015-07-26T14:26:00.000000" itemprop="datePublished">2015-07-26</time>
+    </div>
+    <div class="tags">
+        <a href="http://blog.aaapei.com/tags/android">android</a> ,         <a href="http://blog.aaapei.com/tags/applink">applink</a>     </div>
+</div>                <h1 class="title" itemprop="name"><a href="http://blog.aaapei.com/article/2015/07/cong-deeplinkdispatchtan-tan-zu-jian-tiao-zhuan" itemprop="url">从DeepLinkDispatch谈谈组件跳转</a></h1>
+                <div class="entry-content" itemprop="description"><h3>前言</h3>
+<p>最近airbnb开源了<a href="https://github.com/airbnb/DeepLinkDispatch">DeepLinkDispatch</a>项目，DeepLinkDispatch是一个基于注解的链接跳转库，简单了解完其实现后，想起了Facebook今年5月公布的另一个项目<a href="http://applinks.org/">AppLink</a>,于是有了这篇文章。</p>
+<h3>AppLink</h3>
+<p>与其说AppLink是一个框架，更不如说他是一个规范。当app内嵌WebView遇到自定义的Schema时，app只能简单的将url转交给系统，或直接显示页面无法加载。AppLink规范旨在解决各个平台的app跳转的问题。第三方网页或者app接入applink后，跳转方可以根据AppLink规范进行<em>精确</em>的目标跳转以及<em>数据传输</em>。
+引用官方文档中的例子,example.hmtl:</p>
+<div class="highlight"><pre><span class="nt">&lt;html&gt;</span>
+<span class="nt">&lt;head&gt;</span>
+    <span class="nt">&lt;meta</span> <span class="na">property=</span><span class="s">&quot;al:ios:url&quot;</span> <span class="na">content=</span><span class="s">&quot;applinks://docs&quot;</span> <span class="nt">/&gt;</span>
+    <span class="nt">&lt;meta</span> <span class="na">property=</span><span class="s">&quot;al:ios:app_store_id&quot;</span> <span class="na">content=</span><span class="s">&quot;12345&quot;</span> <span class="nt">/&gt;</span>
+    <span class="nt">&lt;meta</span> <span class="na">property=</span><span class="s">&quot;al:ios:app_name&quot;</span> <span class="na">content=</span><span class="s">&quot;App Links&quot;</span> <span class="nt">/&gt;</span>
+    <span class="nt">&lt;meta ...</span></pre></div>
+					<br/ >
+					<a href="http://blog.aaapei.com/article/2015/07/cong-deeplinkdispatchtan-tan-zu-jian-tiao-zhuan">查看全文</a>
+                </div>
+                <div class="meta">
+                    <span class="author">Posted by <a href="http://blog.aaapei.com/author/zhengwen.html">zhengwen</a></span>
+                </div>
+            </article>
+            <hr/>
+            <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
+<div class="meta">
+    <div class="date">
         <time datetime="2014-12-21T00:00:00.000000" itemprop="datePublished">2014-12-21</time>
     </div>
     <div class="tags">
@@ -167,45 +194,6 @@
 <p>android在3.0之后新增了一个BitmapFactory.Options.inBitmap开关，加了这个开关之后，bitmapfactory在加载位图时候，会尝试使用inbitmap指向的已分配在heap中位图空间；而不是重新申请一块内存；从而减少了虚拟机最讨厌的短生命周期大内存对象；  不过这个开关有严格的使用场景，即两个bitamp的位图大小必须一致</p>
 					<br/ >
 					<a href="http://blog.aaapei.com/article/2014/01/android-bitmap-tips">查看全文</a>
-                </div>
-                <div class="meta">
-                    <span class="author">Posted by <a href="http://blog.aaapei.com/author/zhengwen.html">zhengwen</a></span>
-                </div>
-            </article>
-            <hr/>
-            <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
-<div class="meta">
-    <div class="date">
-        <time datetime="2013-12-11T19:50:00.000000" itemprop="datePublished">2013-12-11</time>
-    </div>
-    <div class="tags">
-        <a href="http://blog.aaapei.com/tags/android">android</a> ,         <a href="http://blog.aaapei.com/tags/wei-xin">微信</a>     </div>
-</div>                <h1 class="title" itemprop="name"><a href="http://blog.aaapei.com/article/2013/12/wei-xin-de-jsbridgeshi-xian" itemprop="url">微信的jsbridge实现</a></h1>
-                <div class="entry-content" itemprop="description"><p>微信公共平台开放了几个操作webview界面的js接口<br />
-示例代码是这样的:  </p>
-<div class="highlight"><pre><span class="nx">WeixinJSBridge</span><span class="p">.</span><span class="nx">invoke</span><span class="p">(</span><span class="s1">&#39;getNetworkType&#39;</span><span class="p">,{},</span>
-    <span class="kd">function</span><span class="p">(</span><span class="nx">e</span><span class="p">){</span>
-        <span class="nx">WeixinJSBridge</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">e</span><span class="p">.</span><span class="nx">err_msg</span><span class="p">);</span>
-    <span class="p">});</span>
-</pre></div>
-
-
-<p>android的webview api中有开放过一个<em>addJavaScriptInterface</em>函数,这个函数的作用是在页面的Window中注入一个JS对象<br />
-如果你的应用中使用了这个api,建议先看一下国内安全领域第一人黑哥的这篇文章<a href="http://hi.baidu.com/hi_heige/item/9baf99f063331d58c9f3379a">android webview 漏洞背后的节操</a>,  </p>
-<p>没耐心的同学直接看结尾的解决方案吧:</p>
-<blockquote>
-<p>第1个方案是设置信任域，这个问题其实是不太靠谱的，在我之前在kcon里演讲《去年跨过的浏览器》里有很多信任域带来的安全问题<br />
- 第2个方案是使用 shouldOverrideUrlLoading 的方式，据说这个方案还是比较靠谱的，只是可能代价比较大<br />
- 第3个方案就是教育那些开发商，没有必要用webview的时候就不要用，不要java与js交互就不要用  </p>
-</blockquote>
-<p>不过,按黑哥这篇文章的想法,这个漏洞危险等级很低,可以无视之<br />
-暂时把安全问题放一边,Js对象的注入,对函数的参数类型有严格要求,它只能传递基本数据类型以及JSON<br />
-但微信的JsApi中,参数三是一个函数对象,那他是如果做到的呢</p>
-<h3>逆向</h3>
-<p>Android原生的机制既然不能支持函数对象的传递,于是猜测微信是否会对原始的api做了一层包装;<br />
-先下载weixin ...</p>
-					<br/ >
-					<a href="http://blog.aaapei.com/article/2013/12/wei-xin-de-jsbridgeshi-xian">查看全文</a>
                 </div>
                 <div class="meta">
                     <span class="author">Posted by <a href="http://blog.aaapei.com/author/zhengwen.html">zhengwen</a></span>

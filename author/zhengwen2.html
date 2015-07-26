@@ -83,6 +83,44 @@
             <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
 <div class="meta">
     <div class="date">
+        <time datetime="2014-12-21T00:00:00.000000" itemprop="datePublished">2014-12-21</time>
+    </div>
+    <div class="tags">
+        <a href="http://blog.aaapei.com/tags/android">android</a> ,         <a href="http://blog.aaapei.com/tags/yi-bu">异步</a>     </div>
+</div>                <h1 class="title" itemprop="name"><a href="http://blog.aaapei.com/article/2014/12/androidyi-bu-bian-cheng" itemprop="url">android异步编程</a></h1>
+                <div class="entry-content" itemprop="description"><p>在android开发中，有两条很重要的<a href="http://developer.android.com/guide/components/processes-and-threads.html">编程准则</a></p>
+<ul>
+<li>不要堵塞ui线程</li>
+<li>不要在非ui线程操作ui控件</li>
+</ul>
+<p>开发者必须这两个遵守单线程模型的准则，将耗时的逻辑转移到非ui线程进行，得出计算结果后，通知ui线程进行数据的展现。本文介绍一下android的异步编程。</p>
+<h3>android线程模型</h3>
+<p>同hotspot vm一样，在daivlk vm中，采取的是1：1线程模型，每一个android thread对应一个Native Linux thread；linux内核通过cfs（completely fair scheduler）来进行线程调度，在cfs中着影响一个线程时间分配的因素有两个：</p>
+<ul>
+<li>thread priority</li>
+<li>thread group</li>
+</ul>
+<h4>thread group</h4>
+<p>线程的thread group是动态改变的，在android framework层面，android的应用有5个等级，分别是</p>
+<ul>
+<li>foreground process</li>
+<li>visible process</li>
+<li>service process</li>
+<li>backgroud process</li>
+<li>empty process  </li>
+</ul>
+<p>它们的thread ...</p>
+					<br/ >
+					<a href="http://blog.aaapei.com/article/2014/12/androidyi-bu-bian-cheng">查看全文</a>
+                </div>
+                <div class="meta">
+                    <span class="author">Posted by <a href="http://blog.aaapei.com/author/zhengwen.html">zhengwen</a></span>
+                </div>
+            </article>
+            <hr/>
+            <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
+<div class="meta">
+    <div class="date">
         <time datetime="2014-11-09T00:00:00.000000" itemprop="datePublished">2014-11-09</time>
     </div>
     <div class="tags">
@@ -150,39 +188,6 @@ Java Native Interface(java本地接口),用于java与c/c++代码进行交互.需
    <span class="k">for</span> <span class="p">(</span> <span class="nx">i ...</span></pre></div>
 					<br/ >
 					<a href="http://blog.aaapei.com/article/2014/04/androidzhong-luajiao-ben-de-bu-shu">查看全文</a>
-                </div>
-                <div class="meta">
-                    <span class="author">Posted by <a href="http://blog.aaapei.com/author/zhengwen.html">zhengwen</a></span>
-                </div>
-            </article>
-            <hr/>
-            <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
-<div class="meta">
-    <div class="date">
-        <time datetime="2014-02-19T19:50:00.000000" itemprop="datePublished">2014-02-19</time>
-    </div>
-    <div class="tags">
-        <a href="http://blog.aaapei.com/tags/lua">lua</a> ,         <a href="http://blog.aaapei.com/tags/luajava">luajava</a>     </div>
-</div>                <h1 class="title" itemprop="name"><a href="http://blog.aaapei.com/article/2014/02/luazai-kua-yu-yan-huan-jing-zhong-de-nei-cun-xie-lu" itemprop="url">lua在跨语言环境中的内存泄露</a></h1>
-                <div class="entry-content" itemprop="description"><p>前段时间在android环境中使用lua,采用的luabridge是luajava,遇到一个内存泄露问题,查了很久,终于定位了;</p>
-<p>场景是这样的:<br />
-1:在lua中创建了一个java对象,将jobject指针传递给java;对应在luajava中,即传递了一个luaobject给java;java保存了这个对象;<br />
-2:在Lua中需要对这个java对象设置一个事件回调,比如说为某个控件setOnClickListener;<br />
-其中设置的代码是这样的:</p>
-<div class="highlight"><pre><span class="nx">local</span> <span class="nx">viewclick_cb</span><span class="o">=</span><span class="p">{}</span>
-<span class="kd">function</span> <span class="nx">viewclick_cb</span><span class="p">.</span><span class="nx">onClick</span><span class="p">(</span><span class="nx">v</span><span class="p">)</span>
-    <span class="nx">self</span><span class="o">:</span><span class="nx">cb</span><span class="p">(</span><span class="nx">v</span><span class="p">)</span>  
-<span class="nx">end</span>
-<span class="nx">local</span> <span class="nx">listenerProxy</span>  <span class="o">=</span> <span class="nx">luajava</span><span class="p">.</span><span class="nx">createProxy</span><span class="p">(</span><span class="s1">&#39;android.view.View$OnClickListener&#39;</span><span class="p">,</span><span class="nx">viewclick_cb</span><span class="p">)</span>       
-<span class="nx">javaobjhandler</span><span class="o">:</span><span class="nx">setOnClickListener</span><span class="p">(</span><span class="nx">ListenerProxy</span><span class="p">)</span>   
-</pre></div>
-
-
-<p>lua和java交互时,对象生命周期管理分两种情况:</p>
-<blockquote>
-<p>1:java对象传递个lua虚拟机,lua虚拟机为java对象创建一个userdata,在globalref中增加一个引用,标记这个java对象正在被使用;同时,为这个userdata设置一个__gc元方法,当lua对象需要被释放时,_gc元方法回调,释放掉java对象的globaref ...</p></blockquote>
-					<br/ >
-					<a href="http://blog.aaapei.com/article/2014/02/luazai-kua-yu-yan-huan-jing-zhong-de-nei-cun-xie-lu">查看全文</a>
                 </div>
                 <div class="meta">
                     <span class="author">Posted by <a href="http://blog.aaapei.com/author/zhengwen.html">zhengwen</a></span>

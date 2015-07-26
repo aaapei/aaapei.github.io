@@ -83,45 +83,6 @@
             <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
 <div class="meta">
     <div class="date">
-        <time datetime="2013-12-11T19:50:00.000000" itemprop="datePublished">2013-12-11</time>
-    </div>
-    <div class="tags">
-        <a href="http://blog.aaapei.com/tags/android">android</a> ,         <a href="http://blog.aaapei.com/tags/wei-xin">微信</a>     </div>
-</div>                <h1 class="title" itemprop="name"><a href="http://blog.aaapei.com/article/2013/12/wei-xin-de-jsbridgeshi-xian" itemprop="url">微信的jsbridge实现</a></h1>
-                <div class="entry-content" itemprop="description"><p>微信公共平台开放了几个操作webview界面的js接口<br />
-示例代码是这样的:  </p>
-<div class="highlight"><pre><span class="nx">WeixinJSBridge</span><span class="p">.</span><span class="nx">invoke</span><span class="p">(</span><span class="s1">&#39;getNetworkType&#39;</span><span class="p">,{},</span>
-    <span class="kd">function</span><span class="p">(</span><span class="nx">e</span><span class="p">){</span>
-        <span class="nx">WeixinJSBridge</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">e</span><span class="p">.</span><span class="nx">err_msg</span><span class="p">);</span>
-    <span class="p">});</span>
-</pre></div>
-
-
-<p>android的webview api中有开放过一个<em>addJavaScriptInterface</em>函数,这个函数的作用是在页面的Window中注入一个JS对象<br />
-如果你的应用中使用了这个api,建议先看一下国内安全领域第一人黑哥的这篇文章<a href="http://hi.baidu.com/hi_heige/item/9baf99f063331d58c9f3379a">android webview 漏洞背后的节操</a>,  </p>
-<p>没耐心的同学直接看结尾的解决方案吧:</p>
-<blockquote>
-<p>第1个方案是设置信任域，这个问题其实是不太靠谱的，在我之前在kcon里演讲《去年跨过的浏览器》里有很多信任域带来的安全问题<br />
- 第2个方案是使用 shouldOverrideUrlLoading 的方式，据说这个方案还是比较靠谱的，只是可能代价比较大<br />
- 第3个方案就是教育那些开发商，没有必要用webview的时候就不要用，不要java与js交互就不要用  </p>
-</blockquote>
-<p>不过,按黑哥这篇文章的想法,这个漏洞危险等级很低,可以无视之<br />
-暂时把安全问题放一边,Js对象的注入,对函数的参数类型有严格要求,它只能传递基本数据类型以及JSON<br />
-但微信的JsApi中,参数三是一个函数对象,那他是如果做到的呢</p>
-<h3>逆向</h3>
-<p>Android原生的机制既然不能支持函数对象的传递,于是猜测微信是否会对原始的api做了一层包装;<br />
-先下载weixin ...</p>
-					<br/ >
-					<a href="http://blog.aaapei.com/article/2013/12/wei-xin-de-jsbridgeshi-xian">查看全文</a>
-                </div>
-                <div class="meta">
-                    <span class="author">Posted by <a href="http://blog.aaapei.com/author/zhengwen.html">zhengwen</a></span>
-                </div>
-            </article>
-            <hr/>
-            <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
-<div class="meta">
-    <div class="date">
         <time datetime="2013-12-02T20:20:00.000000" itemprop="datePublished">2013-12-02</time>
     </div>
     <div class="tags">
@@ -148,7 +109,7 @@ luajava目前只支持到lua5.1,不过升级到5.2困难不大,主要是一些�
             <hr/>
 
         <nav id="pagenavi">
-                <a href="http://blog.aaapei.com/tags/android.html" class="prev">Prev</a>
+                <a href="http://blog.aaapei.com/author/zhengwen3.html" class="prev">Prev</a>
 
 
             <a href="http://blog.aaapei.com" class="center">文章列表</a>
