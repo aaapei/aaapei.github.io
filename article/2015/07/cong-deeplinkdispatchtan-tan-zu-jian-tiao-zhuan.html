@@ -131,7 +131,7 @@ Hello, world!
 <p>al_applink_data用于数据传递，以android的intent为例，al:android:package和al:android:class分别标识app的包名以及activity的类名，al:android:url作为intent.setData的参数，al_applink_data的内容放在<a href="http://developer.android.com/reference/android/content/Intent.html#putExtra(java.lang.String,%20android.os.Bundle)">Bundle</a>数据中。</p>
 <p>AppLink使用<a href="https://github.com/BoltsFramework">BoltsFramework</a>工具库中的<em>WebViewAppLinkResolver</em>来进行html的解析，WebViewAppLinkResolver需先从网络中下载到完整的html文本再进行元标签的解析。</p>
 <p>AppLink的目标很高大上，然后在国内没什么卵用，  做为Applink的发起者，facebook的app装机量巨大且开放，第三方app愿意进入其生态圈。而国内的app霸主微信，正忙着为自家的各个产品撕逼，封锁竞争对手的app跳转。可想到的场景只剩有多个产品线的几个大厂，利用AppLink进行自家兄弟应用的跳转。</p>
-<p>做为小型app的开发者，与其期待facebook的AppLink规范在国内得到普及，不如等待Android M的AppLink可以尽快完善低版本的适配。</p>
+<p>做为小型app的开发者，与其期待facebook的AppLink规范在国内得到普及，不如等待Android M的AppLink可以尽快完善。</p>
 <h3>DeepLinkDispatch</h3>
 <p>AppLink无卵用，但我们将AppLink结合其他框架。去年info的架构师大会中，淘宝提到了<a href="http://www.infoq.com/cn/presentations/taobao-mobile-client-architecture-road">UI总线</a>的概念，使用跨平台统一的URL来进行Web、Android、IOS的寻址。在android平台上，当本地没有activity来匹配URL时，自动降级成WebView加载。</p>
 <p>DeepLinkDispatch是使用url的跳转框架,activity可以通过注解来描述activity的资源定位符，参考一个DeepLinkDispatch的一个示例：</p>
@@ -149,7 +149,7 @@ Hello, world!
 </pre></div>
 
 
-<p>表示MainActivity接受airbnb://example.com/deepLink/{id}规则的跳转。 在编译期，所有activity的DeepLinks注解都会被解析生成实际的跳转规则，生成在<em>DeepLinkActivity</em>类中，DeepLinkActivity是一个预先声明在manifest中的不可见activity，
+<p>DeepLink注解表示MainActivity接受airbnb://example.com/deepLink/{id}规则的跳转。 在编译期，所有activity的DeepLinks注解都会被解析生成实际的跳转规则，生成在<em>DeepLinkActivity</em>类中，DeepLinkActivity是一个预先声明在manifest中的不可见activity，
 DeepLinkActivity.onCreate():</p>
 <div class="highlight"><pre>  <span class="err">@</span><span class="nx">Override</span>
   <span class="kr">protected</span> <span class="k">void</span> <span class="nx">onCreate</span><span class="p">(</span><span class="nx">Bundle</span> <span class="nx">savedInstanceState</span><span class="p">)</span> <span class="p">{</span>
