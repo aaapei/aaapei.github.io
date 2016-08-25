@@ -1,5 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>I'm aaapei</title><link>http://blog.aaapei.com/</link><description></description><atom:link href="http://blog.aaapei.com/rss.xml" rel="self"></atom:link><lastBuildDate>Sun, 26 Jul 2015 14:26:00 +0800</lastBuildDate><item><title>从DeepLinkDispatch谈谈组件跳转</title><link>http://blog.aaapei.com/article/2015/07/cong-deeplinkdispatchtan-tan-zu-jian-tiao-zhuan</link><description>&lt;h3&gt;前言&lt;/h3&gt;
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>I'm aaapei</title><link>http://blog.aaapei.com/</link><description></description><atom:link href="http://blog.aaapei.com/rss.xml" rel="self"></atom:link><lastBuildDate>Thu, 25 Aug 2016 14:26:00 +0800</lastBuildDate><item><title>网易云课堂的android微专业课程</title><link>http://blog.aaapei.com/article/2016/08/wang-yi-yun-ke-tang-de-androidwei-zhuan-ye-ke-cheng</link><description>&lt;p&gt;懒癌晚期，一年多没更新blog，近一两月项目以外做了两件事情：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;在听云和infoq的&lt;a href="http://www.apmcon.cn/"&gt;apmcon&lt;/a&gt;大会做了个android 编译器hook的分享，ppt地址在&lt;a href="http://nos.netease.com/knowledge/fd1ba942-d609-4fa4-bdce-e1003febc1ce?download=apmcon_apm%E6%96%B9%E6%A1%88%E6%8E%A2%E7%B4%A2_v0818.pdf"&gt;网易APM hook方案探索&lt;/a&gt;，介绍了我们在编译期做bytecode植入的一些实践工作，有兴趣的同学可以和我私信交流；&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;和杭研的同事们一起做了在线的Android课程，讲师基本囊括了网易杭研院各部门的大牛，课程针对在校生和1年以下工作经验的新同学。想了解我们工作方式的同学可以看看，通过下面这个链接购买成功的朋友，也可以私信我下，我再返个微信红包给你 ：）&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;android网易云课堂微专业：&lt;a href="http://mooc.study.163.com/smartSpec/detail/1001168002.htm?utm_source=832006&amp;amp;utm_medium=cps&amp;amp;utm_campaign=affiliate"&gt;android&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;ios网易云课堂微专业：&lt;a href="http://mooc.study.163.com/smartSpec/detail/1001168001.htm?utm_source=832006&amp;amp;utm_medium=cps&amp;amp;utm_campaign=affiliate"&gt;ios&lt;/a&gt;&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">zhengwen</dc:creator><pubDate>Thu, 25 Aug 2016 14:26:00 +0800</pubDate><guid>tag:blog.aaapei.com,2016-08-25:article/2016/08/wang-yi-yun-ke-tang-de-androidwei-zhuan-ye-ke-cheng</guid><category>android</category><category>apm</category></item><item><title>从DeepLinkDispatch谈谈组件跳转</title><link>http://blog.aaapei.com/article/2015/07/cong-deeplinkdispatchtan-tan-zu-jian-tiao-zhuan</link><description>&lt;h3&gt;前言&lt;/h3&gt;
 &lt;p&gt;最近airbnb开源了&lt;a href="https://github.com/airbnb/DeepLinkDispatch"&gt;DeepLinkDispatch&lt;/a&gt;项目，DeepLinkDispatch是一个基于注解的链接跳转库，简单了解完其实现后，想起了Facebook今年5月公布的另一个项目&lt;a href="http://applinks.org/"&gt;AppLink&lt;/a&gt;,于是有了这篇文章。&lt;/p&gt;
 &lt;h3&gt;AppLink&lt;/h3&gt;
 &lt;p&gt;与其说AppLink是一个框架，更不如说他是一个规范。当app内嵌WebView遇到自定义的Schema时，app只能简单的将url转交给系统，或直接显示页面无法加载。AppLink规范旨在解决各个平台的app跳转的问题。第三方网页或者app接入applink后，跳转方可以根据AppLink规范进行&lt;em&gt;精确&lt;/em&gt;的目标跳转以及&lt;em&gt;数据传输&lt;/em&gt;。
@@ -117,15 +127,7 @@ DeepLinkActivity.onCreate():&lt;/p&gt;
 &lt;h3&gt;App跳转&lt;/h3&gt;
 &lt;p&gt;解决完nativie跳转webview的问题，我们回头看一下facebook的AppLink规范，惊喜的发现它与DeepLinkActivity意外的搭配，AppLink中需要为跳转指定al:android:class，一旦APK的包结构发生了调整，已经发布的网页需做一次重新部署，引入DeepLinkDispatch后，al:android:class的入口统一成了DeepLinkActivity，由DeepLinkDispatch进行二次寻址。额外还带来一个好处，app内嵌webview经常会有拦截自定义url跳转的需求，为了运营活动，不得不为某个url拦截专门发一个版本，采用UI总线的设计，此类需求可以通过动态调整网页AppLink完成。&lt;/p&gt;
 &lt;h3&gt;最后&lt;/h3&gt;
-&lt;p&gt;AppLink以及DeepLinkDispatch各自还是有一些缺陷，比如AppLink的BoltsFramework不能和WebView很好的结合，导致html下载多次。App跳转中若需要携带复杂的数据格式，DeepLinkDispatch的url会变得过于冗长。但UI总线的概念可以为native和webview之间的连接提供一些好的思路。&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">zhengwen</dc:creator><pubDate>Sun, 26 Jul 2015 14:26:00 +0800</pubDate><guid>tag:blog.aaapei.com,2015-07-26:article/2015/07/cong-deeplinkdispatchtan-tan-zu-jian-tiao-zhuan</guid><category>android</category><category>applink</category></item><item><title>网易杭州研究院招聘</title><link>http://blog.aaapei.com/article/2015/03/wang-yi-hang-zhou-yan-jiu-yuan-zhao-pin</link><description>&lt;p&gt;原来是blog被androidweekly.cn转发了，机智的发个招聘小广告&lt;/p&gt;
-&lt;p&gt;&lt;a href="http://hr.163.com/getPositionById.do?id=3183"&gt;前端开发工程师&lt;/a&gt; &lt;/p&gt;
-&lt;p&gt;&lt;a href="http://hr.163.com/getPositionById.do?id=3336"&gt;Node.js开发工程师&lt;/a&gt; &lt;/p&gt;
-&lt;p&gt;&lt;a href="http://hr.163.com/getPositionById.do?id=1603"&gt;ios开发工程师&lt;/a&gt;&lt;/p&gt;
-&lt;p&gt;&lt;a href="http://hr.163.com/getPositionById.do?id=1604"&gt;android开发工程师&lt;/a&gt;&lt;/p&gt;
-&lt;p&gt;&lt;a href="http://hr.163.com/getPositionById.do?id=3321"&gt;数据可视化工程师&lt;/a&gt;&lt;/p&gt;
-&lt;p&gt;&lt;a href="http://hr.163.com/getPositionById.do?id=3335"&gt;数据产品专员&lt;/a&gt;&lt;/p&gt;
-&lt;p&gt;&lt;a href="http://hr.163.com/getPositionById.do?id=2737"&gt;交互设计师&lt;/a&gt;&lt;/p&gt;
-&lt;p&gt;邮箱:aaapei@gmail.com&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">zhengwen</dc:creator><pubDate>Tue, 03 Mar 2015 00:00:00 +0800</pubDate><guid>tag:blog.aaapei.com,2015-03-03:article/2015/03/wang-yi-hang-zhou-yan-jiu-yuan-zhao-pin</guid><category>招聘</category></item><item><title>booking.com android客户端的bitmap复用</title><link>http://blog.aaapei.com/article/2015/02/bookingcom-androidke-hu-duan-de-bitmapfu-yong</link><description>&lt;h3&gt;前言&lt;/h3&gt;
+&lt;p&gt;AppLink以及DeepLinkDispatch各自还是有一些缺陷，比如AppLink的BoltsFramework不能和WebView很好的结合，导致html下载多次。App跳转中若需要携带复杂的数据格式，DeepLinkDispatch的url会变得过于冗长。但UI总线的概念可以为native和webview之间的连接提供一些好的思路。&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">zhengwen</dc:creator><pubDate>Sun, 26 Jul 2015 14:26:00 +0800</pubDate><guid>tag:blog.aaapei.com,2015-07-26:article/2015/07/cong-deeplinkdispatchtan-tan-zu-jian-tiao-zhuan</guid><category>android</category><category>applink</category></item><item><title>booking.com android客户端的bitmap复用</title><link>http://blog.aaapei.com/article/2015/02/bookingcom-androidke-hu-duan-de-bitmapfu-yong</link><description>&lt;h3&gt;前言&lt;/h3&gt;
 &lt;p&gt;被鞭炮吵得睡不着觉，rss中找一篇简单的文档翻译下，原文链接：http://blog.booking.com/android-reuse-bitmaps.html，大部分团队应该都做过这个bitmap优化，不过估计设置过BitmapFactory.Options.inTempStorage参数的应该不多 :)&lt;/p&gt;
 &lt;p&gt;booking.com android客户端在新版本的增加了一个新功能：酒店的图片集合&lt;/p&gt;
 &lt;p&gt;&lt;img alt="此处输入图片的描述" src="http://blog.booking.com/static/android-reuse-bitmaps/hotel_photo_header.png" /&gt;&lt;/p&gt;

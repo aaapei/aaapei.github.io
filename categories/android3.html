@@ -83,30 +83,6 @@
             <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
 <div class="meta">
     <div class="date">
-        <time datetime="2014-01-28T17:30:00.000000" itemprop="datePublished">2014-01-28</time>
-    </div>
-    <div class="tags">
-        <a href="http://blog.aaapei.com/tags/android">android</a>     </div>
-</div>                <h1 class="title" itemprop="name"><a href="http://blog.aaapei.com/article/2014/01/android-bitmap-tips" itemprop="url">android bitmap tips</a></h1>
-                <div class="entry-content" itemprop="description"><p>大部分android开发者只知道bitmap再使用之后，需要显式的调用一次bitmap.recycle，回收bitmap内存;  </p>
-<p>这个观点，在android3.0之后其实已经过时了，android3.0将bitmap所引用的位图资源从native heap移到虚拟机的heap空间，bitmap的生命周期由虚拟机管理，开发者只需要保证在应用中不在持有对bitmap的引用，即可保证不发生内存泄漏；位图资源的内存由GC进行回收；<br />
-将bitmap的位图内存转移到虚拟机heap后，由于位图资源本身较大，造成gc的概率的增加   </p>
-<h3>bitmap proxy</h3>
-<p>在一般的应用场景中，bitmap的引用一般是和imageview关联；当大量imageview持有对bitmap的引用时，虚拟机无法释放bitmap的内存，导致oom；</p>
-<p>针对这种场景，开发者可以实现一个bitmap的代理类，作为bitmap和imageview的中间层，在imageview不可见时（例如imageview是一个listview的子控件，listview发生滚动/activiy切换到后台），即释放掉对bitamp的引用；当imageview重新可见时，通过代理类重新去加载bitmap，以解耦bitmap和iamgeview的引用关系;   </p>
-<h3>inBitmap</h3>
-<p>android在3.0之后新增了一个BitmapFactory.Options.inBitmap开关，加了这个开关之后，bitmapfactory在加载位图时候，会尝试使用inbitmap指向的已分配在heap中位图空间；而不是重新申请一块内存；从而减少了虚拟机最讨厌的短生命周期大内存对象；  不过这个开关有严格的使用场景，即两个bitamp的位图大小必须一致</p>
-					<br/ >
-					<a href="http://blog.aaapei.com/article/2014/01/android-bitmap-tips">查看全文</a>
-                </div>
-                <div class="meta">
-                    <span class="author">Posted by <a href="http://blog.aaapei.com/author/zhengwen.html">zhengwen</a></span>
-                </div>
-            </article>
-            <hr/>
-            <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
-<div class="meta">
-    <div class="date">
         <time datetime="2013-12-11T19:50:00.000000" itemprop="datePublished">2013-12-11</time>
     </div>
     <div class="tags">
@@ -143,36 +119,9 @@
                 </div>
             </article>
             <hr/>
-            <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
-<div class="meta">
-    <div class="date">
-        <time datetime="2013-12-02T20:20:00.000000" itemprop="datePublished">2013-12-02</time>
-    </div>
-    <div class="tags">
-        <a href="http://blog.aaapei.com/tags/android">android</a> ,         <a href="http://blog.aaapei.com/tags/lua">lua</a>     </div>
-</div>                <h1 class="title" itemprop="name"><a href="http://blog.aaapei.com/article/2013/12/luajavaxing-neng-you-hua" itemprop="url">luajava性能优化</a></h1>
-                <div class="entry-content" itemprop="description"><p>最近在做一个lua的android项目,对于lua的生态环境完全陌生,所以选用了个文档资料最全的lua bridge:<em>luajava</em><br />
-luajava目前只支持到lua5.1,不过升级到5.2困难不大,主要是一些宏开关以及静态变量;然而实际运行的时候发现卡的很不行,ui频繁掉祯,profile后发现90%+的cpu耗时在luajava中  </p>
-<p>看了一下luajava本身代码量不大;索性就追了一下,luajava的native层就一个luajava.c,java层,除了LuaJavaApi.java,其他java类都是Value Object</p>
-<h3>lua逻辑分析</h3>
-<p>先看lua创建java object的代码,luajava.c中</p>
-<div class="highlight"><pre><span class="kt">int</span> <span class="nf">javaNewInstance</span><span class="p">(</span> <span class="n">lua_State</span> <span class="o">*</span> <span class="n">L</span> <span class="p">)</span>
-<span class="p">{</span>     
-    <span class="c1">//some code …..</span>
-    <span class="n">method</span>  <span class="o">=</span> <span class="p">(</span> <span class="o">*</span><span class="n">javaEnv</span> <span class="p">)</span><span class="o">-&gt;</span><span class="n">GetStaticMethodID</span><span class="p">(</span> <span class="n">javaEnv</span> <span class="p">,</span> <span class="n">luajava_api_class</span> <span class="p">,</span> <span class="s">&quot;javaNewInstance&quot;</span> <span class="p">,</span><span class="s">&quot;(ILjava/lang/String;)I&quot;</span> <span class="p">);</span>
-     <span class="c1">//先调用java层创建javaobject</span>
-    <span class="n">javaClassName</span> <span class="o">=</span> <span class="p">(</span> <span class="o">*</span><span class="n">javaEnv</span> <span class="p">)</span><span class="o">-&gt;</span><span class="n">NewStringUTF</span><span class="p">(</span> <span class="n">javaEnv</span> <span class="p">,</span> <span class="n">className ...</span></pre></div>
-					<br/ >
-					<a href="http://blog.aaapei.com/article/2013/12/luajavaxing-neng-you-hua">查看全文</a>
-                </div>
-                <div class="meta">
-                    <span class="author">Posted by <a href="http://blog.aaapei.com/author/zhengwen.html">zhengwen</a></span>
-                </div>
-            </article>
-            <hr/>
 
         <nav id="pagenavi">
-                <a href="http://blog.aaapei.com/tags/android.html" class="prev">Prev</a>
+                <a href="http://blog.aaapei.com/categories/android2.html" class="prev">Prev</a>
 
 
             <a href="http://blog.aaapei.com" class="center">文章列表</a>

@@ -83,6 +83,33 @@
             <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
 <div class="meta">
     <div class="date">
+        <time datetime="2016-08-25T14:26:00.000000" itemprop="datePublished">2016-08-25</time>
+    </div>
+    <div class="tags">
+        <a href="http://blog.aaapei.com/tags/android">android</a> ,         <a href="http://blog.aaapei.com/tags/apm">apm</a>     </div>
+</div>                <h1 class="title" itemprop="name"><a href="http://blog.aaapei.com/article/2016/08/wang-yi-yun-ke-tang-de-androidwei-zhuan-ye-ke-cheng" itemprop="url">网易云课堂的android微专业课程</a></h1>
+                <div class="entry-content" itemprop="description"><p>懒癌晚期，一年多没更新blog，近一两月项目以外做了两件事情：</p>
+<ul>
+<li>
+<p>在听云和infoq的<a href="http://www.apmcon.cn/">apmcon</a>大会做了个android 编译器hook的分享，ppt地址在<a href="http://nos.netease.com/knowledge/fd1ba942-d609-4fa4-bdce-e1003febc1ce?download=apmcon_apm%E6%96%B9%E6%A1%88%E6%8E%A2%E7%B4%A2_v0818.pdf">网易APM hook方案探索</a>，介绍了我们在编译期做bytecode植入的一些实践工作，有兴趣的同学可以和我私信交流；</p>
+</li>
+<li>
+<p>和杭研的同事们一起做了在线的Android课程，讲师基本囊括了网易杭研院各部门的大牛，课程针对在校生和1年以下工作经验的新同学。想了解我们工作方式的同学可以看看，通过下面这个链接购买成功的朋友，也可以私信我下，我再返个微信红包给你 ：）</p>
+</li>
+</ul>
+<p>android网易云课堂微专业：<a href="http://mooc.study.163.com/smartSpec/detail/1001168002.htm?utm_source=832006&amp;utm_medium=cps&amp;utm_campaign=affiliate">android</a></p>
+<p>ios网易云课堂微专业：<a href="http://mooc.study.163.com/smartSpec/detail/1001168001.htm?utm_source=832006&amp;utm_medium=cps&amp;utm_campaign=affiliate">ios</a></p>
+					<br/ >
+					<a href="http://blog.aaapei.com/article/2016/08/wang-yi-yun-ke-tang-de-androidwei-zhuan-ye-ke-cheng">查看全文</a>
+                </div>
+                <div class="meta">
+                    <span class="author">Posted by <a href="http://blog.aaapei.com/author/zhengwen.html">zhengwen</a></span>
+                </div>
+            </article>
+            <hr/>
+            <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
+<div class="meta">
+    <div class="date">
         <time datetime="2015-07-26T14:26:00.000000" itemprop="datePublished">2015-07-26</time>
     </div>
     <div class="tags">
@@ -149,44 +176,6 @@
 首先，新闻页的每一条新闻的可见区域非常大，包含一系列的文本以及照片；其次，新闻的展现类型也很多样，除了文本以及照片，新闻的附件还可包含链接、音频 ...</p>
 					<br/ >
 					<a href="http://blog.aaapei.com/article/2015/02/facebookxin-wen-ye-listviewyou-hua">查看全文</a>
-                </div>
-                <div class="meta">
-                    <span class="author">Posted by <a href="http://blog.aaapei.com/author/zhengwen.html">zhengwen</a></span>
-                </div>
-            </article>
-            <hr/>
-            <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
-<div class="meta">
-    <div class="date">
-        <time datetime="2014-12-21T00:00:00.000000" itemprop="datePublished">2014-12-21</time>
-    </div>
-    <div class="tags">
-        <a href="http://blog.aaapei.com/tags/android">android</a> ,         <a href="http://blog.aaapei.com/tags/yi-bu">异步</a>     </div>
-</div>                <h1 class="title" itemprop="name"><a href="http://blog.aaapei.com/article/2014/12/androidyi-bu-bian-cheng" itemprop="url">android异步编程</a></h1>
-                <div class="entry-content" itemprop="description"><p>在android开发中，有两条很重要的<a href="http://developer.android.com/guide/components/processes-and-threads.html">编程准则</a></p>
-<ul>
-<li>不要堵塞ui线程</li>
-<li>不要在非ui线程操作ui控件</li>
-</ul>
-<p>开发者必须这两个遵守单线程模型的准则，将耗时的逻辑转移到非ui线程进行，得出计算结果后，通知ui线程进行数据的展现。本文介绍一下android的异步编程。</p>
-<h3>android线程模型</h3>
-<p>同hotspot vm一样，在daivlk vm中，采取的是1：1线程模型，每一个android thread对应一个Native Linux thread；linux内核通过cfs（completely fair scheduler）来进行线程调度，在cfs中着影响一个线程时间分配的因素有两个：</p>
-<ul>
-<li>thread priority</li>
-<li>thread group</li>
-</ul>
-<h4>thread group</h4>
-<p>线程的thread group是动态改变的，在android framework层面，android的应用有5个等级，分别是</p>
-<ul>
-<li>foreground process</li>
-<li>visible process</li>
-<li>service process</li>
-<li>backgroud process</li>
-<li>empty process  </li>
-</ul>
-<p>它们的thread ...</p>
-					<br/ >
-					<a href="http://blog.aaapei.com/article/2014/12/androidyi-bu-bian-cheng">查看全文</a>
                 </div>
                 <div class="meta">
                     <span class="author">Posted by <a href="http://blog.aaapei.com/author/zhengwen.html">zhengwen</a></span>
