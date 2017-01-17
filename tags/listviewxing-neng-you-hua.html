@@ -83,7 +83,7 @@
             <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
 <div class="meta">
     <div class="date">
-        <time datetime="2015-02-01T00:00:00.000000" itemprop="datePublished">2015-02-01</time>
+        <time datetime="2015-02-01T00:00:00.000000+0800" itemprop="datePublished">2015-02-01</time>
     </div>
     <div class="tags">
         <a href="http://blog.aaapei.com/tags/listviewxing-neng-you-hua">listview，性能优化</a>     </div>
@@ -95,7 +95,7 @@
 <p>android系统每隔16.7ms发出一个渲染信号，通知ui线程进行界面的渲染。为了达到流畅的体验，应用程序需要在这个时间内完成应用逻辑，使系统达到60fps。当一个Listview被添加到布局时，其关联的adapter的getView方法将会被回调。在16.7毫秒这样一个时间单元内，可见listitem单元的getView方法将被按照顺序执行。在大多数情况下，由于其他绘图行为的存在，例如measure和draw，getVIew实际分配到执行时间远低于16ms。一旦listview包含复杂控件时，在16毫秒内不能完成渲染，用户只能看到上一祯的结果，这时就发生了掉帧。</p>
 <h3>Facebook新闻页介绍</h3>
 <p>Facebook的新闻页是一个复杂的listview控件，如何使它获得流畅的滚动体验一直困扰我们。
-首先，新闻页的每一条新闻的可见区域非常大，包含一系列的文本以及照片；其次，新闻的展现类型也很多样，除了文本以及照片，新闻的附件还可包含链接、音频 ...</p>
+首先，新闻页的每一条新闻的可见区域非常大，包含一系列的文本以及照片；其次，新闻的展现类型也很多样，除了文本以及照片，新闻的附件还可包含链接、音频 …</p>
 					<br/ >
 					<a href="http://blog.aaapei.com/article/2015/02/facebookxin-wen-ye-listviewyou-hua">查看全文</a>
                 </div>

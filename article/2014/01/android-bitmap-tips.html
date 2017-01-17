@@ -86,14 +86,14 @@
             <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
 <div class="meta">
     <div class="date">
-        <time datetime="2014-01-28T17:30:00.000000" itemprop="datePublished">2014-01-28</time>
+        <time datetime="2014-01-28T17:30:00.000000+0800" itemprop="datePublished">2014-01-28</time>
     </div>
     <div class="tags">
         <a href="http://blog.aaapei.com/tags/android">android</a>     </div>
 </div>                <h1 class="title" itemprop="name"><a href="http://blog.aaapei.com/article/2014/01/android-bitmap-tips" itemprop="url">android bitmap tips</a></h1>
                 <div class="entry-content" itemprop="articleBody">
                     <p>大部分android开发者只知道bitmap再使用之后，需要显式的调用一次bitmap.recycle，回收bitmap内存;  </p>
-<p>这个观点，在android3.0之后其实已经过时了，android3.0将bitmap所引用的位图资源从native heap移到虚拟机的heap空间，bitmap的生命周期由虚拟机管理，开发者只需要保证在应用中不在持有对bitmap的引用，即可保证不发生内存泄漏；位图资源的内存由GC进行回收；<br />
+<p>这个观点，在android3.0之后其实已经过时了，android3.0将bitmap所引用的位图资源从native heap移到虚拟机的heap空间，bitmap的生命周期由虚拟机管理，开发者只需要保证在应用中不在持有对bitmap的引用，即可保证不发生内存泄漏；位图资源的内存由GC进行回收；<br>
 将bitmap的位图内存转移到虚拟机heap后，由于位图资源本身较大，造成gc的概率的增加   </p>
 <h3>bitmap proxy</h3>
 <p>在一般的应用场景中，bitmap的引用一般是和imageview关联；当大量imageview持有对bitmap的引用时，虚拟机无法释放bitmap的内存，导致oom；</p>
@@ -104,16 +104,20 @@
             </article>
                 <section id="comment">
                     <h1 class="title">Comments</h1>
-                    <div id="disqus_thread" aria-live="polite">
-                        <script type="text/javascript">
-                            var disqus_identifier = "article/2014/01/android-bitmap-tips";
-                            (function() {
-                                var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
-                                dsq.src = 'http://aaapeigithub.disqus.com/embed.js';
-                                (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
-                            })();
-                        </script>
-                    </div>
+                    <div class="ds-thread" data-thread-key="article/2014/01/android-bitmap-tips" data-title="{ article.title }" data-url="article/2014/01/android-bitmap-tips"></div>
+                        <!-- 多说评论框 end -->
+                        <!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+                    <script type="text/javascript">
+                    var duoshuoQuery = {short_name:"aaapei"};
+                      (function() {
+                        var ds = document.createElement('script');
+                        ds.type = 'text/javascript';ds.async = true;
+                        ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+                        ds.charset = 'UTF-8';
+                        (document.getElementsByTagName('head')[0] 
+                         || document.getElementsByTagName('body')[0]).appendChild(ds);
+                      })();
+                      </script>
                 </section>
 
         </section>

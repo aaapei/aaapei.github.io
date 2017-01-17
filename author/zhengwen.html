@@ -83,7 +83,7 @@
             <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
 <div class="meta">
     <div class="date">
-        <time datetime="2016-08-25T14:26:00.000000" itemprop="datePublished">2016-08-25</time>
+        <time datetime="2016-08-25T14:26:00.000000+0800" itemprop="datePublished">2016-08-25</time>
     </div>
     <div class="tags">
         <a href="http://blog.aaapei.com/tags/android">android</a> ,         <a href="http://blog.aaapei.com/tags/apm">apm</a>     </div>
@@ -110,7 +110,7 @@
             <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
 <div class="meta">
     <div class="date">
-        <time datetime="2015-07-26T14:26:00.000000" itemprop="datePublished">2015-07-26</time>
+        <time datetime="2015-07-26T14:26:00.000000+0800" itemprop="datePublished">2015-07-26</time>
     </div>
     <div class="tags">
         <a href="http://blog.aaapei.com/tags/android">android</a> ,         <a href="http://blog.aaapei.com/tags/applink">applink</a>     </div>
@@ -120,12 +120,12 @@
 <h3>AppLink</h3>
 <p>与其说AppLink是一个框架，更不如说他是一个规范。当app内嵌WebView遇到自定义的Schema时，app只能简单的将url转交给系统，或直接显示页面无法加载。AppLink规范旨在解决各个平台的app跳转的问题。第三方网页或者app接入applink后，跳转方可以根据AppLink规范进行<em>精确</em>的目标跳转以及<em>数据传输</em>。
 引用官方文档中的例子,example.hmtl:</p>
-<div class="highlight"><pre><span class="nt">&lt;html&gt;</span>
+<div class="highlight"><pre><span></span><span class="nt">&lt;html&gt;</span>
 <span class="nt">&lt;head&gt;</span>
     <span class="nt">&lt;meta</span> <span class="na">property=</span><span class="s">&quot;al:ios:url&quot;</span> <span class="na">content=</span><span class="s">&quot;applinks://docs&quot;</span> <span class="nt">/&gt;</span>
     <span class="nt">&lt;meta</span> <span class="na">property=</span><span class="s">&quot;al:ios:app_store_id&quot;</span> <span class="na">content=</span><span class="s">&quot;12345&quot;</span> <span class="nt">/&gt;</span>
     <span class="nt">&lt;meta</span> <span class="na">property=</span><span class="s">&quot;al:ios:app_name&quot;</span> <span class="na">content=</span><span class="s">&quot;App Links&quot;</span> <span class="nt">/&gt;</span>
-    <span class="nt">&lt;meta ...</span></pre></div>
+    <span class="nt">&lt;meta …</span></pre></div>
 					<br/ >
 					<a href="http://blog.aaapei.com/article/2015/07/cong-deeplinkdispatchtan-tan-zu-jian-tiao-zhuan">查看全文</a>
                 </div>
@@ -137,7 +137,7 @@
             <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
 <div class="meta">
     <div class="date">
-        <time datetime="2015-02-19T00:00:00.000000" itemprop="datePublished">2015-02-19</time>
+        <time datetime="2015-02-19T00:00:00.000000+0800" itemprop="datePublished">2015-02-19</time>
     </div>
     <div class="tags">
         <a href="http://blog.aaapei.com/tags/bitmapxing-neng-you-hua">bitmap，性能优化</a>     </div>
@@ -145,11 +145,11 @@
                 <div class="entry-content" itemprop="description"><h3>前言</h3>
 <p>被鞭炮吵得睡不着觉，rss中找一篇简单的文档翻译下，原文链接：http://blog.booking.com/android-reuse-bitmaps.html，大部分团队应该都做过这个bitmap优化，不过估计设置过BitmapFactory.Options.inTempStorage参数的应该不多 :)</p>
 <p>booking.com android客户端在新版本的增加了一个新功能：酒店的图片集合</p>
-<p><img alt="此处输入图片的描述" src="http://blog.booking.com/static/android-reuse-bitmaps/hotel_photo_header.png" /></p>
+<p><img alt="此处输入图片的描述" src="http://blog.booking.com/static/android-reuse-bitmaps/hotel_photo_header.png"></p>
 <p>不幸的是，增加了这个新功能后，发现这个应用的内存消耗增长了20%。图片集的界面的滑动有明显的卡顿，经定位，我们发现viewpager加载图片时的gc问题造成了以上的问题。由于应用的图片资源多；控件布局层次复杂；数据量较大，造成内存的申请很容易触发GC。</p>
 <p>当申请bitmap内存时，logcat输出信息如下：</p>
-<div class="highlight"><pre><span class="n">GC_FOR_ALLOC</span> <span class="n">freed</span> <span class="mi">3255</span><span class="n">K</span><span class="p">,</span> <span class="mi">20</span><span class="o">%</span> <span class="n">free</span> <span class="mi">21813</span><span class="n">K</span><span class="o">/</span><span class="mi">26980</span><span class="n">K</span><span class="p">,</span> <span class="n">paused</span> <span class="mi">62</span><span class="n">ms</span><span class="p">,</span> <span class="n">total</span> <span class="mi">62</span><span class="n">ms</span>
-<span class="n">GC_FOR_ALLOC</span> <span class="n">freed</span> <span class="mi">710</span><span class="n">K ...</span></pre></div>
+<div class="highlight"><pre><span></span>GC_FOR_ALLOC freed 3255K, 20% free 21813K/26980K, paused 62ms, total 62ms
+GC_FOR_ALLOC freed 710K, 20% free 30242K/37740K, paused 72ms …</pre></div>
 					<br/ >
 					<a href="http://blog.aaapei.com/article/2015/02/bookingcom-androidke-hu-duan-de-bitmapfu-yong">查看全文</a>
                 </div>
@@ -161,7 +161,7 @@
             <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
 <div class="meta">
     <div class="date">
-        <time datetime="2015-02-01T00:00:00.000000" itemprop="datePublished">2015-02-01</time>
+        <time datetime="2015-02-01T00:00:00.000000+0800" itemprop="datePublished">2015-02-01</time>
     </div>
     <div class="tags">
         <a href="http://blog.aaapei.com/tags/listviewxing-neng-you-hua">listview，性能优化</a>     </div>
@@ -173,7 +173,7 @@
 <p>android系统每隔16.7ms发出一个渲染信号，通知ui线程进行界面的渲染。为了达到流畅的体验，应用程序需要在这个时间内完成应用逻辑，使系统达到60fps。当一个Listview被添加到布局时，其关联的adapter的getView方法将会被回调。在16.7毫秒这样一个时间单元内，可见listitem单元的getView方法将被按照顺序执行。在大多数情况下，由于其他绘图行为的存在，例如measure和draw，getVIew实际分配到执行时间远低于16ms。一旦listview包含复杂控件时，在16毫秒内不能完成渲染，用户只能看到上一祯的结果，这时就发生了掉帧。</p>
 <h3>Facebook新闻页介绍</h3>
 <p>Facebook的新闻页是一个复杂的listview控件，如何使它获得流畅的滚动体验一直困扰我们。
-首先，新闻页的每一条新闻的可见区域非常大，包含一系列的文本以及照片；其次，新闻的展现类型也很多样，除了文本以及照片，新闻的附件还可包含链接、音频 ...</p>
+首先，新闻页的每一条新闻的可见区域非常大，包含一系列的文本以及照片；其次，新闻的展现类型也很多样，除了文本以及照片，新闻的附件还可包含链接、音频 …</p>
 					<br/ >
 					<a href="http://blog.aaapei.com/article/2015/02/facebookxin-wen-ye-listviewyou-hua">查看全文</a>
                 </div>

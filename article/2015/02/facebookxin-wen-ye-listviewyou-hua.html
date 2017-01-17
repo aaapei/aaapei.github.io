@@ -16,8 +16,8 @@
                 <meta property="og:type" content="article"/>
                 <meta property="og:title" content="facebook新闻页ListView优化"/>
                 <meta property="og:url" content="http://blog.aaapei.com/article/2015/02/facebookxin-wen-ye-listviewyou-hua"/>
-                <meta property="og:description" content="引言 原文链接：https://code.facebook.com/posts/879498888759525/fast-rendering-news-feed-on-android/ 透漏的信息量不大，且大多数项目并不会遇到facebook这种ListView的场景，不过可以拓展下思路：逻辑单元不一定是视图单元；移动端不要死搬MVC的架构，在市场上仍是中低端机型为主时，还是应该多考虑性能；附上rebbit的关于本文的讨论，有些干货 :) 基础知识 android系统每隔16.7ms发出一个渲染信号，通知ui线程进行界面的渲染。为了达到流畅的体验，应用程序需要在这个时间内完成应用逻辑，使系统达到60fps。当一个Listview被添加到布局时，其关联的adapter的getView方法将会被回调。在16.7毫秒这样一个时间单元内，可见listitem单元的getView方法将被按照顺序执行。在大多数情况下，由于其他绘图行为的存在，例如measure和draw，getVIew实际分配到执行时间远低于16ms。一旦listview包含复杂控件时，在16毫秒内不能完成渲染，用户只能看到上一祯的结果，这时就发生了掉帧。 Facebook新闻页介绍 Facebook的新闻页是一个复杂的listview控件，如何使它获得流畅的滚动体验一直困扰我们。 首先，新闻页的每一条新闻的可见区域非常大，包含一系列的文本以及照片；其次，新闻的展现类型也很多样，除了文本以及照片，新闻的附件还可包含链接、音频 ..."/>
-                <meta name="description" content="引言 原文链接：https://code.facebook.com/posts/879498888759525/fast-rendering-news-feed-on-android/ 透漏的信息量不大，且大多数项目并不会遇到facebook这种ListView的场景，不过可以拓展下思路：逻辑单元不一定是视图单元；移动端不要死搬MVC的架构，在市场上仍是中低端机型为主时，还是应该多考虑性能；附上rebbit的关于本文的讨论，有些干货 :) 基础知识 android系统每隔16.7ms发出一个渲染信号，通知ui线程进行界面的渲染。为了达到流畅的体验，应用程序需要在这个时间内完成应用逻辑，使系统达到60fps。当一个Listview被添加到布局时，其关联的adapter的getView方法将会被回调。在16.7毫秒这样一个时间单元内，可见listitem单元的getView方法将被按照顺序执行。在大多数情况下，由于其他绘图行为的存在，例如measure和draw，getVIew实际分配到执行时间远低于16ms。一旦listview包含复杂控件时，在16毫秒内不能完成渲染，用户只能看到上一祯的结果，这时就发生了掉帧。 Facebook新闻页介绍 Facebook的新闻页是一个复杂的listview控件，如何使它获得流畅的滚动体验一直困扰我们。 首先，新闻页的每一条新闻的可见区域非常大，包含一系列的文本以及照片；其次，新闻的展现类型也很多样，除了文本以及照片，新闻的附件还可包含链接、音频 ...">
+                <meta property="og:description" content="引言 原文链接：https://code.facebook.com/posts/879498888759525/fast-rendering-news-feed-on-android/ 透漏的信息量不大，且大多数项目并不会遇到facebook这种ListView的场景，不过可以拓展下思路：逻辑单元不一定是视图单元；移动端不要死搬MVC的架构，在市场上仍是中低端机型为主时，还是应该多考虑性能；附上rebbit的关于本文的讨论，有些干货 :) 基础知识 android系统每隔16.7ms发出一个渲染信号，通知ui线程进行界面的渲染。为了达到流畅的体验，应用程序需要在这个时间内完成应用逻辑，使系统达到60fps。当一个Listview被添加到布局时，其关联的adapter的getView方法将会被回调。在16.7毫秒这样一个时间单元内，可见listitem单元的getView方法将被按照顺序执行。在大多数情况下，由于其他绘图行为的存在，例如measure和draw，getVIew实际分配到执行时间远低于16ms。一旦listview包含复杂控件时，在16毫秒内不能完成渲染，用户只能看到上一祯的结果，这时就发生了掉帧。 Facebook新闻页介绍 Facebook的新闻页是一个复杂的listview控件，如何使它获得流畅的滚动体验一直困扰我们。 首先，新闻页的每一条新闻的可见区域非常大，包含一系列的文本以及照片；其次，新闻的展现类型也很多样，除了文本以及照片，新闻的附件还可包含链接、音频 …"/>
+                <meta name="description" content="引言 原文链接：https://code.facebook.com/posts/879498888759525/fast-rendering-news-feed-on-android/ 透漏的信息量不大，且大多数项目并不会遇到facebook这种ListView的场景，不过可以拓展下思路：逻辑单元不一定是视图单元；移动端不要死搬MVC的架构，在市场上仍是中低端机型为主时，还是应该多考虑性能；附上rebbit的关于本文的讨论，有些干货 :) 基础知识 android系统每隔16.7ms发出一个渲染信号，通知ui线程进行界面的渲染。为了达到流畅的体验，应用程序需要在这个时间内完成应用逻辑，使系统达到60fps。当一个Listview被添加到布局时，其关联的adapter的getView方法将会被回调。在16.7毫秒这样一个时间单元内，可见listitem单元的getView方法将被按照顺序执行。在大多数情况下，由于其他绘图行为的存在，例如measure和draw，getVIew实际分配到执行时间远低于16ms。一旦listview包含复杂控件时，在16毫秒内不能完成渲染，用户只能看到上一祯的结果，这时就发生了掉帧。 Facebook新闻页介绍 Facebook的新闻页是一个复杂的listview控件，如何使它获得流畅的滚动体验一直困扰我们。 首先，新闻页的每一条新闻的可见区域非常大，包含一系列的文本以及照片；其次，新闻的展现类型也很多样，除了文本以及照片，新闻的附件还可包含链接、音频 …">
 
 
 
@@ -86,7 +86,7 @@
             <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
 <div class="meta">
     <div class="date">
-        <time datetime="2015-02-01T00:00:00.000000" itemprop="datePublished">2015-02-01</time>
+        <time datetime="2015-02-01T00:00:00.000000+0800" itemprop="datePublished">2015-02-01</time>
     </div>
     <div class="tags">
         <a href="http://blog.aaapei.com/tags/listviewxing-neng-you-hua">listview，性能优化</a>     </div>
@@ -100,15 +100,15 @@
 <h3>Facebook新闻页介绍</h3>
 <p>Facebook的新闻页是一个复杂的listview控件，如何使它获得流畅的滚动体验一直困扰我们。
 首先，新闻页的每一条新闻的可见区域非常大，包含一系列的文本以及照片；其次，新闻的展现类型也很多样，除了文本以及照片，新闻的附件还可包含链接、音频、视频等。除此之外，新闻还可以被点赞、被转载，导致一个新闻会被其他新闻包含在内。当新闻被大量用户转载时，甚至会出现一条新闻占据两个屏幕的情况。加上android用户的机型多为中低端设备，这使我们在16.7ms内完成新闻页的渲染变的非常困难。</p>
-<p><img alt="" src="https://fbcdn-dragon-a.akamaihd.net/hphotos-ak-xpa1/t39.2365-6/10935993_1534797460105141_1373600061_n.png" /></p>
+<p><img alt="" src="https://fbcdn-dragon-a.akamaihd.net/hphotos-ak-xpa1/t39.2365-6/10935993_1534797460105141_1373600061_n.png"></p>
 <h3>新闻页最初架构</h3>
 <p>在2012年，我们将新闻页从web-view转化成本地控件，在最初的那个版本中，基于View-Model-Binder设计模型，我们为新闻listitem创建了一个自定义StoryView类，这个类有一个bindModel方法，该方法用于和数据进行绑定。代码是这样的：</p>
-<p><img alt="" src="https://fbcdn-dragon-a.akamaihd.net/hphotos-ak-xap1/t39.2365-6/10935990_1412843022342801_1297058886_n.png" />
+<p><img alt="" src="https://fbcdn-dragon-a.akamaihd.net/hphotos-ak-xap1/t39.2365-6/10935990_1412843022342801_1297058886_n.png">
 StoryView的包含的子控件都会有一个bindModel方法，例如HeadVIew通过该方法与其相关的数据进行绑定。    </p>
 <p>这种设计，代码非常直观清晰，但他的缺点也很明显：</p>
 <ul>
 <li>
-<p>listview复用机制不能有效的工作,Android's recycling mechanism does not work well in this case: Every item in the ListView was usually a StoryView, but once bound to a story, two StoryViews would be radically different and recycling one into the other wasn't effective.（这一段存疑，直接放原文）</p>
+<p>listview复用机制不能有效的工作</p>
 </li>
 <li>
 <p>逻辑嵌套：采用bindModel绑定控件和数据，业务逻辑与视图逻辑耦合，导致逻辑类层次非常深；</p>
@@ -123,15 +123,15 @@ StoryView的包含的子控件都会有一个bindModel方法，例如HeadVIew通
 <p>以上这些问题虽有他们单独的解决方法，例如我们可以自己设计一套回收机制解决storyView复用问题。但基于维护成本和开发时间考虑，我们决定进行一次重构。</p>
 <h3>重构方案</h3>
 <p>重构工作大约是一年之前开始的，为了解决前一个架构的问题，首先我们决定将一条新闻分隔成多个listview item。例如，新闻的headerview将是一个独立的listitem。这样，我们可以利用android回收机制，HeaderView新闻子控件将被不同的新闻复用。另外，切分成小view也使得内存占用更小，在之前的架构中，Storyview部分的可见会导致这个Storyview被加载到内存中，而现在，粒度更小，只有可见的子控件才会被加载。</p>
-<p><img alt="" src="https://fbcdn-dragon-a.akamaihd.net/hphotos-ak-xap1/t39.2365-6/10935983_984256741587871_980206636_n.png" /></p>
+<p><img alt="" src="https://fbcdn-dragon-a.akamaihd.net/hphotos-ak-xap1/t39.2365-6/10935983_984256741587871_980206636_n.png"></p>
 <p>另一个大的修改是，我们将视图逻辑和数据逻辑分离，StoryView被分离成两个类：
 只负责展现的视图类，以及一个Binder类。视图类仅包含set方法（例如HeaderView包含了setTitle，setSubTitle。setProfiePic等等）。Binder类包含了原来的bindMethod的逻辑，binder类包含三个方法：prepare，bind，unbind。
 bind方法调用view的set方法设置数据，unbind清理视图数据，prepare方法在cpu空闲期间做一些预初始化工作，例如进行click事件绑定、数据格式化、创建spannable等等，它会在getView方法之前被调用
-<img alt="" src="https://fbcdn-dragon-a.akamaihd.net/hphotos-ak-xfp1/t39.2365-6/10956894_918624611495337_1619622974_n.png" /></p>
+<img alt="" src="https://fbcdn-dragon-a.akamaihd.net/hphotos-ak-xfp1/t39.2365-6/10956894_918624611495337_1619622974_n.png"></p>
 <p>我们遇到的技术难点是Binder的设计，由于StoryView被拆分不同的子控件，一条新闻可能会包含多个不同的Binder。而在之前，我们只需要根据视图的树结构进行结构化赋值。因此，我们引进了<em>PartDefinition</em>类，PartDefinition负责维护一条新闻包含哪些子控件、包含Binder的类型以及为新闻创建Binder类，有两种类型的PartDefinition：单个PartDefinition以及PartDefinition集合。</p>
-<p><img alt="" src="https://fbcdn-dragon-a.akamaihd.net/hphotos-ak-xfa1/t39.2365-6/10935981_1536551233276267_1103658334_n.png" /></p>
+<p><img alt="" src="https://fbcdn-dragon-a.akamaihd.net/hphotos-ak-xfa1/t39.2365-6/10935981_1536551233276267_1103658334_n.png"></p>
 <p>一个新闻在重构之后的PartDefinition结构是这样的：</p>
-<p><img alt="" src="https://fbcdn-dragon-a.akamaihd.net/hphotos-ak-xaf1/t39.2365-6/10935975_856616717694467_1297407005_n.png" /></p>
+<p><img alt="" src="https://fbcdn-dragon-a.akamaihd.net/hphotos-ak-xaf1/t39.2365-6/10935975_856616717694467_1297407005_n.png"></p>
 <h3>结论</h3>
 <ul>
 <li>采取新的架构，内存错误减少了17%，总crash率减少了8%，彻底解决涨溢出问题</li>
@@ -142,16 +142,20 @@ bind方法调用view的set方法设置数据，unbind清理视图数据，prepar
             </article>
                 <section id="comment">
                     <h1 class="title">Comments</h1>
-                    <div id="disqus_thread" aria-live="polite">
-                        <script type="text/javascript">
-                            var disqus_identifier = "article/2015/02/facebookxin-wen-ye-listviewyou-hua";
-                            (function() {
-                                var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
-                                dsq.src = 'http://aaapeigithub.disqus.com/embed.js';
-                                (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
-                            })();
-                        </script>
-                    </div>
+                    <div class="ds-thread" data-thread-key="article/2015/02/facebookxin-wen-ye-listviewyou-hua" data-title="{ article.title }" data-url="article/2015/02/facebookxin-wen-ye-listviewyou-hua"></div>
+                        <!-- 多说评论框 end -->
+                        <!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+                    <script type="text/javascript">
+                    var duoshuoQuery = {short_name:"aaapei"};
+                      (function() {
+                        var ds = document.createElement('script');
+                        ds.type = 'text/javascript';ds.async = true;
+                        ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+                        ds.charset = 'UTF-8';
+                        (document.getElementsByTagName('head')[0] 
+                         || document.getElementsByTagName('body')[0]).appendChild(ds);
+                      })();
+                      </script>
                 </section>
 
         </section>

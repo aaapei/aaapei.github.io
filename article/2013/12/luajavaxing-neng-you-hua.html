@@ -16,8 +16,8 @@
                 <meta property="og:type" content="article"/>
                 <meta property="og:title" content="luajava性能优化"/>
                 <meta property="og:url" content="http://blog.aaapei.com/article/2013/12/luajavaxing-neng-you-hua"/>
-                <meta property="og:description" content="最近在做一个lua的android项目,对于lua的生态环境完全陌生,所以选用了个文档资料最全的lua bridge:luajava luajava目前只支持到lua5.1,不过升级到5.2困难不大,主要是一些宏开关以及静态变量;然而实际运行的时候发现卡的很不行,ui频繁掉祯,profile后发现90%+的cpu耗时在luajava中 看了一下luajava本身代码量不大;索性就追了一下,luajava的native层就一个luajava.c,java层,除了LuaJavaApi.java,其他java类都是Value Object lua逻辑分析 先看lua创建java object的代码,luajava.c中 int javaNewInstance( lua_State * L ) { //some code ….. method = ( *javaEnv )->GetStaticMethodID( javaEnv , luajava_api_class , "javaNewInstance" ,"(ILjava/lang/String;)I" ); //先调用java层创建javaobject javaClassName = ( *javaEnv )->NewStringUTF( javaEnv , className ..."/>
-                <meta name="description" content="最近在做一个lua的android项目,对于lua的生态环境完全陌生,所以选用了个文档资料最全的lua bridge:luajava luajava目前只支持到lua5.1,不过升级到5.2困难不大,主要是一些宏开关以及静态变量;然而实际运行的时候发现卡的很不行,ui频繁掉祯,profile后发现90%+的cpu耗时在luajava中 看了一下luajava本身代码量不大;索性就追了一下,luajava的native层就一个luajava.c,java层,除了LuaJavaApi.java,其他java类都是Value Object lua逻辑分析 先看lua创建java object的代码,luajava.c中 int javaNewInstance( lua_State * L ) { //some code ….. method = ( *javaEnv )->GetStaticMethodID( javaEnv , luajava_api_class , "javaNewInstance" ,"(ILjava/lang/String;)I" ); //先调用java层创建javaobject javaClassName = ( *javaEnv )->NewStringUTF( javaEnv , className ...">
+                <meta property="og:description" content="最近在做一个lua的android项目,对于lua的生态环境完全陌生,所以选用了个文档资料最全的lua bridge:luajava luajava目前只支持到lua5.1,不过升级到5.2困难不大,主要是一些宏开关以及静态变量;然而实际运行的时候发现卡的很不行,ui频繁掉祯,profile后发现90%+的cpu耗时在luajava中 看了一下luajava本身代码量不大;索性就追了一下,luajava的native层就一个luajava.c,java层,除了LuaJavaApi.java,其他java类都是Value Object lua逻辑分析 先看lua创建java object的代码,luajava.c中 int javaNewInstance( lua_State * L ) { //some code ….. method = ( *javaEnv )->GetStaticMethodID( javaEnv , luajava_api_class , "javaNewInstance" ,"(ILjava/lang/String;)I" ); //先调用java层创建javaobject javaClassName = ( *javaEnv )->NewStringUTF( javaEnv , className …"/>
+                <meta name="description" content="最近在做一个lua的android项目,对于lua的生态环境完全陌生,所以选用了个文档资料最全的lua bridge:luajava luajava目前只支持到lua5.1,不过升级到5.2困难不大,主要是一些宏开关以及静态变量;然而实际运行的时候发现卡的很不行,ui频繁掉祯,profile后发现90%+的cpu耗时在luajava中 看了一下luajava本身代码量不大;索性就追了一下,luajava的native层就一个luajava.c,java层,除了LuaJavaApi.java,其他java类都是Value Object lua逻辑分析 先看lua创建java object的代码,luajava.c中 int javaNewInstance( lua_State * L ) { //some code ….. method = ( *javaEnv )->GetStaticMethodID( javaEnv , luajava_api_class , "javaNewInstance" ,"(ILjava/lang/String;)I" ); //先调用java层创建javaobject javaClassName = ( *javaEnv )->NewStringUTF( javaEnv , className …">
 
 
 
@@ -86,18 +86,18 @@
             <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
 <div class="meta">
     <div class="date">
-        <time datetime="2013-12-02T20:20:00.000000" itemprop="datePublished">2013-12-02</time>
+        <time datetime="2013-12-02T20:20:00.000000+0800" itemprop="datePublished">2013-12-02</time>
     </div>
     <div class="tags">
         <a href="http://blog.aaapei.com/tags/android">android</a> ,         <a href="http://blog.aaapei.com/tags/lua">lua</a>     </div>
 </div>                <h1 class="title" itemprop="name"><a href="http://blog.aaapei.com/article/2013/12/luajavaxing-neng-you-hua" itemprop="url">luajava性能优化</a></h1>
                 <div class="entry-content" itemprop="articleBody">
-                    <p>最近在做一个lua的android项目,对于lua的生态环境完全陌生,所以选用了个文档资料最全的lua bridge:<em>luajava</em><br />
+                    <p>最近在做一个lua的android项目,对于lua的生态环境完全陌生,所以选用了个文档资料最全的lua bridge:<em>luajava</em><br>
 luajava目前只支持到lua5.1,不过升级到5.2困难不大,主要是一些宏开关以及静态变量;然而实际运行的时候发现卡的很不行,ui频繁掉祯,profile后发现90%+的cpu耗时在luajava中  </p>
 <p>看了一下luajava本身代码量不大;索性就追了一下,luajava的native层就一个luajava.c,java层,除了LuaJavaApi.java,其他java类都是Value Object</p>
 <h3>lua逻辑分析</h3>
 <p>先看lua创建java object的代码,luajava.c中</p>
-<div class="highlight"><pre><span class="kt">int</span> <span class="nf">javaNewInstance</span><span class="p">(</span> <span class="n">lua_State</span> <span class="o">*</span> <span class="n">L</span> <span class="p">)</span>
+<div class="highlight"><pre><span></span><span class="kt">int</span> <span class="nf">javaNewInstance</span><span class="p">(</span> <span class="n">lua_State</span> <span class="o">*</span> <span class="n">L</span> <span class="p">)</span>
 <span class="p">{</span>     
     <span class="c1">//some code …..</span>
     <span class="n">method</span>  <span class="o">=</span> <span class="p">(</span> <span class="o">*</span><span class="n">javaEnv</span> <span class="p">)</span><span class="o">-&gt;</span><span class="n">GetStaticMethodID</span><span class="p">(</span> <span class="n">javaEnv</span> <span class="p">,</span> <span class="n">luajava_api_class</span> <span class="p">,</span> <span class="s">&quot;javaNewInstance&quot;</span> <span class="p">,</span><span class="s">&quot;(ILjava/lang/String;)I&quot;</span> <span class="p">);</span>
@@ -109,60 +109,60 @@ luajava目前只支持到lua5.1,不过升级到5.2困难不大,主要是一些�
 
 
 <p>Java中的newInstance代码是这样的:</p>
-<div class="highlight"><pre><span class="n">public</span> <span class="k">static</span> <span class="kt">int</span> <span class="nf">javaNewInstance</span><span class="p">(</span><span class="kt">int</span> <span class="n">luaState</span><span class="p">,</span> <span class="n">String</span> <span class="n">className</span><span class="p">)</span> <span class="n">throws</span> <span class="n">LuaException</span> <span class="p">{</span>
-     <span class="n">LuaState</span> <span class="n">L</span> <span class="o">=</span> <span class="n">LuaStateFactory</span><span class="p">.</span><span class="n">getExistingState</span><span class="p">(</span><span class="n">luaState</span><span class="p">);</span>
-    <span class="n">synchronized</span> <span class="p">(</span><span class="n">L</span><span class="p">)</span> <span class="p">{</span>
-            <span class="n">Class</span> <span class="n">clazz</span><span class="p">;</span>
-            <span class="n">try</span> <span class="p">{</span>
-                <span class="n">clazz</span> <span class="o">=</span> <span class="n">Class</span><span class="p">.</span><span class="n">forName</span><span class="p">(</span><span class="n">className</span><span class="p">);</span>
-             <span class="p">}</span> <span class="n">catch</span> <span class="p">(</span><span class="n">ClassNotFoundException</span> <span class="n">e</span><span class="p">)</span> <span class="p">{</span>
-                 <span class="n">throw</span> <span class="n">new</span> <span class="n">LuaException</span><span class="p">(</span><span class="n">e</span><span class="p">);}</span>
-            <span class="n">bject</span> <span class="n">ret</span> <span class="o">=</span> <span class="n">getObjInstance</span><span class="p">(</span><span class="n">L</span><span class="p">,</span> <span class="n">clazz</span><span class="p">);</span>
-            <span class="n">L</span><span class="p">.</span><span class="n">pushJavaObject</span><span class="p">(</span><span class="n">ret</span><span class="p">);</span>
-            <span class="k">return</span> <span class="mi">1</span><span class="p">;</span>
-    <span class="p">}</span>
-<span class="p">}</span>
+<div class="highlight"><pre><span></span><span class="kd">public</span> <span class="kd">static</span> <span class="kt">int</span> <span class="nf">javaNewInstance</span><span class="o">(</span><span class="kt">int</span> <span class="n">luaState</span><span class="o">,</span> <span class="n">String</span> <span class="n">className</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">LuaException</span> <span class="o">{</span>
+     <span class="n">LuaState</span> <span class="n">L</span> <span class="o">=</span> <span class="n">LuaStateFactory</span><span class="o">.</span><span class="na">getExistingState</span><span class="o">(</span><span class="n">luaState</span><span class="o">);</span>
+    <span class="kd">synchronized</span> <span class="o">(</span><span class="n">L</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">Class</span> <span class="n">clazz</span><span class="o">;</span>
+            <span class="k">try</span> <span class="o">{</span>
+                <span class="n">clazz</span> <span class="o">=</span> <span class="n">Class</span><span class="o">.</span><span class="na">forName</span><span class="o">(</span><span class="n">className</span><span class="o">);</span>
+             <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">ClassNotFoundException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+                 <span class="k">throw</span> <span class="k">new</span> <span class="n">LuaException</span><span class="o">(</span><span class="n">e</span><span class="o">);}</span>
+            <span class="n">bject</span> <span class="n">ret</span> <span class="o">=</span> <span class="n">getObjInstance</span><span class="o">(</span><span class="n">L</span><span class="o">,</span> <span class="n">clazz</span><span class="o">);</span>
+            <span class="n">L</span><span class="o">.</span><span class="na">pushJavaObject</span><span class="o">(</span><span class="n">ret</span><span class="o">);</span>
+            <span class="k">return</span> <span class="mi">1</span><span class="o">;</span>
+    <span class="o">}</span>
+<span class="o">}</span>
 </pre></div>
 
 
 <p>getObjInstance的逻辑暂时不论,先看L.pushjavaObject; 最终通过jni调用luajava.c中的 pushJavaObject,没错,是luajava.c中!!!  </p>
-<div class="highlight"><pre><span class="kr">int</span> <span class="nx">pushJavaObject</span><span class="p">(</span> <span class="nx">lua_State</span> <span class="o">*</span> <span class="nx">L</span> <span class="p">,</span> <span class="nx">jobject</span> <span class="nx">javaObject</span> <span class="p">){</span>
+<div class="highlight"><pre><span></span><span class="kt">int</span> <span class="nf">pushJavaObject</span><span class="o">(</span> <span class="n">lua_State</span> <span class="o">*</span> <span class="n">L</span> <span class="o">,</span> <span class="n">jobject</span> <span class="n">javaObject</span> <span class="o">){</span>
     <span class="c1">//创建userdata略</span>
     <span class="cm">/* pushes the __index metamethod */</span>
-    <span class="nx">lua_pushstring</span><span class="p">(</span> <span class="nx">L</span> <span class="p">,</span> <span class="s2">&quot;__index&quot;</span> <span class="p">);</span>
-    <span class="nx">lua_pushcfunction</span><span class="p">(</span> <span class="nx">L</span> <span class="p">,</span> <span class="o">&amp;</span><span class="nx">objectIndex</span> <span class="p">);</span>   <span class="nx">lua_rawset</span><span class="p">(</span> <span class="nx">L</span> <span class="p">,</span> <span class="o">-</span><span class="mi">3</span> <span class="p">);</span>
-    <span class="nx">lua_rawset</span><span class="p">(</span> <span class="nx">L</span> <span class="p">,</span> <span class="o">-</span><span class="mi">3</span> <span class="p">);</span>
-<span class="p">}</span>
+    <span class="n">lua_pushstring</span><span class="o">(</span> <span class="n">L</span> <span class="o">,</span> <span class="s">&quot;__index&quot;</span> <span class="o">);</span>
+    <span class="n">lua_pushcfunction</span><span class="o">(</span> <span class="n">L</span> <span class="o">,</span> <span class="o">&amp;</span><span class="n">objectIndex</span> <span class="o">);</span>   <span class="n">lua_rawset</span><span class="o">(</span> <span class="n">L</span> <span class="o">,</span> <span class="o">-</span><span class="mi">3</span> <span class="o">);</span>
+    <span class="n">lua_rawset</span><span class="o">(</span> <span class="n">L</span> <span class="o">,</span> <span class="o">-</span><span class="mi">3</span> <span class="o">);</span>
+<span class="o">}</span>
 </pre></div>
 
 
 <p>这儿的逻辑是,luajava创建的javaobject,对应的userdata的__index元方法是objectIndex,任何方法的调用统一到objectIndex,最终的调用关系到LuaJavaApi.java中的objectIndex… 是不是特别绕..  </p>
 <p>luajava为了提高效率,将类创建\方法查找的逻辑全部放在java层,但是类创建/方法查找又需要将结果通过jni放回lua stack中!!  </p>
 <p>luajava所有的cpu耗时又有70%的耗时在objectIndex,再看一下java层中的objectIndex代码  </p>
-<div class="highlight"><pre><span class="n">public</span> <span class="k">static</span> <span class="kt">int</span> <span class="nf">objectIndex</span><span class="p">(</span><span class="kt">int</span> <span class="n">luaState</span><span class="p">,</span> <span class="n">Object</span> <span class="n">obj</span><span class="p">,</span> <span class="n">String</span> <span class="n">methodName</span><span class="p">)</span> <span class="n">throws</span> <span class="n">LuaException</span> <span class="p">{</span>
+<div class="highlight"><pre><span></span><span class="kd">public</span> <span class="kd">static</span> <span class="kt">int</span> <span class="nf">objectIndex</span><span class="o">(</span><span class="kt">int</span> <span class="n">luaState</span><span class="o">,</span> <span class="n">Object</span> <span class="n">obj</span><span class="o">,</span> <span class="n">String</span> <span class="n">methodName</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">LuaException</span> <span class="o">{</span>
      <span class="c1">//some code</span>
-     <span class="n">Method</span><span class="p">[]</span> <span class="n">methods</span> <span class="o">=</span> <span class="n">clazz</span><span class="p">.</span><span class="n">getMethods</span><span class="p">();</span>
-     <span class="n">Method</span> <span class="n">method</span> <span class="o">=</span> <span class="n">null</span><span class="p">;</span>
+     <span class="n">Method</span><span class="o">[]</span> <span class="n">methods</span> <span class="o">=</span> <span class="n">clazz</span><span class="o">.</span><span class="na">getMethods</span><span class="o">();</span>
+     <span class="n">Method</span> <span class="n">method</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
     <span class="c1">// gets method and arguments</span>
-    <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">methods</span><span class="p">.</span><span class="n">length</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
-        <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">methods</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">getName</span><span class="p">().</span><span class="n">equals</span><span class="p">(</span><span class="n">methodName</span><span class="p">))</span>
-            <span class="k">continue</span><span class="p">;</span>
-         <span class="n">Class</span><span class="p">[]</span> <span class="n">parameters</span> <span class="o">=</span> <span class="n">methods</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">getParameterTypes</span><span class="p">();</span>
-         <span class="k">if</span> <span class="p">(</span><span class="n">parameters</span><span class="p">.</span><span class="n">length</span> <span class="o">!=</span> <span class="n">top</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
-            <span class="k">continue</span><span class="p">;</span>
-         <span class="n">boolean</span> <span class="n">okMethod</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span>
-        <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">j</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">j</span> <span class="o">&lt;</span> <span class="n">parameters</span><span class="p">.</span><span class="n">length</span><span class="p">;</span> <span class="n">j</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
-            <span class="n">try</span> <span class="p">{</span>
-                 <span class="n">objs</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">compareTypes</span><span class="p">(</span><span class="n">L</span><span class="p">,</span> <span class="n">parameters</span><span class="p">[</span><span class="n">j</span><span class="p">],</span> <span class="n">j</span> <span class="o">+</span> <span class="mi">2</span><span class="p">);</span>
-            <span class="p">}</span> <span class="n">catch</span> <span class="p">(</span><span class="n">Exception</span> <span class="n">e</span><span class="p">)</span> <span class="p">{</span>
-                <span class="n">okMethod</span> <span class="o">=</span> <span class="nb">false</span><span class="p">;</span>
-                <span class="k">break</span><span class="p">;</span>
-            <span class="p">}</span>
-        <span class="p">}</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">okMethod</span><span class="p">)</span> <span class="p">{</span>
-        <span class="n">method</span> <span class="o">=</span> <span class="n">methods</span><span class="p">[</span><span class="n">i</span><span class="p">];</span>
-    <span class="p">}</span>
- <span class="p">}</span>
+    <span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">methods</span><span class="o">.</span><span class="na">length</span><span class="o">;</span> <span class="n">i</span><span class="o">++)</span> <span class="o">{</span>
+        <span class="k">if</span> <span class="o">(!</span><span class="n">methods</span><span class="o">[</span><span class="n">i</span><span class="o">].</span><span class="na">getName</span><span class="o">().</span><span class="na">equals</span><span class="o">(</span><span class="n">methodName</span><span class="o">))</span>
+            <span class="k">continue</span><span class="o">;</span>
+         <span class="n">Class</span><span class="o">[]</span> <span class="n">parameters</span> <span class="o">=</span> <span class="n">methods</span><span class="o">[</span><span class="n">i</span><span class="o">].</span><span class="na">getParameterTypes</span><span class="o">();</span>
+         <span class="k">if</span> <span class="o">(</span><span class="n">parameters</span><span class="o">.</span><span class="na">length</span> <span class="o">!=</span> <span class="n">top</span> <span class="o">-</span> <span class="mi">1</span><span class="o">)</span>
+            <span class="k">continue</span><span class="o">;</span>
+         <span class="kt">boolean</span> <span class="n">okMethod</span> <span class="o">=</span> <span class="kc">true</span><span class="o">;</span>
+        <span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">j</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span> <span class="n">j</span> <span class="o">&lt;</span> <span class="n">parameters</span><span class="o">.</span><span class="na">length</span><span class="o">;</span> <span class="n">j</span><span class="o">++)</span> <span class="o">{</span>
+            <span class="k">try</span> <span class="o">{</span>
+                 <span class="n">objs</span><span class="o">[</span><span class="n">j</span><span class="o">]</span> <span class="o">=</span> <span class="n">compareTypes</span><span class="o">(</span><span class="n">L</span><span class="o">,</span> <span class="n">parameters</span><span class="o">[</span><span class="n">j</span><span class="o">],</span> <span class="n">j</span> <span class="o">+</span> <span class="mi">2</span><span class="o">);</span>
+            <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">Exception</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+                <span class="n">okMethod</span> <span class="o">=</span> <span class="kc">false</span><span class="o">;</span>
+                <span class="k">break</span><span class="o">;</span>
+            <span class="o">}</span>
+        <span class="o">}</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">okMethod</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">method</span> <span class="o">=</span> <span class="n">methods</span><span class="o">[</span><span class="n">i</span><span class="o">];</span>
+    <span class="o">}</span>
+ <span class="o">}</span>
 </pre></div>
 
 
@@ -170,30 +170,34 @@ luajava目前只支持到lua5.1,不过升级到5.2困难不大,主要是一些�
 <h3>性能优化</h3>
 <p>确定原因后,就可以进行性能优化, 
 1. 首先,在jni层将常用的method static化
-2. 其次,compareTypes之前先确定是否有同名方法,java方法无重载时候跳过compareTypes逻辑<br />
-优化之后测试,效率还是远远不能达到产品化的需求;getmethods的cpu耗时还是很高,因此必须做cache;  但是由于前面提到的参数问题,在objectIndex中不能唯一确定方法签名;这儿有两个方法:<br />
+2. 其次,compareTypes之前先确定是否有同名方法,java方法无重载时候跳过compareTypes逻辑<br>
+优化之后测试,效率还是远远不能达到产品化的需求;getmethods的cpu耗时还是很高,因此必须做cache;  但是由于前面提到的参数问题,在objectIndex中不能唯一确定方法签名;这儿有两个方法:<br>
 1. 牺牲编码效率,lua中调用java method,通过类似jni调用方式,将方法签名一并带进来,objectIndex解析形成正确的方法签名
 2. 牺牲java的方法重载,约定java class不做重载方法</p>
-<p>博主选的是方法2..原因是项目中交互很多,但是调用的class有限  做cache的逻辑基本上同java jit,热点代码检测<br />
+<p>博主选的是方法2..原因是项目中交互很多,但是调用的class有限  做cache的逻辑基本上同java jit,热点代码检测<br>
 优化之后,勉强能达到产品化的性能要求;不过由于luajava的机制问题,优化的点基本到头了;</p>
 <h3>jnlua</h3>
 <p>如果对lua c api的android开发者,不建议使用luajava,而使用<a href="https://code.google.com/p/jnlua/">jnlua</a>,纯jni实现,原理上性能应该会比luajava高一头  </p>
-<p>jnlua分两个版本,0.9支持lua 5.2,1.0支持lua5.2,0.9已经移植到android平台,1.0暂无(作者在wiki中说明未来会移植)<br />
+<p>jnlua分两个版本,0.9支持lua 5.2,1.0支持lua5.2,0.9已经移植到android平台,1.0暂无(作者在wiki中说明未来会移植)<br>
 缺点是文档很少,有时间我再说说jnlua</p>
                 </div>
             </article>
                 <section id="comment">
                     <h1 class="title">Comments</h1>
-                    <div id="disqus_thread" aria-live="polite">
-                        <script type="text/javascript">
-                            var disqus_identifier = "article/2013/12/luajavaxing-neng-you-hua";
-                            (function() {
-                                var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
-                                dsq.src = 'http://aaapeigithub.disqus.com/embed.js';
-                                (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
-                            })();
-                        </script>
-                    </div>
+                    <div class="ds-thread" data-thread-key="article/2013/12/luajavaxing-neng-you-hua" data-title="{ article.title }" data-url="article/2013/12/luajavaxing-neng-you-hua"></div>
+                        <!-- 多说评论框 end -->
+                        <!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+                    <script type="text/javascript">
+                    var duoshuoQuery = {short_name:"aaapei"};
+                      (function() {
+                        var ds = document.createElement('script');
+                        ds.type = 'text/javascript';ds.async = true;
+                        ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+                        ds.charset = 'UTF-8';
+                        (document.getElementsByTagName('head')[0] 
+                         || document.getElementsByTagName('body')[0]).appendChild(ds);
+                      })();
+                      </script>
                 </section>
 
         </section>

@@ -1791,9 +1791,9 @@ body {
   font-size: 1.2em;
 }
 /* line 112, ../../sass/_greyshade.scss */
-.container .mid-col .mid-col-container #content article .entry-content p {
+/*.container .mid-col .mid-col-container #content article .entry-content p {
   margin-top: 30px;
-}
+}*/
 /* line 115, ../../sass/_greyshade.scss */
 .container .mid-col .mid-col-container #content article .entry-content .github-widget p {
   margin-top: 0px;

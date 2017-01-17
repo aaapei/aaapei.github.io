@@ -16,8 +16,8 @@
                 <meta property="og:type" content="article"/>
                 <meta property="og:title" content="从DeepLinkDispatch谈谈组件跳转"/>
                 <meta property="og:url" content="http://blog.aaapei.com/article/2015/07/cong-deeplinkdispatchtan-tan-zu-jian-tiao-zhuan"/>
-                <meta property="og:description" content="前言 最近airbnb开源了DeepLinkDispatch项目，DeepLinkDispatch是一个基于注解的链接跳转库，简单了解完其实现后，想起了Facebook今年5月公布的另一个项目AppLink,于是有了这篇文章。 AppLink 与其说AppLink是一个框架，更不如说他是一个规范。当app内嵌WebView遇到自定义的Schema时，app只能简单的将url转交给系统，或直接显示页面无法加载。AppLink规范旨在解决各个平台的app跳转的问题。第三方网页或者app接入applink后，跳转方可以根据AppLink规范进行精确的目标跳转以及数据传输。 引用官方文档中的例子,example.hmtl: <html> <head> <meta property="al:ios:url" content="applinks://docs" /> <meta property="al:ios:app_store_id" content="12345" /> <meta property="al:ios:app_name" content="App Links" /> <meta ..."/>
-                <meta name="description" content="前言 最近airbnb开源了DeepLinkDispatch项目，DeepLinkDispatch是一个基于注解的链接跳转库，简单了解完其实现后，想起了Facebook今年5月公布的另一个项目AppLink,于是有了这篇文章。 AppLink 与其说AppLink是一个框架，更不如说他是一个规范。当app内嵌WebView遇到自定义的Schema时，app只能简单的将url转交给系统，或直接显示页面无法加载。AppLink规范旨在解决各个平台的app跳转的问题。第三方网页或者app接入applink后，跳转方可以根据AppLink规范进行精确的目标跳转以及数据传输。 引用官方文档中的例子,example.hmtl: <html> <head> <meta property="al:ios:url" content="applinks://docs" /> <meta property="al:ios:app_store_id" content="12345" /> <meta property="al:ios:app_name" content="App Links" /> <meta ...">
+                <meta property="og:description" content="前言 最近airbnb开源了DeepLinkDispatch项目，DeepLinkDispatch是一个基于注解的链接跳转库，简单了解完其实现后，想起了Facebook今年5月公布的另一个项目AppLink,于是有了这篇文章。 AppLink 与其说AppLink是一个框架，更不如说他是一个规范。当app内嵌WebView遇到自定义的Schema时，app只能简单的将url转交给系统，或直接显示页面无法加载。AppLink规范旨在解决各个平台的app跳转的问题。第三方网页或者app接入applink后，跳转方可以根据AppLink规范进行精确的目标跳转以及数据传输。 引用官方文档中的例子,example.hmtl: <html> <head> <meta property="al:ios:url" content="applinks://docs" /> <meta property="al:ios:app_store_id" content="12345" /> <meta property="al:ios:app_name" content="App Links" /> <meta …"/>
+                <meta name="description" content="前言 最近airbnb开源了DeepLinkDispatch项目，DeepLinkDispatch是一个基于注解的链接跳转库，简单了解完其实现后，想起了Facebook今年5月公布的另一个项目AppLink,于是有了这篇文章。 AppLink 与其说AppLink是一个框架，更不如说他是一个规范。当app内嵌WebView遇到自定义的Schema时，app只能简单的将url转交给系统，或直接显示页面无法加载。AppLink规范旨在解决各个平台的app跳转的问题。第三方网页或者app接入applink后，跳转方可以根据AppLink规范进行精确的目标跳转以及数据传输。 引用官方文档中的例子,example.hmtl: <html> <head> <meta property="al:ios:url" content="applinks://docs" /> <meta property="al:ios:app_store_id" content="12345" /> <meta property="al:ios:app_name" content="App Links" /> <meta …">
 
 
 
@@ -86,7 +86,7 @@
             <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
 <div class="meta">
     <div class="date">
-        <time datetime="2015-07-26T14:26:00.000000" itemprop="datePublished">2015-07-26</time>
+        <time datetime="2015-07-26T14:26:00.000000+0800" itemprop="datePublished">2015-07-26</time>
     </div>
     <div class="tags">
         <a href="http://blog.aaapei.com/tags/android">android</a> ,         <a href="http://blog.aaapei.com/tags/applink">applink</a>     </div>
@@ -97,7 +97,7 @@
 <h3>AppLink</h3>
 <p>与其说AppLink是一个框架，更不如说他是一个规范。当app内嵌WebView遇到自定义的Schema时，app只能简单的将url转交给系统，或直接显示页面无法加载。AppLink规范旨在解决各个平台的app跳转的问题。第三方网页或者app接入applink后，跳转方可以根据AppLink规范进行<em>精确</em>的目标跳转以及<em>数据传输</em>。
 引用官方文档中的例子,example.hmtl:</p>
-<div class="highlight"><pre><span class="nt">&lt;html&gt;</span>
+<div class="highlight"><pre><span></span><span class="nt">&lt;html&gt;</span>
 <span class="nt">&lt;head&gt;</span>
     <span class="nt">&lt;meta</span> <span class="na">property=</span><span class="s">&quot;al:ios:url&quot;</span> <span class="na">content=</span><span class="s">&quot;applinks://docs&quot;</span> <span class="nt">/&gt;</span>
     <span class="nt">&lt;meta</span> <span class="na">property=</span><span class="s">&quot;al:ios:app_store_id&quot;</span> <span class="na">content=</span><span class="s">&quot;12345&quot;</span> <span class="nt">/&gt;</span>
@@ -117,41 +117,41 @@ Hello, world!
 
 
 <p>第三方网页在meta中加以上信息，ios或android的webview通过以上信息可以向系统询问第三方app是否安装，进而生成跳转路由。第三方app未安装的情况下，利用al:web:url进行降级跳转。除例子的属性之外，AppLink还提供了一个重要的标签属性：al_applink_data，他的结构：</p>
-<div class="highlight"><pre><span class="p">{</span>
-  <span class="s">&quot;target_url&quot;</span><span class="o">:</span> <span class="s">&quot;http://example.com/docs&quot;</span><span class="p">,</span>
-  <span class="s">&quot;extras&quot;</span><span class="o">:</span> <span class="p">{</span>
-    <span class="s">&quot;myapp_token&quot;</span><span class="o">:</span> <span class="s">&quot;t0kEn&quot;</span>
-  <span class="p">},</span>
-  <span class="s">&quot;user_agent&quot;</span><span class="o">:</span> <span class="s">&quot;Bolts iOS 1.1&quot;</span><span class="p">,</span>
-  <span class="s">&quot;version&quot;</span><span class="o">:</span> <span class="s">&quot;1.0&quot;</span>
-<span class="p">}</span>
+<div class="highlight"><pre><span></span>{
+  &quot;target_url&quot;: &quot;http://example.com/docs&quot;,
+  &quot;extras&quot;: {
+    &quot;myapp_token&quot;: &quot;t0kEn&quot;
+  },
+  &quot;user_agent&quot;: &quot;Bolts iOS 1.1&quot;,
+  &quot;version&quot;: &quot;1.0&quot;
+}
 </pre></div>
 
 
-<p>al_applink_data用于数据传递，以android的intent为例，al:android:package和al:android:class分别标识app的包名以及activity的类名，al:android:url作为intent.setData的参数，al_applink_data的内容放在<a href="http://developer.android.com/reference/android/content/Intent.html#putExtra(java.lang.String,%20android.os.Bundle)">Bundle</a>数据中。</p>
+<p>al_applink_data用于数据传递，以android的intent为例，al:android:package和al:android:class分别标识app的包名以及activity的类名，al:android:url作为intent.setData的参数，al_applink_data的内容放在<a href="http://developer.android.com/reference/android/content/Intent.html#putExtra(java.lang.String, android.os.Bundle)">Bundle</a>数据中。</p>
 <p>AppLink使用<a href="https://github.com/BoltsFramework">BoltsFramework</a>工具库中的<em>WebViewAppLinkResolver</em>来进行html的解析，WebViewAppLinkResolver需先从网络中下载到完整的html文本再进行元标签的解析。</p>
 <p>AppLink的目标很高大上，然后在国内没什么卵用，  做为Applink的发起者，facebook的app装机量巨大且开放，第三方app愿意进入其生态圈。而国内的app霸主微信，正忙着为自家的各个产品撕逼，封锁竞争对手的app跳转。可想到的场景只剩有多个产品线的几个大厂，利用AppLink进行自家兄弟应用的跳转。</p>
 <p>做为小型app的开发者，与其期待facebook的AppLink规范在国内得到普及，不如等待Android M的AppLink可以尽快完善。</p>
 <h3>DeepLinkDispatch</h3>
 <p>AppLink无卵用，但我们将AppLink结合其他框架。去年info的架构师大会中，淘宝提到了<a href="http://www.infoq.com/cn/presentations/taobao-mobile-client-architecture-road">UI总线</a>的概念，使用跨平台统一的URL来进行Web、Android、IOS的寻址。在android平台上，当本地没有activity来匹配URL时，自动降级成WebView加载。</p>
 <p>DeepLinkDispatch是使用url的跳转框架,activity可以通过注解来描述activity的资源定位符，参考一个DeepLinkDispatch的一个示例：</p>
-<div class="highlight"><pre><span class="err">@</span><span class="n">DeepLink</span><span class="p">(</span><span class="s">&quot;airbnb://example.com/deepLink/{id}&quot;</span><span class="p">)</span>
-<span class="n">public</span> <span class="n">class</span> <span class="n">MainActivity</span> <span class="n">extends</span> <span class="n">AppCompatActivity</span> <span class="p">{</span>
-    <span class="err">@</span><span class="n">Override</span> <span class="n">protected</span> <span class="kt">void</span> <span class="n">onCreate</span><span class="p">(</span><span class="n">Bundle</span> <span class="n">savedInstanceState</span><span class="p">)</span> <span class="p">{</span>
-        <span class="n">super</span><span class="p">.</span><span class="n">onCreate</span><span class="p">(</span><span class="n">savedInstanceState</span><span class="p">);</span>
-        <span class="n">setContentView</span><span class="p">(</span><span class="n">R</span><span class="p">.</span><span class="n">layout</span><span class="p">.</span><span class="n">activity_main</span><span class="p">);</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">getIntent</span><span class="p">().</span><span class="n">getBooleanExtra</span><span class="p">(</span><span class="n">DeepLink</span><span class="p">.</span><span class="n">IS_DEEP_LINK</span><span class="p">,</span> <span class="nb">false</span><span class="p">))</span> <span class="p">{</span>
-            <span class="n">showToast</span><span class="p">(</span><span class="s">&quot;secondactivity&quot;</span><span class="p">);</span>
-        <span class="p">}</span>
-     <span class="err">｝</span>
-     <span class="p">...</span>
-<span class="err">｝</span>
+<div class="highlight"><pre><span></span>@DeepLink(&quot;airbnb://example.com/deepLink/{id}&quot;)
+public class MainActivity extends AppCompatActivity {
+    @Override protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        if (getIntent().getBooleanExtra(DeepLink.IS_DEEP_LINK, false)) {
+            showToast(&quot;secondactivity&quot;);
+        }
+     ｝
+     ...
+｝
 </pre></div>
 
 
 <p>DeepLink注解表示MainActivity接受airbnb://example.com/deepLink/{id}规则的跳转。 在编译期，所有activity的DeepLinks注解都会被解析生成实际的跳转规则，生成在<em>DeepLinkActivity</em>类中，DeepLinkActivity是一个预先声明在manifest中的不可见activity，
 DeepLinkActivity.onCreate():</p>
-<div class="highlight"><pre>  <span class="err">@</span><span class="nx">Override</span>
+<div class="highlight"><pre><span></span>  <span class="err">@</span><span class="nx">Override</span>
   <span class="kr">protected</span> <span class="k">void</span> <span class="nx">onCreate</span><span class="p">(</span><span class="nx">Bundle</span> <span class="nx">savedInstanceState</span><span class="p">)</span> <span class="p">{</span>
     <span class="kr">super</span><span class="p">.</span><span class="nx">onCreate</span><span class="p">(</span><span class="nx">savedInstanceState</span><span class="p">);</span>
     <span class="nx">Loader</span> <span class="nx">loader</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">com</span><span class="p">.</span><span class="nx">airbnb</span><span class="p">.</span><span class="nx">deeplinkdispatch</span><span class="p">.</span><span class="nx">DeepLinkLoader</span><span class="p">();</span>
@@ -190,7 +190,7 @@ DeepLinkActivity.onCreate():</p>
         <span class="o">...</span>
         <span class="p">}</span> 
       <span class="o">...</span>
-      <span class="p">}</span> <span class="nx">finally</span> <span class="p">{</span>
+      <span class="p">}</span> <span class="k">finally</span> <span class="p">{</span>
         <span class="nx">finish</span><span class="p">();</span>
       <span class="p">}</span>
 <span class="p">}</span>
@@ -199,10 +199,10 @@ DeepLinkActivity.onCreate():</p>
 
 <p>DeepLinkActivity作为url的统一入口以及路由，定位并启动目标activity，之后立即销毁。</p>
 <p>在DeepLinkDispatch下，启动MainActivity的代码就变成了：</p>
-<div class="highlight"><pre>  <span class="n">Intent</span> <span class="n">intent</span> <span class="o">=</span> <span class="n">new</span> <span class="n">Intent</span><span class="p">();</span>
-  <span class="n">intent</span><span class="p">.</span><span class="n">setData</span><span class="p">(</span><span class="n">Uri</span><span class="p">.</span><span class="n">parse</span><span class="p">(</span><span class="s">&quot;airbnb://example.com/deepLink/1&quot;</span><span class="p">));</span>
-  <span class="n">intent</span><span class="p">.</span><span class="n">setAction</span><span class="p">(</span><span class="n">Intent</span><span class="p">.</span><span class="n">ACTION_VIEW</span><span class="p">);</span>
-  <span class="n">startActivity</span><span class="p">(</span><span class="n">intent</span><span class="p">);</span>
+<div class="highlight"><pre><span></span>  <span class="nt">Intent</span> <span class="nt">intent</span> <span class="o">=</span> <span class="nt">new</span> <span class="nt">Intent</span><span class="o">();</span>
+  <span class="nt">intent</span><span class="nc">.setData</span><span class="o">(</span><span class="nt">Uri</span><span class="nc">.parse</span><span class="o">(</span><span class="s2">&quot;airbnb://example.com/deepLink/1&quot;</span><span class="o">));</span>
+  <span class="nt">intent</span><span class="nc">.setAction</span><span class="o">(</span><span class="nt">Intent</span><span class="nc">.ACTION_VIEW</span><span class="o">);</span>
+  <span class="nt">startActivity</span><span class="o">(</span><span class="nt">intent</span><span class="o">);</span>
 </pre></div>
 
 
@@ -215,16 +215,20 @@ DeepLinkActivity.onCreate():</p>
             </article>
                 <section id="comment">
                     <h1 class="title">Comments</h1>
-                    <div id="disqus_thread" aria-live="polite">
-                        <script type="text/javascript">
-                            var disqus_identifier = "article/2015/07/cong-deeplinkdispatchtan-tan-zu-jian-tiao-zhuan";
-                            (function() {
-                                var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
-                                dsq.src = 'http://aaapeigithub.disqus.com/embed.js';
-                                (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
-                            })();
-                        </script>
-                    </div>
+                    <div class="ds-thread" data-thread-key="article/2015/07/cong-deeplinkdispatchtan-tan-zu-jian-tiao-zhuan" data-title="{ article.title }" data-url="article/2015/07/cong-deeplinkdispatchtan-tan-zu-jian-tiao-zhuan"></div>
+                        <!-- 多说评论框 end -->
+                        <!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+                    <script type="text/javascript">
+                    var duoshuoQuery = {short_name:"aaapei"};
+                      (function() {
+                        var ds = document.createElement('script');
+                        ds.type = 'text/javascript';ds.async = true;
+                        ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+                        ds.charset = 'UTF-8';
+                        (document.getElementsByTagName('head')[0] 
+                         || document.getElementsByTagName('body')[0]).appendChild(ds);
+                      })();
+                      </script>
                 </section>
 
         </section>

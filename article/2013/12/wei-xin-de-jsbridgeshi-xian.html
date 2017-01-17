@@ -16,8 +16,8 @@
                 <meta property="og:type" content="article"/>
                 <meta property="og:title" content="微信的jsbridge实现"/>
                 <meta property="og:url" content="http://blog.aaapei.com/article/2013/12/wei-xin-de-jsbridgeshi-xian"/>
-                <meta property="og:description" content="微信公共平台开放了几个操作webview界面的js接口 示例代码是这样的: WeixinJSBridge.invoke('getNetworkType',{}, function(e){ WeixinJSBridge.log(e.err_msg); }); android的webview api中有开放过一个addJavaScriptInterface函数,这个函数的作用是在页面的Window中注入一个JS对象 如果你的应用中使用了这个api,建议先看一下国内安全领域第一人黑哥的这篇文章android webview 漏洞背后的节操, 没耐心的同学直接看结尾的解决方案吧: 第1个方案是设置信任域，这个问题其实是不太靠谱的，在我之前在kcon里演讲《去年跨过的浏览器》里有很多信任域带来的安全问题 第2个方案是使用 shouldOverrideUrlLoading 的方式，据说这个方案还是比较靠谱的，只是可能代价比较大 第3个方案就是教育那些开发商，没有必要用webview的时候就不要用，不要java与js交互就不要用 不过,按黑哥这篇文章的想法,这个漏洞危险等级很低,可以无视之 暂时把安全问题放一边,Js对象的注入,对函数的参数类型有严格要求,它只能传递基本数据类型以及JSON 但微信的JsApi中,参数三是一个函数对象,那他是如果做到的呢 逆向 Android原生的机制既然不能支持函数对象的传递,于是猜测微信是否会对原始的api做了一层包装; 先下载weixin ..."/>
-                <meta name="description" content="微信公共平台开放了几个操作webview界面的js接口 示例代码是这样的: WeixinJSBridge.invoke('getNetworkType',{}, function(e){ WeixinJSBridge.log(e.err_msg); }); android的webview api中有开放过一个addJavaScriptInterface函数,这个函数的作用是在页面的Window中注入一个JS对象 如果你的应用中使用了这个api,建议先看一下国内安全领域第一人黑哥的这篇文章android webview 漏洞背后的节操, 没耐心的同学直接看结尾的解决方案吧: 第1个方案是设置信任域，这个问题其实是不太靠谱的，在我之前在kcon里演讲《去年跨过的浏览器》里有很多信任域带来的安全问题 第2个方案是使用 shouldOverrideUrlLoading 的方式，据说这个方案还是比较靠谱的，只是可能代价比较大 第3个方案就是教育那些开发商，没有必要用webview的时候就不要用，不要java与js交互就不要用 不过,按黑哥这篇文章的想法,这个漏洞危险等级很低,可以无视之 暂时把安全问题放一边,Js对象的注入,对函数的参数类型有严格要求,它只能传递基本数据类型以及JSON 但微信的JsApi中,参数三是一个函数对象,那他是如果做到的呢 逆向 Android原生的机制既然不能支持函数对象的传递,于是猜测微信是否会对原始的api做了一层包装; 先下载weixin ...">
+                <meta property="og:description" content="微信公共平台开放了几个操作webview界面的js接口 示例代码是这样的: WeixinJSBridge.invoke('getNetworkType',{}, function(e){ WeixinJSBridge.log(e.err_msg); }); android的webview api中有开放过一个addJavaScriptInterface函数,这个函数的作用是在页面的Window中注入一个JS对象 如果你的应用中使用了这个api,建议先看一下国内安全领域第一人黑哥的这篇文章android webview 漏洞背后的节操, 没耐心的同学直接看结尾的解决方案吧: 第1个方案是设置信任域，这个问题其实是不太靠谱的，在我之前在kcon里演讲《去年跨过的浏览器》里有很多信任域带来的安全问题 第2个方案是使用 shouldOverrideUrlLoading 的方式，据说这个方案还是比较靠谱的，只是可能代价比较大 第3个方案就是教育那些开发商，没有必要用webview的时候就不要用，不要java与js交互就不要用 不过,按黑哥这篇文章的想法,这个漏洞危险等级很低,可以无视之 暂时把安全问题放一边,Js对象的注入,对函数的参数类型有严格要求,它只能传递基本数据类型以及JSON 但微信的JsApi中,参数三是一个函数对象,那他是如果做到的呢 逆向 Android原生的机制既然不能支持函数对象的传递,于是猜测微信是否会对原始的api做了一层包装; 先下载weixin …"/>
+                <meta name="description" content="微信公共平台开放了几个操作webview界面的js接口 示例代码是这样的: WeixinJSBridge.invoke('getNetworkType',{}, function(e){ WeixinJSBridge.log(e.err_msg); }); android的webview api中有开放过一个addJavaScriptInterface函数,这个函数的作用是在页面的Window中注入一个JS对象 如果你的应用中使用了这个api,建议先看一下国内安全领域第一人黑哥的这篇文章android webview 漏洞背后的节操, 没耐心的同学直接看结尾的解决方案吧: 第1个方案是设置信任域，这个问题其实是不太靠谱的，在我之前在kcon里演讲《去年跨过的浏览器》里有很多信任域带来的安全问题 第2个方案是使用 shouldOverrideUrlLoading 的方式，据说这个方案还是比较靠谱的，只是可能代价比较大 第3个方案就是教育那些开发商，没有必要用webview的时候就不要用，不要java与js交互就不要用 不过,按黑哥这篇文章的想法,这个漏洞危险等级很低,可以无视之 暂时把安全问题放一边,Js对象的注入,对函数的参数类型有严格要求,它只能传递基本数据类型以及JSON 但微信的JsApi中,参数三是一个函数对象,那他是如果做到的呢 逆向 Android原生的机制既然不能支持函数对象的传递,于是猜测微信是否会对原始的api做了一层包装; 先下载weixin …">
 
 
 
@@ -86,47 +86,47 @@
             <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
 <div class="meta">
     <div class="date">
-        <time datetime="2013-12-11T19:50:00.000000" itemprop="datePublished">2013-12-11</time>
+        <time datetime="2013-12-11T19:50:00.000000+0800" itemprop="datePublished">2013-12-11</time>
     </div>
     <div class="tags">
         <a href="http://blog.aaapei.com/tags/android">android</a> ,         <a href="http://blog.aaapei.com/tags/wei-xin">微信</a>     </div>
 </div>                <h1 class="title" itemprop="name"><a href="http://blog.aaapei.com/article/2013/12/wei-xin-de-jsbridgeshi-xian" itemprop="url">微信的jsbridge实现</a></h1>
                 <div class="entry-content" itemprop="articleBody">
-                    <p>微信公共平台开放了几个操作webview界面的js接口<br />
+                    <p>微信公共平台开放了几个操作webview界面的js接口<br>
 示例代码是这样的:  </p>
-<div class="highlight"><pre><span class="nx">WeixinJSBridge</span><span class="p">.</span><span class="nx">invoke</span><span class="p">(</span><span class="s1">&#39;getNetworkType&#39;</span><span class="p">,{},</span>
+<div class="highlight"><pre><span></span><span class="nx">WeixinJSBridge</span><span class="p">.</span><span class="nx">invoke</span><span class="p">(</span><span class="s1">&#39;getNetworkType&#39;</span><span class="p">,{},</span>
     <span class="kd">function</span><span class="p">(</span><span class="nx">e</span><span class="p">){</span>
         <span class="nx">WeixinJSBridge</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">e</span><span class="p">.</span><span class="nx">err_msg</span><span class="p">);</span>
     <span class="p">});</span>
 </pre></div>
 
 
-<p>android的webview api中有开放过一个<em>addJavaScriptInterface</em>函数,这个函数的作用是在页面的Window中注入一个JS对象<br />
+<p>android的webview api中有开放过一个<em>addJavaScriptInterface</em>函数,这个函数的作用是在页面的Window中注入一个JS对象<br>
 如果你的应用中使用了这个api,建议先看一下国内安全领域第一人黑哥的这篇文章<a href="http://hi.baidu.com/hi_heige/item/9baf99f063331d58c9f3379a">android webview 漏洞背后的节操</a>,  </p>
 <p>没耐心的同学直接看结尾的解决方案吧:</p>
 <blockquote>
-<p>第1个方案是设置信任域，这个问题其实是不太靠谱的，在我之前在kcon里演讲《去年跨过的浏览器》里有很多信任域带来的安全问题<br />
- 第2个方案是使用 shouldOverrideUrlLoading 的方式，据说这个方案还是比较靠谱的，只是可能代价比较大<br />
+<p>第1个方案是设置信任域，这个问题其实是不太靠谱的，在我之前在kcon里演讲《去年跨过的浏览器》里有很多信任域带来的安全问题<br>
+ 第2个方案是使用 shouldOverrideUrlLoading 的方式，据说这个方案还是比较靠谱的，只是可能代价比较大<br>
  第3个方案就是教育那些开发商，没有必要用webview的时候就不要用，不要java与js交互就不要用  </p>
 </blockquote>
-<p>不过,按黑哥这篇文章的想法,这个漏洞危险等级很低,可以无视之<br />
-暂时把安全问题放一边,Js对象的注入,对函数的参数类型有严格要求,它只能传递基本数据类型以及JSON<br />
+<p>不过,按黑哥这篇文章的想法,这个漏洞危险等级很低,可以无视之<br>
+暂时把安全问题放一边,Js对象的注入,对函数的参数类型有严格要求,它只能传递基本数据类型以及JSON<br>
 但微信的JsApi中,参数三是一个函数对象,那他是如果做到的呢</p>
 <h3>逆向</h3>
-<p>Android原生的机制既然不能支持函数对象的传递,于是猜测微信是否会对原始的api做了一层包装;<br />
+<p>Android原生的机制既然不能支持函数对象的传递,于是猜测微信是否会对原始的api做了一层包装;<br>
 先下载weixin.apk,反编译,全局搜索"WeixinJSBrige",在assets目录找到一个wxjs.js;不知什么原因,微信团队没有对这个js文件进行代码混淆;</p>
 <h3>wxjs.js分析</h3>
-<p>wxjs.js有两千多行的代码,不过不必担心,其中有一大部分是jquery的实现<br />
+<p>wxjs.js有两千多行的代码,不过不必担心,其中有一大部分是jquery的实现<br>
 直接找我们想要的,先看'WeixinJSBridge'  </p>
-<div class="highlight"><pre>   <span class="n">var</span> <span class="n">__WeixinJSBridge</span> <span class="o">=</span> <span class="p">{</span>
+<div class="highlight"><pre><span></span>   <span class="kd">var</span> <span class="nx">__WeixinJSBridge</span> <span class="o">=</span> <span class="p">{</span>
                <span class="c1">// public</span>
-        <span class="nl">invoke:</span><span class="n">_call</span><span class="p">,</span>
-        <span class="nl">call:</span><span class="n">_call</span><span class="p">,</span>
-        <span class="nl">on:</span><span class="n">_on</span><span class="p">,</span>
-        <span class="nl">env:</span><span class="n">_env</span><span class="p">,</span>
-        <span class="nl">log:</span><span class="n">_log</span><span class="p">,</span>
-       <span class="nl">_fetchQueue:</span> <span class="n">_fetchQueue</span><span class="p">,</span>
-        <span class="nl">_handleMessageFromWeixin:</span> <span class="n">_handleMessageFromWeixin</span><span class="p">,</span>
+        <span class="nx">invoke</span><span class="o">:</span><span class="nx">_call</span><span class="p">,</span>
+        <span class="nx">call</span><span class="o">:</span><span class="nx">_call</span><span class="p">,</span>
+        <span class="nx">on</span><span class="o">:</span><span class="nx">_on</span><span class="p">,</span>
+        <span class="nx">env</span><span class="o">:</span><span class="nx">_env</span><span class="p">,</span>
+        <span class="nx">log</span><span class="o">:</span><span class="nx">_log</span><span class="p">,</span>
+       <span class="nx">_fetchQueue</span><span class="o">:</span> <span class="nx">_fetchQueue</span><span class="p">,</span>
+        <span class="nx">_handleMessageFromWeixin</span><span class="o">:</span> <span class="nx">_handleMessageFromWeixin</span><span class="p">,</span>
    <span class="p">};</span>
 </pre></div>
 
@@ -134,7 +134,7 @@
 <p>看到方法名可以猜测微信JSBridge的大概的逻辑了;应该是消息队列处理机制,</p>
 <p>具体还是看一下微信是怎么实现的</p>
 <p>先看_call方法的逻辑:</p>
-<div class="highlight"><pre>  <span class="kd">function</span> <span class="nx">_call</span><span class="p">(</span><span class="nx">func</span><span class="p">,</span><span class="nx">params</span><span class="p">,</span><span class="nx">callback</span><span class="p">)</span> <span class="p">{</span>
+<div class="highlight"><pre><span></span>  <span class="kd">function</span> <span class="nx">_call</span><span class="p">(</span><span class="nx">func</span><span class="p">,</span><span class="nx">params</span><span class="p">,</span><span class="nx">callback</span><span class="p">)</span> <span class="p">{</span>
         <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">func</span> <span class="o">||</span> <span class="k">typeof</span> <span class="nx">func</span> <span class="o">!==</span> <span class="s1">&#39;string&#39;</span><span class="p">)</span> <span class="p">{</span>
             <span class="k">return</span><span class="p">;</span>
         <span class="p">};</span>
@@ -145,12 +145,12 @@
         <span class="kd">var</span> <span class="nx">callbackID</span> <span class="o">=</span> <span class="p">(</span><span class="nx">_callback_count</span><span class="o">++</span><span class="p">).</span><span class="nx">toString</span><span class="p">();</span>
 
         <span class="k">if</span> <span class="p">(</span><span class="k">typeof</span> <span class="nx">callback</span> <span class="o">===</span> <span class="s1">&#39;function&#39;</span><span class="p">)</span> <span class="p">{</span>
-          <span class="nx">_callback_map</span><span class="cp">[</span><span class="nx">callbackID</span><span class="cp">]</span> <span class="o">=</span> <span class="nx">callback</span><span class="p">;</span>
+          <span class="nx">_callback_map</span><span class="p">[</span><span class="nx">callbackID</span><span class="p">]</span> <span class="o">=</span> <span class="nx">callback</span><span class="p">;</span>
         <span class="p">};</span>
 
         <span class="kd">var</span> <span class="nx">msgObj</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;func&#39;</span><span class="o">:</span><span class="nx">func</span><span class="p">,</span><span class="s1">&#39;params&#39;</span><span class="o">:</span><span class="nx">params</span><span class="p">};</span>
-        <span class="nx">msgObj</span><span class="cp">[</span><span class="nx">_MESSAGE_TYPE</span><span class="cp">]</span> <span class="o">=</span> <span class="s1">&#39;call&#39;</span><span class="p">;</span>        
-        <span class="nx">msgObj</span><span class="cp">[</span><span class="nx">_CALLBACK_ID</span><span class="cp">]</span> <span class="o">=</span> <span class="nx">callbackID</span><span class="p">;</span>
+        <span class="nx">msgObj</span><span class="p">[</span><span class="nx">_MESSAGE_TYPE</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;call&#39;</span><span class="p">;</span>        
+        <span class="nx">msgObj</span><span class="p">[</span><span class="nx">_CALLBACK_ID</span><span class="p">]</span> <span class="o">=</span> <span class="nx">callbackID</span><span class="p">;</span>
 
         <span class="nx">_sendMessage</span><span class="p">(</span><span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">(</span><span class="nx">msgObj</span><span class="p">));</span>
     <span class="p">}</span>
@@ -159,7 +159,7 @@
 
 <p>callbackId是一个自增的ID,_call调用时候将id和回调函数通过_sendMessage存在队列中,</p>
 <p>再看一下_sendMessage的逻辑:</p>
-<div class="highlight"><pre>       <span class="kd">function</span> <span class="nx">_sendMessage</span><span class="p">(</span><span class="nx">message</span><span class="p">)</span> <span class="p">{</span>
+<div class="highlight"><pre><span></span>       <span class="kd">function</span> <span class="nx">_sendMessage</span><span class="p">(</span><span class="nx">message</span><span class="p">)</span> <span class="p">{</span>
         <span class="nx">_sendMessageQueue</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">message</span><span class="p">);</span>
         <span class="nx">_readyMessageIframe</span><span class="p">.</span><span class="nx">src</span> <span class="o">=</span> <span class="nx">_CUSTOM_PROTOCOL_SCHEME</span> <span class="o">+</span> <span class="s1">&#39;://&#39;</span> <span class="o">+</span> <span class="nx">_QUEUE_HAS_MESSAGE</span><span class="p">;</span>
       <span class="p">};</span>
@@ -168,10 +168,10 @@
 
 <p>事件队列和之前猜测的一样; 但是,为什么会构造一个url? 难道微信没有用addJavaScriptInterface</p>
 <p>既然有sendMessage,其他地方必然有一个取消息的逻辑:</p>
-<div class="highlight"><pre>      <span class="c1">//取出队列中的消息，并清空接收队列</span>
+<div class="highlight"><pre><span></span>      <span class="c1">//取出队列中的消息，并清空接收队列</span>
     <span class="kd">function</span> <span class="nx">_fetchQueue</span><span class="p">()</span> <span class="p">{</span>
         <span class="kd">var</span> <span class="nx">messageQueueString</span> <span class="o">=</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">(</span><span class="nx">_sendMessageQueue</span><span class="p">);</span>
-        <span class="nx">_sendMessageQueue</span> <span class="o">=</span> <span class="cp">[]</span><span class="p">;</span>
+        <span class="nx">_sendMessageQueue</span> <span class="o">=</span> <span class="p">[];</span>
         <span class="c1">//window.JsApi &amp;&amp; JsApi.keep_setReturnValue &amp;&amp; window.JsApi.keep_setReturnValue(&#39;SCENE_FETCHQUEUE&#39;, messageQueueString);</span>
         <span class="nx">_setResultValue</span><span class="p">(</span><span class="s1">&#39;SCENE_FETCHQUEUE&#39;</span><span class="p">,</span> <span class="nx">messageQueueString</span><span class="p">);</span>
         <span class="k">return</span> <span class="nx">messageQueueString</span><span class="p">;</span>
@@ -180,7 +180,7 @@
 
 
 <p>JavaScript调用java的逻辑最终在_setResultValue中</p>
-<div class="highlight"><pre>    <span class="kd">function</span> <span class="nx">_setResultValue</span><span class="p">(</span><span class="nx">scene</span><span class="p">,</span> <span class="nx">result</span><span class="p">)</span> <span class="p">{</span>
+<div class="highlight"><pre><span></span>    <span class="kd">function</span> <span class="nx">_setResultValue</span><span class="p">(</span><span class="nx">scene</span><span class="p">,</span> <span class="nx">result</span><span class="p">)</span> <span class="p">{</span>
         <span class="k">if</span> <span class="p">(</span><span class="nx">result</span> <span class="o">===</span> <span class="kc">undefined</span><span class="p">)</span> <span class="p">{</span>
             <span class="nx">result</span> <span class="o">=</span> <span class="s1">&#39;dummy&#39;</span><span class="p">;</span>
         <span class="p">}</span>
@@ -191,7 +191,7 @@
 
 
 <p>又出现一个_setResultIfrmae,寻迹查找,最后找到了这个东西</p>
-<div class="highlight"><pre>    <span class="c1">//创建ifram的准备队列</span>
+<div class="highlight"><pre><span></span>    <span class="c1">//创建ifram的准备队列</span>
     <span class="kd">function</span> <span class="nx">_createQueueReadyIframe</span><span class="p">(</span><span class="nx">doc</span><span class="p">)</span> <span class="p">{</span>
         <span class="c1">// _setResultIframe 的初始化</span>
         <span class="nx">_setResultIframe</span> <span class="o">=</span> <span class="nx">doc</span><span class="p">.</span><span class="nx">createElement</span><span class="p">(</span><span class="s1">&#39;iframe&#39;</span><span class="p">);</span>
@@ -215,15 +215,15 @@
 <p>微信的这个js框架为所有的js函数做了一个统一的入口,</p>
 <p>所以编码代码不大,不失为一个好方法</p>
 <p>最后瞄一下java调用的js的入口,那就是标准的调用方式了;</p>
-<div class="highlight"><pre>  <span class="kd">function</span> <span class="nx">_handleMessageFromWeixin</span><span class="p">(</span><span class="nx">message</span><span class="p">)</span> <span class="p">{</span>
+<div class="highlight"><pre><span></span>  <span class="kd">function</span> <span class="nx">_handleMessageFromWeixin</span><span class="p">(</span><span class="nx">message</span><span class="p">)</span> <span class="p">{</span>
       <span class="kd">var</span> <span class="nx">msgWrap</span> <span class="o">=</span> <span class="nx">message</span><span class="p">;</span>
 
-      <span class="k">switch</span><span class="p">(</span><span class="nx">msgWrap</span><span class="cp">[</span><span class="nx">_MESSAGE_TYPE</span><span class="cp">]</span><span class="p">){</span>
+      <span class="k">switch</span><span class="p">(</span><span class="nx">msgWrap</span><span class="p">[</span><span class="nx">_MESSAGE_TYPE</span><span class="p">]){</span>
         <span class="k">case</span> <span class="s1">&#39;callback&#39;</span><span class="o">:</span>
         <span class="p">{</span>       
-          <span class="k">if</span><span class="p">(</span><span class="k">typeof</span> <span class="nx">msgWrap</span><span class="cp">[</span><span class="nx">_CALLBACK_ID</span><span class="cp">]</span> <span class="o">===</span> <span class="s1">&#39;string&#39;</span> <span class="o">&amp;&amp;</span> <span class="k">typeof</span> <span class="nx">_callback_map</span><span class="cp">[</span><span class="nx">msgWrap</span><span class="err">[</span><span class="nx">_CALLBACK_ID</span><span class="cp">]</span><span class="p">]</span> <span class="o">===</span> <span class="s1">&#39;function&#39;</span><span class="p">){</span>
-            <span class="kd">var</span> <span class="nx">ret</span> <span class="o">=</span> <span class="nx">_callback_map</span><span class="cp">[</span><span class="nx">msgWrap</span><span class="err">[</span><span class="nx">_CALLBACK_ID</span><span class="cp">]</span><span class="p">](</span><span class="nx">msgWrap</span><span class="cp">[</span><span class="s1">&#39;__params&#39;</span><span class="cp">]</span><span class="p">);</span> <span class="c1">//根据id进行函数 回调</span>
-            <span class="k">delete</span> <span class="nx">_callback_map</span><span class="cp">[</span><span class="nx">msgWrap</span><span class="err">[</span><span class="nx">_CALLBACK_ID</span><span class="cp">]</span><span class="p">];</span> <span class="c1">// 保证调用一次,删除函数</span>
+          <span class="k">if</span><span class="p">(</span><span class="k">typeof</span> <span class="nx">msgWrap</span><span class="p">[</span><span class="nx">_CALLBACK_ID</span><span class="p">]</span> <span class="o">===</span> <span class="s1">&#39;string&#39;</span> <span class="o">&amp;&amp;</span> <span class="k">typeof</span> <span class="nx">_callback_map</span><span class="p">[</span><span class="nx">msgWrap</span><span class="p">[</span><span class="nx">_CALLBACK_ID</span><span class="p">]]</span> <span class="o">===</span> <span class="s1">&#39;function&#39;</span><span class="p">){</span>
+            <span class="kd">var</span> <span class="nx">ret</span> <span class="o">=</span> <span class="nx">_callback_map</span><span class="p">[</span><span class="nx">msgWrap</span><span class="p">[</span><span class="nx">_CALLBACK_ID</span><span class="p">]](</span><span class="nx">msgWrap</span><span class="p">[</span><span class="s1">&#39;__params&#39;</span><span class="p">]);</span> <span class="c1">//根据id进行函数 回调</span>
+            <span class="k">delete</span> <span class="nx">_callback_map</span><span class="p">[</span><span class="nx">msgWrap</span><span class="p">[</span><span class="nx">_CALLBACK_ID</span><span class="p">]];</span> <span class="c1">// 保证调用一次,删除函数</span>
             <span class="c1">//window.JsApi &amp;&amp; JsApi.keep_setReturnValue &amp;&amp; window.JsApi.keep_setReturnValue(&#39;SCENE_HANDLEMSGFROMWX&#39;, JSON.stringify(ret));</span>
             <span class="nx">_setResultValue</span><span class="p">(</span><span class="s1">&#39;SCENE_HANDLEMSGFROMWX&#39;</span><span class="p">,</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">(</span><span class="nx">ret</span><span class="p">));</span>
             <span class="k">return</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">(</span><span class="nx">ret</span><span class="p">);</span>
@@ -242,16 +242,20 @@
             </article>
                 <section id="comment">
                     <h1 class="title">Comments</h1>
-                    <div id="disqus_thread" aria-live="polite">
-                        <script type="text/javascript">
-                            var disqus_identifier = "article/2013/12/wei-xin-de-jsbridgeshi-xian";
-                            (function() {
-                                var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
-                                dsq.src = 'http://aaapeigithub.disqus.com/embed.js';
-                                (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
-                            })();
-                        </script>
-                    </div>
+                    <div class="ds-thread" data-thread-key="article/2013/12/wei-xin-de-jsbridgeshi-xian" data-title="{ article.title }" data-url="article/2013/12/wei-xin-de-jsbridgeshi-xian"></div>
+                        <!-- 多说评论框 end -->
+                        <!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+                    <script type="text/javascript">
+                    var duoshuoQuery = {short_name:"aaapei"};
+                      (function() {
+                        var ds = document.createElement('script');
+                        ds.type = 'text/javascript';ds.async = true;
+                        ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+                        ds.charset = 'UTF-8';
+                        (document.getElementsByTagName('head')[0] 
+                         || document.getElementsByTagName('body')[0]).appendChild(ds);
+                      })();
+                      </script>
                 </section>
 
         </section>

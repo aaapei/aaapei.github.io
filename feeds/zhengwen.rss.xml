@@ -1,19 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<rss version="2.0"><channel><title>I'm aaapei</title><link>http://blog.aaapei.com/</link><description></description><lastBuildDate>Tue, 17 Jan 2017 14:26:00 +0800</lastBuildDate><item><title>也谈MultiDex的优化</title><link>http://blog.aaapei.com/article/2017/01/ye-tan-multidexde-you-hua</link><description>&lt;p&gt;旧文一篇，看到移动开发前线推送了&lt;a href="https://zhuanlan.zhihu.com/p/24305296"&gt;MultiDex工作原理分析和优化方案&lt;/a&gt;，也将我们的MultiDex启动优化思路分享给社区&lt;/p&gt;
-&lt;h3&gt;MultiDex存在的问题&lt;/h3&gt;
-&lt;p&gt;我们经常说的MultiDex，可以分成运行时和编译时两个部分：&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;
-&lt;p&gt;编译时的分包机制，将app中的class以某种策略将class分散在多个dex中，目的是减少为了第一个dex也就是main dex中包含的class。&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;运行时： app启动时，虚拟机只加载main dex中的class。app启动以后，使用&lt;em&gt;Multidex.install&lt;/em&gt; API，通过反射修改ClassLoader中的dexElements加载其他dex。&lt;/p&gt;
-&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;MultiDex机制的出现本身是为了避免出现app 65535问题的出现，但随着业务逻辑的增长，以及不合理的模块划分，可能会导致main dex的方法数也超出了65535，这就导致了&lt;em&gt;main dex capacity exceeded&lt;/em&gt;异常。&lt;/p&gt;
-&lt;p&gt;此外，Multidex的接入额外还会对app的启动性能造成影响。Multidex在install时需要加载dex，首次启动时还需要做odex的转换，而这些都是在ui主线程中完成。
-根据&lt;a href="https://medium.com/@Macarse/lazy-loading-dex-files-d41f6f37df0e#.3vx8kle8j"&gt; Carlos Sessa&lt;/a&gt;的测试，启用multidex后，4.4或以下的设备，app的启动时间平均会增加15%，更严重的情况，甚至在启动时候会出现了黑屏。&lt;/p&gt;
-&lt;p&gt;目前部分app采取的策略是，放弃掉Multidex的 …&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">郑文</dc:creator><pubDate>Tue, 17 Jan 2017 14:26:00 +0800</pubDate><guid isPermaLink="false">tag:blog.aaapei.com,2017-01-17:/article/2017/01/ye-tan-multidexde-you-hua</guid><category>multidex</category></item><item><title>网易云课堂的android微专业课程</title><link>http://blog.aaapei.com/article/2016/08/wang-yi-yun-ke-tang-de-androidwei-zhuan-ye-ke-cheng</link><description>&lt;p&gt;懒癌晚期，一年多没更新blog，近一两月项目以外做了两件事情：&lt;/p&gt;
+<rss version="2.0"><channel><title>I'm aaapei - zhengwen</title><link>http://blog.aaapei.com/</link><description></description><lastBuildDate>Thu, 25 Aug 2016 14:26:00 +0800</lastBuildDate><item><title>网易云课堂的android微专业课程</title><link>http://blog.aaapei.com/article/2016/08/wang-yi-yun-ke-tang-de-androidwei-zhuan-ye-ke-cheng</link><description>&lt;p&gt;懒癌晚期，一年多没更新blog，近一两月项目以外做了两件事情：&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;
 &lt;p&gt;在听云和infoq的&lt;a href="http://www.apmcon.cn/"&gt;apmcon&lt;/a&gt;大会做了个android 编译器hook的分享，ppt地址在&lt;a href="http://nos.netease.com/knowledge/fd1ba942-d609-4fa4-bdce-e1003febc1ce?download=apmcon_apm%E6%96%B9%E6%A1%88%E6%8E%A2%E7%B4%A2_v0818.pdf"&gt;网易APM hook方案探索&lt;/a&gt;，介绍了我们在编译期做bytecode植入的一些实践工作，有兴趣的同学可以和我私信交流；&lt;/p&gt;

@@ -83,7 +83,7 @@
             <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
 <div class="meta">
     <div class="date">
-        <time datetime="2014-12-21T00:00:00.000000" itemprop="datePublished">2014-12-21</time>
+        <time datetime="2014-12-21T00:00:00.000000+0800" itemprop="datePublished">2014-12-21</time>
     </div>
     <div class="tags">
         <a href="http://blog.aaapei.com/tags/android">android</a> ,         <a href="http://blog.aaapei.com/tags/yi-bu">异步</a>     </div>
@@ -109,7 +109,7 @@
 <li>backgroud process</li>
 <li>empty process  </li>
 </ul>
-<p>它们的thread ...</p>
+<p>它们的thread …</p>
 					<br/ >
 					<a href="http://blog.aaapei.com/article/2014/12/androidyi-bu-bian-cheng">查看全文</a>
                 </div>
@@ -121,12 +121,12 @@
             <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
 <div class="meta">
     <div class="date">
-        <time datetime="2014-11-09T00:00:00.000000" itemprop="datePublished">2014-11-09</time>
+        <time datetime="2014-11-09T00:00:00.000000+0800" itemprop="datePublished">2014-11-09</time>
     </div>
     <div class="tags">
         <a href="http://blog.aaapei.com/tags/dalvik">dalvik</a> ,         <a href="http://blog.aaapei.com/tags/jni">jni</a>     </div>
 </div>                <h1 class="title" itemprop="name"><a href="http://blog.aaapei.com/article/2014/11/dalvik-jnijie-xi" itemprop="url">dalvik jni解析</a></h1>
-                <div class="entry-content" itemprop="description"><p>android开发者在移植第三方native库时,经常会使用到jni. <br />
+                <div class="entry-content" itemprop="description"><p>android开发者在移植第三方native库时,经常会使用到jni. <br>
 Java Native Interface(java本地接口),用于java与c/c++代码进行交互.需要了解的是,jni只是jvm的一个规范,各家虚拟机有各自的实现,本文分享一下dalvik中jobject reference的实现.</p>
 <h3>jobject reference type</h3>
 <p>jni规范中,对jobject定义了两种reference类型:</p>
@@ -136,7 +136,7 @@ Java Native Interface(java本地接口),用于java与c/c++代码进行交互.需
 </ul>
 <p>在JNI Specification中的说明是:</p>
 <blockquote>
-<p>Local references are valid for the duration of a native method call, and are automatically freed after the native method returns. Global references ...</p></blockquote>
+<p>Local references are valid for the duration of a native method call, and are automatically freed after the native method returns. Global references …</p></blockquote>
 					<br/ >
 					<a href="http://blog.aaapei.com/article/2014/11/dalvik-jnijie-xi">查看全文</a>
                 </div>
@@ -148,7 +148,7 @@ Java Native Interface(java本地接口),用于java与c/c++代码进行交互.需
             <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
 <div class="meta">
     <div class="date">
-        <time datetime="2014-08-09T00:00:00.000000" itemprop="datePublished">2014-08-09</time>
+        <time datetime="2014-08-09T00:00:00.000000+0800" itemprop="datePublished">2014-08-09</time>
     </div>
     <div class="tags">
         <a href="http://blog.aaapei.com/tags/yu-ming">域名</a>     </div>
@@ -166,26 +166,26 @@ Java Native Interface(java本地接口),用于java与c/c++代码进行交互.需
             <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
 <div class="meta">
     <div class="date">
-        <time datetime="2014-04-19T23:21:00.000000" itemprop="datePublished">2014-04-19</time>
+        <time datetime="2014-04-19T23:21:00.000000+0800" itemprop="datePublished">2014-04-19</time>
     </div>
     <div class="tags">
         <a href="http://blog.aaapei.com/tags/android">android</a> ,         <a href="http://blog.aaapei.com/tags/lua">lua</a>     </div>
 </div>                <h1 class="title" itemprop="name"><a href="http://blog.aaapei.com/article/2014/04/androidzhong-luajiao-ben-de-bu-shu" itemprop="url">android中lua脚本的部署</a></h1>
-                <div class="entry-content" itemprop="description"><p>“愤怒的小鸟”中，lua脚本是运行时部署在应用的data目录，同时做了脚本加密；<br />
-但是如果你的lua脚本有了模块包，脚本就会有多级目录，而android的data目录下是不允许有子目录；<br />
+                <div class="entry-content" itemprop="description"><p>“愤怒的小鸟”中，lua脚本是运行时部署在应用的data目录，同时做了脚本加密；<br>
+但是如果你的lua脚本有了模块包，脚本就会有多级目录，而android的data目录下是不允许有子目录；<br>
 当然，lua脚本也可以在运行时拷贝到外置sd卡中，不过既然放置在不安全的公共目录，就会有被第三方删除或篡改的危险，那么每次启动的时候必须做一次文件校验，同时，也必须对脚本进行加密，避免程序逻辑暴露；  </p>
 <h3>lua自定义加载器</h3>
-<p>lua引擎提供了一个自定义加载器，当lua脚本中调用require时，会回调到自定义加载器的CFunction；利用这样特性，可以尝试取消掉脚本的运行时拷贝，而直接从应用的asset资源目录加载；自定义加载器的原理中，云风的blog中有介绍，<a href="http://blog.codingnow.com/2007/04/user_define_lua_loader.html">以自定义方式加载lua模块</a><br />
+<p>lua引擎提供了一个自定义加载器，当lua脚本中调用require时，会回调到自定义加载器的CFunction；利用这样特性，可以尝试取消掉脚本的运行时拷贝，而直接从应用的asset资源目录加载；自定义加载器的原理中，云风的blog中有介绍，<a href="http://blog.codingnow.com/2007/04/user_define_lua_loader.html">以自定义方式加载lua模块</a><br>
 直接贴个代码实现  </p>
-<div class="highlight"><pre><span class="k">void</span> <span class="nx">addAssetLuaLoader</span><span class="p">(</span><span class="nx">lua_State</span> <span class="o">*</span><span class="nx">L</span><span class="p">,</span> <span class="nx">lua_CFunction</span> <span class="nx">func</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><span class="kt">void</span> <span class="nf">addAssetLuaLoader</span><span class="p">(</span><span class="n">lua_State</span> <span class="o">*</span><span class="n">L</span><span class="p">,</span> <span class="n">lua_CFunction</span> <span class="n">func</span><span class="p">)</span>
 <span class="p">{</span>
-   <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">func</span><span class="p">)</span> <span class="k">return</span><span class="p">;</span>
+   <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">func</span><span class="p">)</span> <span class="k">return</span><span class="p">;</span>
 
-   <span class="nx">lua_getglobal</span><span class="p">(</span><span class="nx">L</span><span class="p">,</span> <span class="s2">&quot;package&quot;</span><span class="p">);</span>                   
-   <span class="nx">lua_getfield</span><span class="p">(</span><span class="nx">L</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;loaders&quot;</span><span class="p">);</span>   
-   <span class="nx">lua_pushcfunction</span><span class="p">(</span><span class="nx">L</span><span class="p">,</span> <span class="nx">func</span><span class="p">);</span>  
-   <span class="kr">int</span> <span class="nx">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span>
-   <span class="k">for</span> <span class="p">(</span> <span class="nx">i ...</span></pre></div>
+   <span class="n">lua_getglobal</span><span class="p">(</span><span class="n">L</span><span class="p">,</span> <span class="s">&quot;package&quot;</span><span class="p">);</span>                   
+   <span class="n">lua_getfield</span><span class="p">(</span><span class="n">L</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="s">&quot;loaders&quot;</span><span class="p">);</span>   
+   <span class="n">lua_pushcfunction</span><span class="p">(</span><span class="n">L</span><span class="p">,</span> <span class="n">func</span><span class="p">);</span>  
+   <span class="kt">int</span> <span class="n">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span>
+   <span class="k">for</span> <span class="p">(</span> <span class="n">i …</span></pre></div>
 					<br/ >
 					<a href="http://blog.aaapei.com/article/2014/04/androidzhong-luajiao-ben-de-bu-shu">查看全文</a>
                 </div>

@@ -83,28 +83,59 @@
             <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
 <div class="meta">
     <div class="date">
-        <time datetime="2014-02-19T19:50:00.000000" itemprop="datePublished">2014-02-19</time>
+        <time datetime="2014-04-19T23:21:00.000000+0800" itemprop="datePublished">2014-04-19</time>
+    </div>
+    <div class="tags">
+        <a href="http://blog.aaapei.com/tags/android">android</a> ,         <a href="http://blog.aaapei.com/tags/lua">lua</a>     </div>
+</div>                <h1 class="title" itemprop="name"><a href="http://blog.aaapei.com/article/2014/04/androidzhong-luajiao-ben-de-bu-shu" itemprop="url">android中lua脚本的部署</a></h1>
+                <div class="entry-content" itemprop="description"><p>“愤怒的小鸟”中，lua脚本是运行时部署在应用的data目录，同时做了脚本加密；<br>
+但是如果你的lua脚本有了模块包，脚本就会有多级目录，而android的data目录下是不允许有子目录；<br>
+当然，lua脚本也可以在运行时拷贝到外置sd卡中，不过既然放置在不安全的公共目录，就会有被第三方删除或篡改的危险，那么每次启动的时候必须做一次文件校验，同时，也必须对脚本进行加密，避免程序逻辑暴露；  </p>
+<h3>lua自定义加载器</h3>
+<p>lua引擎提供了一个自定义加载器，当lua脚本中调用require时，会回调到自定义加载器的CFunction；利用这样特性，可以尝试取消掉脚本的运行时拷贝，而直接从应用的asset资源目录加载；自定义加载器的原理中，云风的blog中有介绍，<a href="http://blog.codingnow.com/2007/04/user_define_lua_loader.html">以自定义方式加载lua模块</a><br>
+直接贴个代码实现  </p>
+<div class="highlight"><pre><span></span><span class="kt">void</span> <span class="nf">addAssetLuaLoader</span><span class="p">(</span><span class="n">lua_State</span> <span class="o">*</span><span class="n">L</span><span class="p">,</span> <span class="n">lua_CFunction</span> <span class="n">func</span><span class="p">)</span>
+<span class="p">{</span>
+   <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">func</span><span class="p">)</span> <span class="k">return</span><span class="p">;</span>
+
+   <span class="n">lua_getglobal</span><span class="p">(</span><span class="n">L</span><span class="p">,</span> <span class="s">&quot;package&quot;</span><span class="p">);</span>                   
+   <span class="n">lua_getfield</span><span class="p">(</span><span class="n">L</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="s">&quot;loaders&quot;</span><span class="p">);</span>   
+   <span class="n">lua_pushcfunction</span><span class="p">(</span><span class="n">L</span><span class="p">,</span> <span class="n">func</span><span class="p">);</span>  
+   <span class="kt">int</span> <span class="n">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span>
+   <span class="k">for</span> <span class="p">(</span> <span class="n">i …</span></pre></div>
+					<br/ >
+					<a href="http://blog.aaapei.com/article/2014/04/androidzhong-luajiao-ben-de-bu-shu">查看全文</a>
+                </div>
+                <div class="meta">
+                    <span class="author">Posted by <a href="http://blog.aaapei.com/author/zhengwen.html">zhengwen</a></span>
+                </div>
+            </article>
+            <hr/>
+            <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
+<div class="meta">
+    <div class="date">
+        <time datetime="2014-02-19T19:50:00.000000+0800" itemprop="datePublished">2014-02-19</time>
     </div>
     <div class="tags">
         <a href="http://blog.aaapei.com/tags/lua">lua</a> ,         <a href="http://blog.aaapei.com/tags/luajava">luajava</a>     </div>
 </div>                <h1 class="title" itemprop="name"><a href="http://blog.aaapei.com/article/2014/02/luazai-kua-yu-yan-huan-jing-zhong-de-nei-cun-xie-lu" itemprop="url">lua在跨语言环境中的内存泄露</a></h1>
                 <div class="entry-content" itemprop="description"><p>前段时间在android环境中使用lua,采用的luabridge是luajava,遇到一个内存泄露问题,查了很久,终于定位了;</p>
-<p>场景是这样的:<br />
-1:在lua中创建了一个java对象,将jobject指针传递给java;对应在luajava中,即传递了一个luaobject给java;java保存了这个对象;<br />
-2:在Lua中需要对这个java对象设置一个事件回调,比如说为某个控件setOnClickListener;<br />
+<p>场景是这样的:<br>
+1:在lua中创建了一个java对象,将jobject指针传递给java;对应在luajava中,即传递了一个luaobject给java;java保存了这个对象;<br>
+2:在Lua中需要对这个java对象设置一个事件回调,比如说为某个控件setOnClickListener;<br>
 其中设置的代码是这样的:</p>
-<div class="highlight"><pre><span class="nx">local</span> <span class="nx">viewclick_cb</span><span class="o">=</span><span class="p">{}</span>
-<span class="kd">function</span> <span class="nx">viewclick_cb</span><span class="p">.</span><span class="nx">onClick</span><span class="p">(</span><span class="nx">v</span><span class="p">)</span>
-    <span class="nx">self</span><span class="o">:</span><span class="nx">cb</span><span class="p">(</span><span class="nx">v</span><span class="p">)</span>  
-<span class="nx">end</span>
-<span class="nx">local</span> <span class="nx">listenerProxy</span>  <span class="o">=</span> <span class="nx">luajava</span><span class="p">.</span><span class="nx">createProxy</span><span class="p">(</span><span class="s1">&#39;android.view.View$OnClickListener&#39;</span><span class="p">,</span><span class="nx">viewclick_cb</span><span class="p">)</span>       
-<span class="nx">javaobjhandler</span><span class="o">:</span><span class="nx">setOnClickListener</span><span class="p">(</span><span class="nx">ListenerProxy</span><span class="p">)</span>   
+<div class="highlight"><pre><span></span><span class="kd">local</span> <span class="n">viewclick_cb</span><span class="o">=</span><span class="p">{}</span>
+<span class="k">function</span> <span class="nc">viewclick_cb</span><span class="p">.</span><span class="nf">onClick</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+    <span class="n">self</span><span class="p">:</span><span class="n">cb</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>  
+<span class="k">end</span>
+<span class="kd">local</span> <span class="n">listenerProxy</span>  <span class="o">=</span> <span class="n">luajava</span><span class="p">.</span><span class="n">createProxy</span><span class="p">(</span><span class="s1">&#39;</span><span class="s">android.view.View$OnClickListener&#39;</span><span class="p">,</span><span class="n">viewclick_cb</span><span class="p">)</span>       
+<span class="n">javaobjhandler</span><span class="p">:</span><span class="n">setOnClickListener</span><span class="p">(</span><span class="n">ListenerProxy</span><span class="p">)</span>   
 </pre></div>
 
 
 <p>lua和java交互时,对象生命周期管理分两种情况:</p>
 <blockquote>
-<p>1:java对象传递个lua虚拟机,lua虚拟机为java对象创建一个userdata,在globalref中增加一个引用,标记这个java对象正在被使用;同时,为这个userdata设置一个__gc元方法,当lua对象需要被释放时,_gc元方法回调,释放掉java对象的globaref ...</p></blockquote>
+<p>1:java对象传递个lua虚拟机,lua虚拟机为java对象创建一个userdata,在globalref中增加一个引用,标记这个java对象正在被使用;同时,为这个userdata设置一个__gc元方法,当lua对象需要被释放时,_gc元方法回调,释放掉java对象的globaref …</p></blockquote>
 					<br/ >
 					<a href="http://blog.aaapei.com/article/2014/02/luazai-kua-yu-yan-huan-jing-zhong-de-nei-cun-xie-lu">查看全文</a>
                 </div>
@@ -116,13 +147,13 @@
             <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
 <div class="meta">
     <div class="date">
-        <time datetime="2014-01-28T17:30:00.000000" itemprop="datePublished">2014-01-28</time>
+        <time datetime="2014-01-28T17:30:00.000000+0800" itemprop="datePublished">2014-01-28</time>
     </div>
     <div class="tags">
         <a href="http://blog.aaapei.com/tags/android">android</a>     </div>
 </div>                <h1 class="title" itemprop="name"><a href="http://blog.aaapei.com/article/2014/01/android-bitmap-tips" itemprop="url">android bitmap tips</a></h1>
                 <div class="entry-content" itemprop="description"><p>大部分android开发者只知道bitmap再使用之后，需要显式的调用一次bitmap.recycle，回收bitmap内存;  </p>
-<p>这个观点，在android3.0之后其实已经过时了，android3.0将bitmap所引用的位图资源从native heap移到虚拟机的heap空间，bitmap的生命周期由虚拟机管理，开发者只需要保证在应用中不在持有对bitmap的引用，即可保证不发生内存泄漏；位图资源的内存由GC进行回收；<br />
+<p>这个观点，在android3.0之后其实已经过时了，android3.0将bitmap所引用的位图资源从native heap移到虚拟机的heap空间，bitmap的生命周期由虚拟机管理，开发者只需要保证在应用中不在持有对bitmap的引用，即可保证不发生内存泄漏；位图资源的内存由GC进行回收；<br>
 将bitmap的位图内存转移到虚拟机heap后，由于位图资源本身较大，造成gc的概率的增加   </p>
 <h3>bitmap proxy</h3>
 <p>在一般的应用场景中，bitmap的引用一般是和imageview关联；当大量imageview持有对bitmap的引用时，虚拟机无法释放bitmap的内存，导致oom；</p>
@@ -140,7 +171,7 @@
             <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
 <div class="meta">
     <div class="date">
-        <time datetime="2013-12-29T00:00:00.000000" itemprop="datePublished">2013-12-29</time>
+        <time datetime="2013-12-29T00:00:00.000000+0800" itemprop="datePublished">2013-12-29</time>
     </div>
     <div class="tags">
         <a href="http://blog.aaapei.com/tags/lua">lua</a>     </div>
@@ -156,45 +187,6 @@
 好吧，个人觉得这种基础架构型的bridge，性能才是决定是否使用的第一要素，继续用luajava吧</p>
 					<br/ >
 					<a href="http://blog.aaapei.com/article/2013/12/jnluatu-cao">查看全文</a>
-                </div>
-                <div class="meta">
-                    <span class="author">Posted by <a href="http://blog.aaapei.com/author/zhengwen.html">zhengwen</a></span>
-                </div>
-            </article>
-            <hr/>
-            <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
-<div class="meta">
-    <div class="date">
-        <time datetime="2013-12-11T19:50:00.000000" itemprop="datePublished">2013-12-11</time>
-    </div>
-    <div class="tags">
-        <a href="http://blog.aaapei.com/tags/android">android</a> ,         <a href="http://blog.aaapei.com/tags/wei-xin">微信</a>     </div>
-</div>                <h1 class="title" itemprop="name"><a href="http://blog.aaapei.com/article/2013/12/wei-xin-de-jsbridgeshi-xian" itemprop="url">微信的jsbridge实现</a></h1>
-                <div class="entry-content" itemprop="description"><p>微信公共平台开放了几个操作webview界面的js接口<br />
-示例代码是这样的:  </p>
-<div class="highlight"><pre><span class="nx">WeixinJSBridge</span><span class="p">.</span><span class="nx">invoke</span><span class="p">(</span><span class="s1">&#39;getNetworkType&#39;</span><span class="p">,{},</span>
-    <span class="kd">function</span><span class="p">(</span><span class="nx">e</span><span class="p">){</span>
-        <span class="nx">WeixinJSBridge</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">e</span><span class="p">.</span><span class="nx">err_msg</span><span class="p">);</span>
-    <span class="p">});</span>
-</pre></div>
-
-
-<p>android的webview api中有开放过一个<em>addJavaScriptInterface</em>函数,这个函数的作用是在页面的Window中注入一个JS对象<br />
-如果你的应用中使用了这个api,建议先看一下国内安全领域第一人黑哥的这篇文章<a href="http://hi.baidu.com/hi_heige/item/9baf99f063331d58c9f3379a">android webview 漏洞背后的节操</a>,  </p>
-<p>没耐心的同学直接看结尾的解决方案吧:</p>
-<blockquote>
-<p>第1个方案是设置信任域，这个问题其实是不太靠谱的，在我之前在kcon里演讲《去年跨过的浏览器》里有很多信任域带来的安全问题<br />
- 第2个方案是使用 shouldOverrideUrlLoading 的方式，据说这个方案还是比较靠谱的，只是可能代价比较大<br />
- 第3个方案就是教育那些开发商，没有必要用webview的时候就不要用，不要java与js交互就不要用  </p>
-</blockquote>
-<p>不过,按黑哥这篇文章的想法,这个漏洞危险等级很低,可以无视之<br />
-暂时把安全问题放一边,Js对象的注入,对函数的参数类型有严格要求,它只能传递基本数据类型以及JSON<br />
-但微信的JsApi中,参数三是一个函数对象,那他是如果做到的呢</p>
-<h3>逆向</h3>
-<p>Android原生的机制既然不能支持函数对象的传递,于是猜测微信是否会对原始的api做了一层包装;<br />
-先下载weixin ...</p>
-					<br/ >
-					<a href="http://blog.aaapei.com/article/2013/12/wei-xin-de-jsbridgeshi-xian">查看全文</a>
                 </div>
                 <div class="meta">
                     <span class="author">Posted by <a href="http://blog.aaapei.com/author/zhengwen.html">zhengwen</a></span>

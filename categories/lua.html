@@ -83,28 +83,28 @@
             <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
 <div class="meta">
     <div class="date">
-        <time datetime="2014-02-19T19:50:00.000000" itemprop="datePublished">2014-02-19</time>
+        <time datetime="2014-02-19T19:50:00.000000+0800" itemprop="datePublished">2014-02-19</time>
     </div>
     <div class="tags">
         <a href="http://blog.aaapei.com/tags/lua">lua</a> ,         <a href="http://blog.aaapei.com/tags/luajava">luajava</a>     </div>
 </div>                <h1 class="title" itemprop="name"><a href="http://blog.aaapei.com/article/2014/02/luazai-kua-yu-yan-huan-jing-zhong-de-nei-cun-xie-lu" itemprop="url">lua在跨语言环境中的内存泄露</a></h1>
                 <div class="entry-content" itemprop="description"><p>前段时间在android环境中使用lua,采用的luabridge是luajava,遇到一个内存泄露问题,查了很久,终于定位了;</p>
-<p>场景是这样的:<br />
-1:在lua中创建了一个java对象,将jobject指针传递给java;对应在luajava中,即传递了一个luaobject给java;java保存了这个对象;<br />
-2:在Lua中需要对这个java对象设置一个事件回调,比如说为某个控件setOnClickListener;<br />
+<p>场景是这样的:<br>
+1:在lua中创建了一个java对象,将jobject指针传递给java;对应在luajava中,即传递了一个luaobject给java;java保存了这个对象;<br>
+2:在Lua中需要对这个java对象设置一个事件回调,比如说为某个控件setOnClickListener;<br>
 其中设置的代码是这样的:</p>
-<div class="highlight"><pre><span class="nx">local</span> <span class="nx">viewclick_cb</span><span class="o">=</span><span class="p">{}</span>
-<span class="kd">function</span> <span class="nx">viewclick_cb</span><span class="p">.</span><span class="nx">onClick</span><span class="p">(</span><span class="nx">v</span><span class="p">)</span>
-    <span class="nx">self</span><span class="o">:</span><span class="nx">cb</span><span class="p">(</span><span class="nx">v</span><span class="p">)</span>  
-<span class="nx">end</span>
-<span class="nx">local</span> <span class="nx">listenerProxy</span>  <span class="o">=</span> <span class="nx">luajava</span><span class="p">.</span><span class="nx">createProxy</span><span class="p">(</span><span class="s1">&#39;android.view.View$OnClickListener&#39;</span><span class="p">,</span><span class="nx">viewclick_cb</span><span class="p">)</span>       
-<span class="nx">javaobjhandler</span><span class="o">:</span><span class="nx">setOnClickListener</span><span class="p">(</span><span class="nx">ListenerProxy</span><span class="p">)</span>   
+<div class="highlight"><pre><span></span><span class="kd">local</span> <span class="n">viewclick_cb</span><span class="o">=</span><span class="p">{}</span>
+<span class="k">function</span> <span class="nc">viewclick_cb</span><span class="p">.</span><span class="nf">onClick</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+    <span class="n">self</span><span class="p">:</span><span class="n">cb</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>  
+<span class="k">end</span>
+<span class="kd">local</span> <span class="n">listenerProxy</span>  <span class="o">=</span> <span class="n">luajava</span><span class="p">.</span><span class="n">createProxy</span><span class="p">(</span><span class="s1">&#39;</span><span class="s">android.view.View$OnClickListener&#39;</span><span class="p">,</span><span class="n">viewclick_cb</span><span class="p">)</span>       
+<span class="n">javaobjhandler</span><span class="p">:</span><span class="n">setOnClickListener</span><span class="p">(</span><span class="n">ListenerProxy</span><span class="p">)</span>   
 </pre></div>
 
 
 <p>lua和java交互时,对象生命周期管理分两种情况:</p>
 <blockquote>
-<p>1:java对象传递个lua虚拟机,lua虚拟机为java对象创建一个userdata,在globalref中增加一个引用,标记这个java对象正在被使用;同时,为这个userdata设置一个__gc元方法,当lua对象需要被释放时,_gc元方法回调,释放掉java对象的globaref ...</p></blockquote>
+<p>1:java对象传递个lua虚拟机,lua虚拟机为java对象创建一个userdata,在globalref中增加一个引用,标记这个java对象正在被使用;同时,为这个userdata设置一个__gc元方法,当lua对象需要被释放时,_gc元方法回调,释放掉java对象的globaref …</p></blockquote>
 					<br/ >
 					<a href="http://blog.aaapei.com/article/2014/02/luazai-kua-yu-yan-huan-jing-zhong-de-nei-cun-xie-lu">查看全文</a>
                 </div>
@@ -116,7 +116,7 @@
             <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
 <div class="meta">
     <div class="date">
-        <time datetime="2013-12-29T00:00:00.000000" itemprop="datePublished">2013-12-29</time>
+        <time datetime="2013-12-29T00:00:00.000000+0800" itemprop="datePublished">2013-12-29</time>
     </div>
     <div class="tags">
         <a href="http://blog.aaapei.com/tags/lua">lua</a>     </div>
@@ -141,22 +141,22 @@
             <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
 <div class="meta">
     <div class="date">
-        <time datetime="2013-12-02T20:20:00.000000" itemprop="datePublished">2013-12-02</time>
+        <time datetime="2013-12-02T20:20:00.000000+0800" itemprop="datePublished">2013-12-02</time>
     </div>
     <div class="tags">
         <a href="http://blog.aaapei.com/tags/android">android</a> ,         <a href="http://blog.aaapei.com/tags/lua">lua</a>     </div>
 </div>                <h1 class="title" itemprop="name"><a href="http://blog.aaapei.com/article/2013/12/luajavaxing-neng-you-hua" itemprop="url">luajava性能优化</a></h1>
-                <div class="entry-content" itemprop="description"><p>最近在做一个lua的android项目,对于lua的生态环境完全陌生,所以选用了个文档资料最全的lua bridge:<em>luajava</em><br />
+                <div class="entry-content" itemprop="description"><p>最近在做一个lua的android项目,对于lua的生态环境完全陌生,所以选用了个文档资料最全的lua bridge:<em>luajava</em><br>
 luajava目前只支持到lua5.1,不过升级到5.2困难不大,主要是一些宏开关以及静态变量;然而实际运行的时候发现卡的很不行,ui频繁掉祯,profile后发现90%+的cpu耗时在luajava中  </p>
 <p>看了一下luajava本身代码量不大;索性就追了一下,luajava的native层就一个luajava.c,java层,除了LuaJavaApi.java,其他java类都是Value Object</p>
 <h3>lua逻辑分析</h3>
 <p>先看lua创建java object的代码,luajava.c中</p>
-<div class="highlight"><pre><span class="kt">int</span> <span class="nf">javaNewInstance</span><span class="p">(</span> <span class="n">lua_State</span> <span class="o">*</span> <span class="n">L</span> <span class="p">)</span>
+<div class="highlight"><pre><span></span><span class="kt">int</span> <span class="nf">javaNewInstance</span><span class="p">(</span> <span class="n">lua_State</span> <span class="o">*</span> <span class="n">L</span> <span class="p">)</span>
 <span class="p">{</span>     
     <span class="c1">//some code …..</span>
     <span class="n">method</span>  <span class="o">=</span> <span class="p">(</span> <span class="o">*</span><span class="n">javaEnv</span> <span class="p">)</span><span class="o">-&gt;</span><span class="n">GetStaticMethodID</span><span class="p">(</span> <span class="n">javaEnv</span> <span class="p">,</span> <span class="n">luajava_api_class</span> <span class="p">,</span> <span class="s">&quot;javaNewInstance&quot;</span> <span class="p">,</span><span class="s">&quot;(ILjava/lang/String;)I&quot;</span> <span class="p">);</span>
      <span class="c1">//先调用java层创建javaobject</span>
-    <span class="n">javaClassName</span> <span class="o">=</span> <span class="p">(</span> <span class="o">*</span><span class="n">javaEnv</span> <span class="p">)</span><span class="o">-&gt;</span><span class="n">NewStringUTF</span><span class="p">(</span> <span class="n">javaEnv</span> <span class="p">,</span> <span class="n">className ...</span></pre></div>
+    <span class="n">javaClassName</span> <span class="o">=</span> <span class="p">(</span> <span class="o">*</span><span class="n">javaEnv</span> <span class="p">)</span><span class="o">-&gt;</span><span class="n">NewStringUTF</span><span class="p">(</span> <span class="n">javaEnv</span> <span class="p">,</span> <span class="n">className …</span></pre></div>
 					<br/ >
 					<a href="http://blog.aaapei.com/article/2013/12/luajavaxing-neng-you-hua">查看全文</a>
                 </div>

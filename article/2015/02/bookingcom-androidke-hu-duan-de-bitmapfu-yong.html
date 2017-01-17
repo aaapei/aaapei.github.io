@@ -16,8 +16,8 @@
                 <meta property="og:type" content="article"/>
                 <meta property="og:title" content="booking.com android客户端的bitmap复用"/>
                 <meta property="og:url" content="http://blog.aaapei.com/article/2015/02/bookingcom-androidke-hu-duan-de-bitmapfu-yong"/>
-                <meta property="og:description" content="前言 被鞭炮吵得睡不着觉，rss中找一篇简单的文档翻译下，原文链接：http://blog.booking.com/android-reuse-bitmaps.html，大部分团队应该都做过这个bitmap优化，不过估计设置过BitmapFactory.Options.inTempStorage参数的应该不多 :) booking.com android客户端在新版本的增加了一个新功能：酒店的图片集合 不幸的是，增加了这个新功能后，发现这个应用的内存消耗增长了20%。图片集的界面的滑动有明显的卡顿，经定位，我们发现viewpager加载图片时的gc问题造成了以上的问题。由于应用的图片资源多；控件布局层次复杂；数据量较大，造成内存的申请很容易触发GC。 当申请bitmap内存时，logcat输出信息如下： GC_FOR_ALLOC freed 3255K, 20% free 21813K/26980K, paused 62ms, total 62ms GC_FOR_ALLOC freed 710K ..."/>
-                <meta name="description" content="前言 被鞭炮吵得睡不着觉，rss中找一篇简单的文档翻译下，原文链接：http://blog.booking.com/android-reuse-bitmaps.html，大部分团队应该都做过这个bitmap优化，不过估计设置过BitmapFactory.Options.inTempStorage参数的应该不多 :) booking.com android客户端在新版本的增加了一个新功能：酒店的图片集合 不幸的是，增加了这个新功能后，发现这个应用的内存消耗增长了20%。图片集的界面的滑动有明显的卡顿，经定位，我们发现viewpager加载图片时的gc问题造成了以上的问题。由于应用的图片资源多；控件布局层次复杂；数据量较大，造成内存的申请很容易触发GC。 当申请bitmap内存时，logcat输出信息如下： GC_FOR_ALLOC freed 3255K, 20% free 21813K/26980K, paused 62ms, total 62ms GC_FOR_ALLOC freed 710K ...">
+                <meta property="og:description" content="前言 被鞭炮吵得睡不着觉，rss中找一篇简单的文档翻译下，原文链接：http://blog.booking.com/android-reuse-bitmaps.html，大部分团队应该都做过这个bitmap优化，不过估计设置过BitmapFactory.Options.inTempStorage参数的应该不多 :) booking.com android客户端在新版本的增加了一个新功能：酒店的图片集合 不幸的是，增加了这个新功能后，发现这个应用的内存消耗增长了20%。图片集的界面的滑动有明显的卡顿，经定位，我们发现viewpager加载图片时的gc问题造成了以上的问题。由于应用的图片资源多；控件布局层次复杂；数据量较大，造成内存的申请很容易触发GC。 当申请bitmap内存时，logcat输出信息如下： GC_FOR_ALLOC freed 3255K, 20% free 21813K/26980K, paused 62ms, total 62ms GC_FOR_ALLOC freed 710K, 20% free 30242K/37740K, paused 72ms …"/>
+                <meta name="description" content="前言 被鞭炮吵得睡不着觉，rss中找一篇简单的文档翻译下，原文链接：http://blog.booking.com/android-reuse-bitmaps.html，大部分团队应该都做过这个bitmap优化，不过估计设置过BitmapFactory.Options.inTempStorage参数的应该不多 :) booking.com android客户端在新版本的增加了一个新功能：酒店的图片集合 不幸的是，增加了这个新功能后，发现这个应用的内存消耗增长了20%。图片集的界面的滑动有明显的卡顿，经定位，我们发现viewpager加载图片时的gc问题造成了以上的问题。由于应用的图片资源多；控件布局层次复杂；数据量较大，造成内存的申请很容易触发GC。 当申请bitmap内存时，logcat输出信息如下： GC_FOR_ALLOC freed 3255K, 20% free 21813K/26980K, paused 62ms, total 62ms GC_FOR_ALLOC freed 710K, 20% free 30242K/37740K, paused 72ms …">
 
 
 
@@ -86,7 +86,7 @@
             <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
 <div class="meta">
     <div class="date">
-        <time datetime="2015-02-19T00:00:00.000000" itemprop="datePublished">2015-02-19</time>
+        <time datetime="2015-02-19T00:00:00.000000+0800" itemprop="datePublished">2015-02-19</time>
     </div>
     <div class="tags">
         <a href="http://blog.aaapei.com/tags/bitmapxing-neng-you-hua">bitmap，性能优化</a>     </div>
@@ -95,12 +95,12 @@
                     <h3>前言</h3>
 <p>被鞭炮吵得睡不着觉，rss中找一篇简单的文档翻译下，原文链接：http://blog.booking.com/android-reuse-bitmaps.html，大部分团队应该都做过这个bitmap优化，不过估计设置过BitmapFactory.Options.inTempStorage参数的应该不多 :)</p>
 <p>booking.com android客户端在新版本的增加了一个新功能：酒店的图片集合</p>
-<p><img alt="此处输入图片的描述" src="http://blog.booking.com/static/android-reuse-bitmaps/hotel_photo_header.png" /></p>
+<p><img alt="此处输入图片的描述" src="http://blog.booking.com/static/android-reuse-bitmaps/hotel_photo_header.png"></p>
 <p>不幸的是，增加了这个新功能后，发现这个应用的内存消耗增长了20%。图片集的界面的滑动有明显的卡顿，经定位，我们发现viewpager加载图片时的gc问题造成了以上的问题。由于应用的图片资源多；控件布局层次复杂；数据量较大，造成内存的申请很容易触发GC。</p>
 <p>当申请bitmap内存时，logcat输出信息如下：</p>
-<div class="highlight"><pre><span class="n">GC_FOR_ALLOC</span> <span class="n">freed</span> <span class="mi">3255</span><span class="n">K</span><span class="p">,</span> <span class="mi">20</span><span class="o">%</span> <span class="n">free</span> <span class="mi">21813</span><span class="n">K</span><span class="o">/</span><span class="mi">26980</span><span class="n">K</span><span class="p">,</span> <span class="n">paused</span> <span class="mi">62</span><span class="n">ms</span><span class="p">,</span> <span class="n">total</span> <span class="mi">62</span><span class="n">ms</span>
-<span class="n">GC_FOR_ALLOC</span> <span class="n">freed</span> <span class="mi">710</span><span class="n">K</span><span class="p">,</span> <span class="mi">20</span><span class="o">%</span> <span class="n">free</span> <span class="mi">30242</span><span class="n">K</span><span class="o">/</span><span class="mi">37740</span><span class="n">K</span><span class="p">,</span> <span class="n">paused</span> <span class="mi">72</span><span class="n">ms</span><span class="p">,</span> <span class="n">total</span> <span class="mi">72</span><span class="n">ms</span>
-<span class="n">GC_FOR_ALLOC</span> <span class="n">freed</span> <span class="o">&lt;</span><span class="mi">1</span><span class="n">K</span><span class="p">,</span> <span class="mi">20</span><span class="o">%</span> <span class="n">free</span> <span class="mi">31778</span><span class="n">K</span><span class="o">/</span><span class="mi">39280</span><span class="n">K</span><span class="p">,</span> <span class="n">paused</span> <span class="mi">74</span><span class="n">ms</span><span class="p">,</span> <span class="n">total</span> <span class="mi">74</span><span class="n">ms</span>
+<div class="highlight"><pre><span></span>GC_FOR_ALLOC freed 3255K, 20% free 21813K/26980K, paused 62ms, total 62ms
+GC_FOR_ALLOC freed 710K, 20% free 30242K/37740K, paused 72ms, total 72ms
+GC_FOR_ALLOC freed &lt;1K, 20% free 31778K/39280K, paused 74ms, total 74ms
 </pre></div>
 
 
@@ -109,34 +109,34 @@
 <p>基于这个api，我们在viewpager adapter中抽象了一个图片池管理图片复用。当一个imageview移除屏幕以外时，apater管理bitmap的生命周期，将其关联的bitmap buffer内存放置到图片池中而不是直接销毁。</p>
 <h3>bitmap的生命周期管理</h3>
 <p>为了管理bitmap内存，需要为bitmap进行引用计数，引用技术的接口是这样的；
-<img alt="此处输入图片的描述" src="http://blog.booking.com/static/android-reuse-bitmaps/bitmap_pool_uml.png" /></p>
-<div class="highlight"><pre><span class="n">package</span> <span class="n">com</span><span class="p">.</span><span class="n">booking</span><span class="p">.</span><span class="n">util</span><span class="p">.</span><span class="n">bitmap</span><span class="p">;</span>
+<img alt="此处输入图片的描述" src="http://blog.booking.com/static/android-reuse-bitmaps/bitmap_pool_uml.png"></p>
+<div class="highlight"><pre><span></span><span class="n">package</span> <span class="n">com</span><span class="o">.</span><span class="n">booking</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">bitmap</span><span class="p">;</span>
 
-<span class="n">import</span> <span class="n">android</span><span class="p">.</span><span class="n">graphics</span><span class="p">.</span><span class="n">Bitmap</span><span class="p">;</span>
+<span class="kn">import</span> <span class="nn">android.graphics.Bitmap</span><span class="p">;</span>
 
-<span class="cm">/**</span>
-<span class="cm"> * A reference-counted Bitmap object. The Bitmap is not really recycled</span>
-<span class="cm"> * until the reference counter drops to zero.</span>
-<span class="cm"> */</span>
+<span class="o">/**</span>
+ <span class="o">*</span> <span class="n">A</span> <span class="n">reference</span><span class="o">-</span><span class="n">counted</span> <span class="n">Bitmap</span> <span class="nb">object</span><span class="o">.</span> <span class="n">The</span> <span class="n">Bitmap</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">really</span> <span class="n">recycled</span>
+ <span class="o">*</span> <span class="n">until</span> <span class="n">the</span> <span class="n">reference</span> <span class="n">counter</span> <span class="n">drops</span> <span class="n">to</span> <span class="n">zero</span><span class="o">.</span>
+ <span class="o">*/</span>
 <span class="n">public</span> <span class="n">interface</span> <span class="n">IManagedBitmap</span> <span class="p">{</span>
 
-    <span class="cm">/**</span>
-<span class="cm">     * Get the underlying {@link Bitmap} object.</span>
-<span class="cm">     * NEVER call Bitmap.recycle() on this object.</span>
-<span class="cm">     */</span>
+    <span class="o">/**</span>
+     <span class="o">*</span> <span class="n">Get</span> <span class="n">the</span> <span class="n">underlying</span> <span class="p">{</span><span class="nd">@link</span> <span class="n">Bitmap</span><span class="p">}</span> <span class="nb">object</span><span class="o">.</span>
+     <span class="o">*</span> <span class="n">NEVER</span> <span class="n">call</span> <span class="n">Bitmap</span><span class="o">.</span><span class="n">recycle</span><span class="p">()</span> <span class="n">on</span> <span class="n">this</span> <span class="nb">object</span><span class="o">.</span>
+     <span class="o">*/</span>
     <span class="n">Bitmap</span> <span class="n">getBitmap</span><span class="p">();</span>
 
-    <span class="cm">/**</span>
-<span class="cm">     * Decrease the reference counter and recycle the underlying Bitmap</span>
-<span class="cm">     * if there are no more references.</span>
-<span class="cm">     */</span>
-    <span class="kt">void</span> <span class="nf">recycle</span><span class="p">();</span>
+    <span class="o">/**</span>
+     <span class="o">*</span> <span class="n">Decrease</span> <span class="n">the</span> <span class="n">reference</span> <span class="n">counter</span> <span class="ow">and</span> <span class="n">recycle</span> <span class="n">the</span> <span class="n">underlying</span> <span class="n">Bitmap</span>
+     <span class="o">*</span> <span class="k">if</span> <span class="n">there</span> <span class="n">are</span> <span class="n">no</span> <span class="n">more</span> <span class="n">references</span><span class="o">.</span>
+     <span class="o">*/</span>
+    <span class="n">void</span> <span class="n">recycle</span><span class="p">();</span>
 
-    <span class="cm">/**</span>
-<span class="cm">     * Increase the reference counter.</span>
-<span class="cm">     * @return self</span>
-<span class="cm">     */</span>
-    <span class="n">IManagedBitmap</span> <span class="nf">retain</span><span class="p">();</span>
+    <span class="o">/**</span>
+     <span class="o">*</span> <span class="n">Increase</span> <span class="n">the</span> <span class="n">reference</span> <span class="n">counter</span><span class="o">.</span>
+     <span class="o">*</span> <span class="nd">@return</span> <span class="bp">self</span>
+     <span class="o">*/</span>
+    <span class="n">IManagedBitmap</span> <span class="n">retain</span><span class="p">();</span>
 <span class="p">}</span>
 </pre></div>
 
@@ -145,96 +145,96 @@
 bitmapPool类不直接引用bitmap，而通过IManagedBitmap进行bitmap的引用计数。</p>
 <p>由于我们只在主线程进行imageview的创建和销毁，我们被未对BitmapPool进行线程安全同步，如果你需要在后台线程申请位图资源，请自行进行线程同步。</p>
 <p>BitmapPool的代码片段是这样的:</p>
-<div class="highlight"><pre><span class="nx">package</span> <span class="nx">com.booking.util.bitmap</span><span class="p">;</span>
+<div class="highlight"><pre><span></span><span class="n">package</span> <span class="n">com</span><span class="o">.</span><span class="n">booking</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">bitmap</span><span class="p">;</span>
 
-<span class="k">import</span> <span class="nx">java.util.Stack</span><span class="p">;</span>
+<span class="kn">import</span> <span class="nn">java.util.Stack</span><span class="p">;</span>
 
-<span class="k">import</span> <span class="nx">android.graphics.Bitmap</span><span class="p">;</span>
-<span class="k">import</span> <span class="nx">android.os.Handler</span><span class="p">;</span>
+<span class="kn">import</span> <span class="nn">android.graphics.Bitmap</span><span class="p">;</span>
+<span class="kn">import</span> <span class="nn">android.os.Handler</span><span class="p">;</span>
 
-<span class="cm">/**</span>
-<span class="cm"> * A pool of fixed-size Bitmaps. Leases a managed Bitmap object</span>
-<span class="cm"> * which is tied to this pool. Bitmaps are put back to the pool</span>
-<span class="cm"> * instead of actual recycling.</span>
-<span class="cm"> *</span>
-<span class="cm"> * WARNING: This class is NOT thread safe, intended for use</span>
-<span class="cm"> *          from the main thread only.</span>
-<span class="cm"> */</span>
-<span class="k">public</span> <span class="nf">class</span> <span class="nx">BitmapPool</span> <span class="p">{</span>
-    <span class="k">private</span> <span class="nf">final</span> <span class="nx">int</span> <span class="nb">width</span><span class="p">;</span>
-    <span class="k">private</span> <span class="nf">final</span> <span class="nx">int</span> <span class="nb">height</span><span class="p">;</span>
-    <span class="k">private</span> <span class="nf">final</span> <span class="nx">Bitmap.Config</span> <span class="nx">config</span><span class="p">;</span>
-    <span class="k">private</span> <span class="nf">final</span> <span class="nb">Stack</span><span class="o">&lt;</span><span class="nx">Bitmap</span><span class="o">&gt;</span> <span class="n">bitmaps</span> <span class="o">=</span> <span class="nb">new</span> <span class="nb">Stack</span><span class="o">&lt;</span><span class="nx">Bitmap</span><span class="o">&gt;</span><span class="p">();</span>
-    <span class="k">private</span> <span class="nf">boolean</span> <span class="nx">isRecycled</span><span class="p">;</span>
+<span class="o">/**</span>
+ <span class="o">*</span> <span class="n">A</span> <span class="n">pool</span> <span class="n">of</span> <span class="n">fixed</span><span class="o">-</span><span class="n">size</span> <span class="n">Bitmaps</span><span class="o">.</span> <span class="n">Leases</span> <span class="n">a</span> <span class="n">managed</span> <span class="n">Bitmap</span> <span class="nb">object</span>
+ <span class="o">*</span> <span class="n">which</span> <span class="ow">is</span> <span class="n">tied</span> <span class="n">to</span> <span class="n">this</span> <span class="n">pool</span><span class="o">.</span> <span class="n">Bitmaps</span> <span class="n">are</span> <span class="n">put</span> <span class="n">back</span> <span class="n">to</span> <span class="n">the</span> <span class="n">pool</span>
+ <span class="o">*</span> <span class="n">instead</span> <span class="n">of</span> <span class="n">actual</span> <span class="n">recycling</span><span class="o">.</span>
+ <span class="o">*</span>
+ <span class="o">*</span> <span class="n">WARNING</span><span class="p">:</span> <span class="n">This</span> <span class="k">class</span> <span class="nc">is</span> <span class="n">NOT</span> <span class="n">thread</span> <span class="n">safe</span><span class="p">,</span> <span class="n">intended</span> <span class="k">for</span> <span class="n">use</span>
+ <span class="o">*</span>          <span class="kn">from</span> <span class="nn">the</span> <span class="nn">main</span> <span class="nn">thread</span> <span class="nn">only.</span>
+ <span class="o">*/</span>
+<span class="n">public</span> <span class="k">class</span> <span class="nc">BitmapPool</span> <span class="p">{</span>
+    <span class="n">private</span> <span class="n">final</span> <span class="nb">int</span> <span class="n">width</span><span class="p">;</span>
+    <span class="n">private</span> <span class="n">final</span> <span class="nb">int</span> <span class="n">height</span><span class="p">;</span>
+    <span class="n">private</span> <span class="n">final</span> <span class="n">Bitmap</span><span class="o">.</span><span class="n">Config</span> <span class="n">config</span><span class="p">;</span>
+    <span class="n">private</span> <span class="n">final</span> <span class="n">Stack</span><span class="o">&lt;</span><span class="n">Bitmap</span><span class="o">&gt;</span> <span class="n">bitmaps</span> <span class="o">=</span> <span class="n">new</span> <span class="n">Stack</span><span class="o">&lt;</span><span class="n">Bitmap</span><span class="o">&gt;</span><span class="p">();</span>
+    <span class="n">private</span> <span class="n">boolean</span> <span class="n">isRecycled</span><span class="p">;</span>
 
-    <span class="k">private</span> <span class="nf">final</span> <span class="nx">Handler</span> <span class="n">handler</span> <span class="o">=</span> <span class="nb">new</span> <span class="nx">Handler</span><span class="p">();</span>
+    <span class="n">private</span> <span class="n">final</span> <span class="n">Handler</span> <span class="n">handler</span> <span class="o">=</span> <span class="n">new</span> <span class="n">Handler</span><span class="p">();</span>
 
-    <span class="cm">/**</span>
-<span class="cm">     * Construct a Bitmap pool with desired Bitmap parameters</span>
-<span class="cm">     */</span>
-    <span class="k">public</span> <span class="nf">BitmapPool</span><span class="p">(</span><span class="na">int</span> <span class="nx">bitmapWidth</span><span class="p">,</span>
-                      <span class="na">int</span> <span class="nx">bitmapHeight</span><span class="p">,</span>
-                      <span class="na">Bitmap.Config</span> <span class="nx">config</span><span class="p">)</span>
+    <span class="o">/**</span>
+     <span class="o">*</span> <span class="n">Construct</span> <span class="n">a</span> <span class="n">Bitmap</span> <span class="n">pool</span> <span class="k">with</span> <span class="n">desired</span> <span class="n">Bitmap</span> <span class="n">parameters</span>
+     <span class="o">*/</span>
+    <span class="n">public</span> <span class="n">BitmapPool</span><span class="p">(</span><span class="nb">int</span> <span class="n">bitmapWidth</span><span class="p">,</span>
+                      <span class="nb">int</span> <span class="n">bitmapHeight</span><span class="p">,</span>
+                      <span class="n">Bitmap</span><span class="o">.</span><span class="n">Config</span> <span class="n">config</span><span class="p">)</span>
     <span class="p">{</span>
-        <span class="n">this.width</span> <span class="o">=</span> <span class="nx">bitmapWidth</span><span class="p">;</span>
-        <span class="n">this.height</span> <span class="o">=</span> <span class="nx">bitmapHeight</span><span class="p">;</span>
-        <span class="n">this.config</span> <span class="o">=</span> <span class="nx">config</span><span class="p">;</span>
+        <span class="n">this</span><span class="o">.</span><span class="n">width</span> <span class="o">=</span> <span class="n">bitmapWidth</span><span class="p">;</span>
+        <span class="n">this</span><span class="o">.</span><span class="n">height</span> <span class="o">=</span> <span class="n">bitmapHeight</span><span class="p">;</span>
+        <span class="n">this</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">config</span><span class="p">;</span>
     <span class="p">}</span>
 
-    <span class="cm">/**</span>
-<span class="cm">     * Destroy the pool. Any leased IManagedBitmap items remain valid</span>
-<span class="cm">     * until they are recycled.</span>
-<span class="cm">     */</span>
-    <span class="k">public</span> <span class="nf">void</span> <span class="nx">recycle</span><span class="p">()</span> <span class="p">{</span>
-        <span class="n">isRecycled</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
-        <span class="nb">for</span> <span class="p">(</span><span class="nx">Bitmap</span> <span class="nx">bitmap</span> <span class="p">:</span> <span class="nx">bitmaps</span><span class="p">)</span> <span class="p">{</span>
-            <span class="nx">bitmap.recycle</span><span class="p">();</span>
+    <span class="o">/**</span>
+     <span class="o">*</span> <span class="n">Destroy</span> <span class="n">the</span> <span class="n">pool</span><span class="o">.</span> <span class="n">Any</span> <span class="n">leased</span> <span class="n">IManagedBitmap</span> <span class="n">items</span> <span class="n">remain</span> <span class="n">valid</span>
+     <span class="o">*</span> <span class="n">until</span> <span class="n">they</span> <span class="n">are</span> <span class="n">recycled</span><span class="o">.</span>
+     <span class="o">*/</span>
+    <span class="n">public</span> <span class="n">void</span> <span class="n">recycle</span><span class="p">()</span> <span class="p">{</span>
+        <span class="n">isRecycled</span> <span class="o">=</span> <span class="n">true</span><span class="p">;</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">Bitmap</span> <span class="n">bitmap</span> <span class="p">:</span> <span class="n">bitmaps</span><span class="p">)</span> <span class="p">{</span>
+            <span class="n">bitmap</span><span class="o">.</span><span class="n">recycle</span><span class="p">();</span>
         <span class="p">}</span>
-        <span class="nx">bitmaps.clear</span><span class="p">();</span>
+        <span class="n">bitmaps</span><span class="o">.</span><span class="n">clear</span><span class="p">();</span>
     <span class="p">}</span>
 
-    <span class="cm">/**</span>
-<span class="cm">     * Get a Bitmap from the pool or create a new one.</span>
-<span class="cm">     * @return a managed Bitmap tied to this pool</span>
-<span class="cm">     */</span>
-    <span class="k">public</span> <span class="nf">IManagedBitmap</span> <span class="nx">getBitmap</span><span class="p">()</span> <span class="p">{</span>
-        <span class="k">return</span> <span class="nb">new</span> <span class="nx">LeasedBitmap</span><span class="p">(</span><span class="nx">bitmaps.isEmpty</span><span class="p">()</span>
-            <span class="o">?</span> <span class="nx">Bitmap.createBitmap</span><span class="p">(</span><span class="nb">width</span><span class="p">,</span> <span class="nb">height</span><span class="p">,</span> <span class="nx">config</span><span class="p">)</span> <span class="p">:</span> <span class="nx">bitmaps.pop</span><span class="p">());</span>
+    <span class="o">/**</span>
+     <span class="o">*</span> <span class="n">Get</span> <span class="n">a</span> <span class="n">Bitmap</span> <span class="kn">from</span> <span class="nn">the</span> <span class="nn">pool</span> <span class="nn">or</span> <span class="nn">create</span> <span class="nn">a</span> <span class="nn">new</span> <span class="nn">one.</span>
+     <span class="o">*</span> <span class="nd">@return</span> <span class="n">a</span> <span class="n">managed</span> <span class="n">Bitmap</span> <span class="n">tied</span> <span class="n">to</span> <span class="n">this</span> <span class="n">pool</span>
+     <span class="o">*/</span>
+    <span class="n">public</span> <span class="n">IManagedBitmap</span> <span class="n">getBitmap</span><span class="p">()</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="n">new</span> <span class="n">LeasedBitmap</span><span class="p">(</span><span class="n">bitmaps</span><span class="o">.</span><span class="n">isEmpty</span><span class="p">()</span>
+            <span class="err">?</span> <span class="n">Bitmap</span><span class="o">.</span><span class="n">createBitmap</span><span class="p">(</span><span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="n">config</span><span class="p">)</span> <span class="p">:</span> <span class="n">bitmaps</span><span class="o">.</span><span class="n">pop</span><span class="p">());</span>
     <span class="p">}</span>
 
-    <span class="k">private</span> <span class="nf">class</span> <span class="nx">LeasedBitmap</span> <span class="nx">implements</span> <span class="nx">IManagedBitmap</span> <span class="p">{</span>
-        <span class="k">private</span> <span class="nf">int</span> <span class="n">referenceCounter</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
-        <span class="k">private</span> <span class="nf">final</span> <span class="nx">Bitmap</span> <span class="nx">bitmap</span><span class="p">;</span>
+    <span class="n">private</span> <span class="k">class</span> <span class="nc">LeasedBitmap</span> <span class="n">implements</span> <span class="n">IManagedBitmap</span> <span class="p">{</span>
+        <span class="n">private</span> <span class="nb">int</span> <span class="n">referenceCounter</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+        <span class="n">private</span> <span class="n">final</span> <span class="n">Bitmap</span> <span class="n">bitmap</span><span class="p">;</span>
 
-        <span class="k">private</span> <span class="nf">LeasedBitmap</span><span class="p">(</span><span class="na">Bitmap</span> <span class="nx">bitmap</span><span class="p">)</span> <span class="p">{</span>
-            <span class="n">this.bitmap</span> <span class="o">=</span> <span class="nx">bitmap</span><span class="p">;</span>
+        <span class="n">private</span> <span class="n">LeasedBitmap</span><span class="p">(</span><span class="n">Bitmap</span> <span class="n">bitmap</span><span class="p">)</span> <span class="p">{</span>
+            <span class="n">this</span><span class="o">.</span><span class="n">bitmap</span> <span class="o">=</span> <span class="n">bitmap</span><span class="p">;</span>
         <span class="p">}</span>
 
-        <span class="p">@</span><span class="nx">Override</span>
-        <span class="k">public</span> <span class="nf">Bitmap</span> <span class="nx">getBitmap</span><span class="p">()</span> <span class="p">{</span>
-            <span class="k">return</span> <span class="nx">bitmap</span><span class="p">;</span>
+        <span class="nd">@Override</span>
+        <span class="n">public</span> <span class="n">Bitmap</span> <span class="n">getBitmap</span><span class="p">()</span> <span class="p">{</span>
+            <span class="k">return</span> <span class="n">bitmap</span><span class="p">;</span>
         <span class="p">}</span>
 
-        <span class="p">@</span><span class="nx">Override</span>
-        <span class="k">public</span> <span class="nf">void</span> <span class="nx">recycle</span><span class="p">()</span> <span class="p">{</span>
-            <span class="nx">handler.post</span><span class="p">(</span><span class="nb">new</span> <span class="nx">Runnable</span><span class="p">()</span> <span class="p">{</span>
-                <span class="p">@</span><span class="nx">Override</span>
-                <span class="k">public</span> <span class="nf">void</span> <span class="nb">run</span><span class="p">()</span> <span class="p">{</span>
-                    <span class="k">if</span> <span class="p">(</span><span class="o">--</span><span class="nx">referenceCounter</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
-                        <span class="k">if</span> <span class="p">(</span><span class="nx">isRecycled</span><span class="p">)</span> <span class="p">{</span>
-                            <span class="nx">bitmap.recycle</span><span class="p">();</span>
+        <span class="nd">@Override</span>
+        <span class="n">public</span> <span class="n">void</span> <span class="n">recycle</span><span class="p">()</span> <span class="p">{</span>
+            <span class="n">handler</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="n">new</span> <span class="n">Runnable</span><span class="p">()</span> <span class="p">{</span>
+                <span class="nd">@Override</span>
+                <span class="n">public</span> <span class="n">void</span> <span class="n">run</span><span class="p">()</span> <span class="p">{</span>
+                    <span class="k">if</span> <span class="p">(</span><span class="o">--</span><span class="n">referenceCounter</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+                        <span class="k">if</span> <span class="p">(</span><span class="n">isRecycled</span><span class="p">)</span> <span class="p">{</span>
+                            <span class="n">bitmap</span><span class="o">.</span><span class="n">recycle</span><span class="p">();</span>
                         <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
-                            <span class="nx">bitmaps.push</span><span class="p">(</span><span class="nx">bitmap</span><span class="p">);</span>
+                            <span class="n">bitmaps</span><span class="o">.</span><span class="n">push</span><span class="p">(</span><span class="n">bitmap</span><span class="p">);</span>
                         <span class="p">}</span>
                     <span class="p">}</span>
                 <span class="p">}</span>
             <span class="p">});</span>
         <span class="p">}</span>
 
-        <span class="p">@</span><span class="nx">Override</span>
-        <span class="k">public</span> <span class="nf">IManagedBitmap</span> <span class="nx">retain</span><span class="p">()</span> <span class="p">{</span>
-            <span class="o">++</span><span class="nx">referenceCounter</span><span class="p">;</span>
-            <span class="k">return</span> <span class="nx">this</span><span class="p">;</span>
+        <span class="nd">@Override</span>
+        <span class="n">public</span> <span class="n">IManagedBitmap</span> <span class="n">retain</span><span class="p">()</span> <span class="p">{</span>
+            <span class="o">++</span><span class="n">referenceCounter</span><span class="p">;</span>
+            <span class="k">return</span> <span class="n">this</span><span class="p">;</span>
         <span class="p">}</span>
     <span class="p">}</span>
 <span class="p">}</span>
@@ -245,7 +245,7 @@ bitmapPool类不直接引用bitmap，而通过IManagedBitmap进行bitmap的引�
 <p>Booking.com客户端的网络通信层使用Vollery框架，默认情况下，Volley通过ImageRequest进行网络图片的bitmap的获取，为了和ImagePool集成，我们实现了一个自定义的ImageRequest（ReusableImageRequest）,ReusableImageRequest内部持有一个IManagedBitmap进行bitmap的解码。
 为了避免内存泄漏，当ReusableImageRequest被取消时，需要有机制通知IManagedBitmap进行引用释放，因此，我们为ReusableImageRequest扩展了一个onFinished方法。</p>
 <p>与volley的结构图是这样的：</p>
-<p><img alt="此处输入图片的描述" src="http://blog.booking.com/static/android-reuse-bitmaps/volley_uml.png" /></p>
+<p><img alt="此处输入图片的描述" src="http://blog.booking.com/static/android-reuse-bitmaps/volley_uml.png"></p>
 <h3>其他工作</h3>
 <p>当我们实现了一个自定义的ImageRequest时，我们还利用 
 <a href="http://developer.android.com/reference/android/graphics/BitmapFactory.Options.html#inTempStorage">BitmapFactory.Options.inTempStorage</a>. 参数进行了图片解码的优化。inTempStorege可以预申请一块内存，对所有解码过程中指定相同的内存，以达到减少临时内存的目的。</p>
@@ -253,16 +253,20 @@ bitmapPool类不直接引用bitmap，而通过IManagedBitmap进行bitmap的引�
             </article>
                 <section id="comment">
                     <h1 class="title">Comments</h1>
-                    <div id="disqus_thread" aria-live="polite">
-                        <script type="text/javascript">
-                            var disqus_identifier = "article/2015/02/bookingcom-androidke-hu-duan-de-bitmapfu-yong";
-                            (function() {
-                                var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
-                                dsq.src = 'http://aaapeigithub.disqus.com/embed.js';
-                                (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
-                            })();
-                        </script>
-                    </div>
+                    <div class="ds-thread" data-thread-key="article/2015/02/bookingcom-androidke-hu-duan-de-bitmapfu-yong" data-title="{ article.title }" data-url="article/2015/02/bookingcom-androidke-hu-duan-de-bitmapfu-yong"></div>
+                        <!-- 多说评论框 end -->
+                        <!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+                    <script type="text/javascript">
+                    var duoshuoQuery = {short_name:"aaapei"};
+                      (function() {
+                        var ds = document.createElement('script');
+                        ds.type = 'text/javascript';ds.async = true;
+                        ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+                        ds.charset = 'UTF-8';
+                        (document.getElementsByTagName('head')[0] 
+                         || document.getElementsByTagName('body')[0]).appendChild(ds);
+                      })();
+                      </script>
                 </section>
 
         </section>

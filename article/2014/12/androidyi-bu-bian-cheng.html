@@ -16,8 +16,8 @@
                 <meta property="og:type" content="article"/>
                 <meta property="og:title" content="android异步编程"/>
                 <meta property="og:url" content="http://blog.aaapei.com/article/2014/12/androidyi-bu-bian-cheng"/>
-                <meta property="og:description" content="在android开发中，有两条很重要的编程准则 不要堵塞ui线程 不要在非ui线程操作ui控件 开发者必须这两个遵守单线程模型的准则，将耗时的逻辑转移到非ui线程进行，得出计算结果后，通知ui线程进行数据的展现。本文介绍一下android的异步编程。 android线程模型 同hotspot vm一样，在daivlk vm中，采取的是1：1线程模型，每一个android thread对应一个Native Linux thread；linux内核通过cfs（completely fair scheduler）来进行线程调度，在cfs中着影响一个线程时间分配的因素有两个： thread priority thread group thread group 线程的thread group是动态改变的，在android framework层面，android的应用有5个等级，分别是 foreground process visible process service process backgroud process empty process 它们的thread ..."/>
-                <meta name="description" content="在android开发中，有两条很重要的编程准则 不要堵塞ui线程 不要在非ui线程操作ui控件 开发者必须这两个遵守单线程模型的准则，将耗时的逻辑转移到非ui线程进行，得出计算结果后，通知ui线程进行数据的展现。本文介绍一下android的异步编程。 android线程模型 同hotspot vm一样，在daivlk vm中，采取的是1：1线程模型，每一个android thread对应一个Native Linux thread；linux内核通过cfs（completely fair scheduler）来进行线程调度，在cfs中着影响一个线程时间分配的因素有两个： thread priority thread group thread group 线程的thread group是动态改变的，在android framework层面，android的应用有5个等级，分别是 foreground process visible process service process backgroud process empty process 它们的thread ...">
+                <meta property="og:description" content="在android开发中，有两条很重要的编程准则 不要堵塞ui线程 不要在非ui线程操作ui控件 开发者必须这两个遵守单线程模型的准则，将耗时的逻辑转移到非ui线程进行，得出计算结果后，通知ui线程进行数据的展现。本文介绍一下android的异步编程。 android线程模型 同hotspot vm一样，在daivlk vm中，采取的是1：1线程模型，每一个android thread对应一个Native Linux thread；linux内核通过cfs（completely fair scheduler）来进行线程调度，在cfs中着影响一个线程时间分配的因素有两个： thread priority thread group thread group 线程的thread group是动态改变的，在android framework层面，android的应用有5个等级，分别是 foreground process visible process service process backgroud process empty process 它们的thread …"/>
+                <meta name="description" content="在android开发中，有两条很重要的编程准则 不要堵塞ui线程 不要在非ui线程操作ui控件 开发者必须这两个遵守单线程模型的准则，将耗时的逻辑转移到非ui线程进行，得出计算结果后，通知ui线程进行数据的展现。本文介绍一下android的异步编程。 android线程模型 同hotspot vm一样，在daivlk vm中，采取的是1：1线程模型，每一个android thread对应一个Native Linux thread；linux内核通过cfs（completely fair scheduler）来进行线程调度，在cfs中着影响一个线程时间分配的因素有两个： thread priority thread group thread group 线程的thread group是动态改变的，在android framework层面，android的应用有5个等级，分别是 foreground process visible process service process backgroud process empty process 它们的thread …">
 
 
 
@@ -86,7 +86,7 @@
             <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
 <div class="meta">
     <div class="date">
-        <time datetime="2014-12-21T00:00:00.000000" itemprop="datePublished">2014-12-21</time>
+        <time datetime="2014-12-21T00:00:00.000000+0800" itemprop="datePublished">2014-12-21</time>
     </div>
     <div class="tags">
         <a href="http://blog.aaapei.com/tags/android">android</a> ,         <a href="http://blog.aaapei.com/tags/yi-bu">异步</a>     </div>
@@ -113,8 +113,8 @@
 <li>backgroud process</li>
 <li>empty process  </li>
 </ul>
-<p>它们的thread group如图，<br />
-<img alt="Alt pic" src="http://nos.netease.com/knowledge/e2d1dc53-5724-4b1e-b93e-74325a0d70f5" />   </p>
+<p>它们的thread group如图，<br>
+<img alt="Alt pic" src="http://nos.netease.com/knowledge/e2d1dc53-5724-4b1e-b93e-74325a0d70f5">   </p>
 <p>在实际的分配中，系统会将90%的cpu时间分配给foregroud thread group，
 如果某个应用处于foreground或visible level，那么它创建的所有thread都属于foreground group。
 当应用的可见状态被改变时，例如按home健被切入到后台运用，应用从foregroud process变成了backgroud process，应用对应的的thread group也切换到了backgroud group</p>
@@ -157,19 +157,19 @@
 <p>AsyncTask是android中最常用的并发机制，api非常简洁，开发者只需简单的继承AsyncTask即可完成异步逻辑以及数据协同,
 数据的协同，内部通过Handler/Message进行，异步逻辑doInBackground则利用Executor完成。
 必须要了解是，AysncTask是一个全局行为，在不同的组件中创建Asynctask，最终的执行都会在同一个Executor中：</p>
-<p><img alt="Alt pic" src="http://nos.netease.com/knowledge/42dccf78-0a92-4d5f-9463-1e77174ca076" /> </p>
+<p><img alt="Alt pic" src="http://nos.netease.com/knowledge/42dccf78-0a92-4d5f-9463-1e77174ca076"> </p>
 <p>作为最常用的异步编程解决方案，AsyncTask也是被批评最多的异步机制，原因是其在不同android版本中的不同表现，
 在1.6版本之前，AsyncTask的Executor是一个单线程，所有AsyncTaskd都是顺序执行；
 在1.6到3.0版本中，Executor维护了一个最多线程池并发执行
 android版本发展到3.0后，默认的线程修改成了单线程task，同时提供了一个executeOneExecutor api支持多个并行task，
  但这不表示的在3.x版本之后，你的task是默认一定是顺序执行的，它还受taregetSdkVersion的影响，AcitivityThread.java中有这样一段代码</p>
-<div class="highlight"><pre><span class="c1">// If the app is Honeycomb MR1 or earlier, switch its AsyncTask</span>
-<span class="c1">// implementation to use the pool executor.  Normally, we use the</span>
-<span class="c1">// serialized executor as the default. This has to happen in the</span>
-<span class="c1">// main thread so the main looper is set right.</span>
-<span class="k">if</span> <span class="p">(</span><span class="n">data</span><span class="p">.</span><span class="n">appInfo</span><span class="p">.</span><span class="n">targetSdkVersion</span> <span class="o">&lt;=</span> <span class="n">android</span><span class="p">.</span><span class="n">os</span><span class="p">.</span><span class="n">Build</span><span class="p">.</span><span class="no">VERSION_CODES</span><span class="p">.</span><span class="no">HONEYCOMB_MR1</span><span class="p">)</span> <span class="p">{</span>
-     <span class="n">AsyncTask</span><span class="p">.</span><span class="n">setDefaultExecutor</span><span class="p">(</span><span class="n">AsyncTask</span><span class="p">.</span><span class="no">THREAD_POOL_EXECUTOR</span><span class="p">);</span>
-<span class="p">}</span>
+<div class="highlight"><pre><span></span>// If the app is Honeycomb MR1 or earlier, switch its AsyncTask
+// implementation to use the pool executor.  Normally, we use the
+// serialized executor as the default. This has to happen in the
+// main thread so the main looper is set right.
+if (data.appInfo.targetSdkVersion &lt;= android.os.Build.VERSION_CODES.HONEYCOMB_MR1) {
+     AsyncTask.setDefaultExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+}
 </pre></div>
 
 
@@ -205,16 +205,20 @@ Loader机制在api 11中引入，通过support包的方式支持已有版本，�
             </article>
                 <section id="comment">
                     <h1 class="title">Comments</h1>
-                    <div id="disqus_thread" aria-live="polite">
-                        <script type="text/javascript">
-                            var disqus_identifier = "article/2014/12/androidyi-bu-bian-cheng";
-                            (function() {
-                                var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
-                                dsq.src = 'http://aaapeigithub.disqus.com/embed.js';
-                                (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
-                            })();
-                        </script>
-                    </div>
+                    <div class="ds-thread" data-thread-key="article/2014/12/androidyi-bu-bian-cheng" data-title="{ article.title }" data-url="article/2014/12/androidyi-bu-bian-cheng"></div>
+                        <!-- 多说评论框 end -->
+                        <!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+                    <script type="text/javascript">
+                    var duoshuoQuery = {short_name:"aaapei"};
+                      (function() {
+                        var ds = document.createElement('script');
+                        ds.type = 'text/javascript';ds.async = true;
+                        ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+                        ds.charset = 'UTF-8';
+                        (document.getElementsByTagName('head')[0] 
+                         || document.getElementsByTagName('body')[0]).appendChild(ds);
+                      })();
+                      </script>
                 </section>
 
         </section>

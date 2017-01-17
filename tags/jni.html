@@ -83,12 +83,12 @@
             <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
 <div class="meta">
     <div class="date">
-        <time datetime="2014-11-09T00:00:00.000000" itemprop="datePublished">2014-11-09</time>
+        <time datetime="2014-11-09T00:00:00.000000+0800" itemprop="datePublished">2014-11-09</time>
     </div>
     <div class="tags">
         <a href="http://blog.aaapei.com/tags/dalvik">dalvik</a> ,         <a href="http://blog.aaapei.com/tags/jni">jni</a>     </div>
 </div>                <h1 class="title" itemprop="name"><a href="http://blog.aaapei.com/article/2014/11/dalvik-jnijie-xi" itemprop="url">dalvik jni解析</a></h1>
-                <div class="entry-content" itemprop="description"><p>android开发者在移植第三方native库时,经常会使用到jni. <br />
+                <div class="entry-content" itemprop="description"><p>android开发者在移植第三方native库时,经常会使用到jni. <br>
 Java Native Interface(java本地接口),用于java与c/c++代码进行交互.需要了解的是,jni只是jvm的一个规范,各家虚拟机有各自的实现,本文分享一下dalvik中jobject reference的实现.</p>
 <h3>jobject reference type</h3>
 <p>jni规范中,对jobject定义了两种reference类型:</p>
@@ -98,7 +98,7 @@ Java Native Interface(java本地接口),用于java与c/c++代码进行交互.需
 </ul>
 <p>在JNI Specification中的说明是:</p>
 <blockquote>
-<p>Local references are valid for the duration of a native method call, and are automatically freed after the native method returns. Global references ...</p></blockquote>
+<p>Local references are valid for the duration of a native method call, and are automatically freed after the native method returns. Global references …</p></blockquote>
 					<br/ >
 					<a href="http://blog.aaapei.com/article/2014/11/dalvik-jnijie-xi">查看全文</a>
                 </div>
