@@ -82,6 +82,40 @@
             <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
 <div class="meta">
     <div class="date">
+        <time datetime="2017-11-05T11:28:00.000000+0800" itemprop="datePublished">2017-11-05</time>
+    </div>
+    <div class="tags">
+        <a href="http://blog.aaapei.com/tags/httpdns">httpdns</a>     </div>
+</div>                <h1 class="title" itemprop="name"><a href="http://blog.aaapei.com/article/2017/11/androidjie-ru-httpdnsde-ling-yi-chong-si-lu" itemprop="url">Android接入httpdns的另一种思路</a></h1>
+                <div class="entry-content" itemprop="description"><h3>前言</h3>
+<p>httpdns是基于Http协议的域名解析服务，用于替代基于UDP协议向运营商Local DNS发起解析请求的传统方式，目标是解决域名劫持和跨网访问等问题。</p>
+<h3>httpdns的接入</h3>
+<p>传统的使用Local DNS的方式，我们只需要在url中指定hostname；网络库帮我们做了域名解析、ttl缓存管理，我们不需要关心底层的流程。</p>
+<p>但当使用httpdns，就需要我们自己向httpdns发起http请求，获取到域名对应的ip。一般商业的httpdns sdk都会提供域名解析成ip的方法，一般的开发者接入httpdns还是需要做以下工作：</p>
+<ol>
+<li>从URL中提取hostname，通过httpdns sdk获取到对应的IP</li>
+<li>将URL中的hostname替换成IP</li>
+<li>设置请求Header的Host字段</li>
+<li>如果请求的是HTTPS，修改证书的域名验证策略</li>
+</ol>
+<p>android端有三个网络基础库，具体的接入方式会有差异：</p>
+<ul>
+<li>apache httpclient</li>
+<li>http urlconnection</li>
+<li>okhttp</li>
+</ul>
+<p>对于最后一个okhttp，由于它本身提供的设置外部dns的api，接入最简单，只需要简单的实现okhttp提供的<em>lookup</em>方法即可；但针对apache和urlconnection，就只能采取显式将url中的hostname替换成ip的方式了，然后添加Host头和HTTPS证书验证策略。但由于apache httpclient和urlconnection在设计之初，就没有考虑外部设置dns的策略，进行相关的接入时，总有各种异常case需要处理，比如apache http client在实现上，使用的是url中的ip信息作为cookie存储管理的key …</p>
+					<br/ >
+					<a href="http://blog.aaapei.com/article/2017/11/androidjie-ru-httpdnsde-ling-yi-chong-si-lu">查看全文</a>
+                </div>
+                <div class="meta">
+                    <span class="author">Posted by <a href="http://blog.aaapei.com/author/zheng-wen.html">郑文</a></span>
+                </div>
+            </article>
+            <hr/>
+            <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
+<div class="meta">
+    <div class="date">
         <time datetime="2017-01-17T14:26:00.000000+0800" itemprop="datePublished">2017-01-17</time>
     </div>
     <div class="tags">
@@ -158,30 +192,6 @@
     <span class="nt">&lt;meta …</span></pre></div>
 					<br/ >
 					<a href="http://blog.aaapei.com/article/2015/07/cong-deeplinkdispatchtan-tan-zu-jian-tiao-zhuan">查看全文</a>
-                </div>
-                <div class="meta">
-                    <span class="author">Posted by <a href="http://blog.aaapei.com/author/zhengwen.html">zhengwen</a></span>
-                </div>
-            </article>
-            <hr/>
-            <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
-<div class="meta">
-    <div class="date">
-        <time datetime="2015-02-19T00:00:00.000000+0800" itemprop="datePublished">2015-02-19</time>
-    </div>
-    <div class="tags">
-        <a href="http://blog.aaapei.com/tags/bitmapxing-neng-you-hua">bitmap，性能优化</a>     </div>
-</div>                <h1 class="title" itemprop="name"><a href="http://blog.aaapei.com/article/2015/02/bookingcom-androidke-hu-duan-de-bitmapfu-yong" itemprop="url">booking.com android客户端的bitmap复用</a></h1>
-                <div class="entry-content" itemprop="description"><h3>前言</h3>
-<p>被鞭炮吵得睡不着觉，rss中找一篇简单的文档翻译下，原文链接：http://blog.booking.com/android-reuse-bitmaps.html，大部分团队应该都做过这个bitmap优化，不过估计设置过BitmapFactory.Options.inTempStorage参数的应该不多 :)</p>
-<p>booking.com android客户端在新版本的增加了一个新功能：酒店的图片集合</p>
-<p><img alt="此处输入图片的描述" src="http://blog.booking.com/static/android-reuse-bitmaps/hotel_photo_header.png"></p>
-<p>不幸的是，增加了这个新功能后，发现这个应用的内存消耗增长了20%。图片集的界面的滑动有明显的卡顿，经定位，我们发现viewpager加载图片时的gc问题造成了以上的问题。由于应用的图片资源多；控件布局层次复杂；数据量较大，造成内存的申请很容易触发GC。</p>
-<p>当申请bitmap内存时，logcat输出信息如下：</p>
-<div class="highlight"><pre><span></span>GC_FOR_ALLOC freed 3255K, 20% free 21813K/26980K, paused 62ms, total 62ms
-GC_FOR_ALLOC freed 710K, 20% free 30242K/37740K, paused 72ms …</pre></div>
-					<br/ >
-					<a href="http://blog.aaapei.com/article/2015/02/bookingcom-androidke-hu-duan-de-bitmapfu-yong">查看全文</a>
                 </div>
                 <div class="meta">
                     <span class="author">Posted by <a href="http://blog.aaapei.com/author/zhengwen.html">zhengwen</a></span>

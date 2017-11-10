@@ -79,108 +79,41 @@
 			<div class="mid-col">
 				<div class="mid-col-container">
 					<div id="content" class="inner">
-		<section id="tags">
-		<h1 class="tags">标签:</h1>
-		<br/>
-				<div class="tag">
+            <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
+<div class="meta">
+    <div class="date">
+        <time datetime="2017-11-05T11:28:00.000000+0800" itemprop="datePublished">2017-11-05</time>
+    </div>
+    <div class="tags">
+        <a href="http://blog.aaapei.com/tags/httpdns">httpdns</a>     </div>
+</div>                <h1 class="title" itemprop="name"><a href="http://blog.aaapei.com/article/2017/11/androidjie-ru-httpdnsde-ling-yi-chong-si-lu" itemprop="url">Android接入httpdns的另一种思路</a></h1>
+                <div class="entry-content" itemprop="description"><h3>前言</h3>
+<p>httpdns是基于Http协议的域名解析服务，用于替代基于UDP协议向运营商Local DNS发起解析请求的传统方式，目标是解决域名劫持和跨网访问等问题。</p>
+<h3>httpdns的接入</h3>
+<p>传统的使用Local DNS的方式，我们只需要在url中指定hostname；网络库帮我们做了域名解析、ttl缓存管理，我们不需要关心底层的流程。</p>
+<p>但当使用httpdns，就需要我们自己向httpdns发起http请求，获取到域名对应的ip。一般商业的httpdns sdk都会提供域名解析成ip的方法，一般的开发者接入httpdns还是需要做以下工作：</p>
+<ol>
+<li>从URL中提取hostname，通过httpdns sdk获取到对应的IP</li>
+<li>将URL中的hostname替换成IP</li>
+<li>设置请求Header的Host字段</li>
+<li>如果请求的是HTTPS，修改证书的域名验证策略</li>
+</ol>
+<p>android端有三个网络基础库，具体的接入方式会有差异：</p>
+<ul>
+<li>apache httpclient</li>
+<li>http urlconnection</li>
+<li>okhttp</li>
+</ul>
+<p>对于最后一个okhttp，由于它本身提供的设置外部dns的api，接入最简单，只需要简单的实现okhttp提供的<em>lookup</em>方法即可；但针对apache和urlconnection，就只能采取显式将url中的hostname替换成ip的方式了，然后添加Host头和HTTPS证书验证策略。但由于apache httpclient和urlconnection在设计之初，就没有考虑外部设置dns的策略，进行相关的接入时，总有各种异常case需要处理，比如apache http client在实现上，使用的是url中的ip信息作为cookie存储管理的key …</p>
+					<br/ >
+					<a href="http://blog.aaapei.com/article/2017/11/androidjie-ru-httpdnsde-ling-yi-chong-si-lu">查看全文</a>
+                </div>
+                <div class="meta">
+                    <span class="author">Posted by <a href="http://blog.aaapei.com/author/zheng-wen.html">郑文</a></span>
+                </div>
+            </article>
+            <hr/>
 
-					<a href="http://blog.aaapei.com/tags/android">android</a>
-				<!--	
-					<a href="/blog/tags/android">android</a>
-					-->
-				</div>
-				<div class="tag">
-
-					<a href="http://blog.aaapei.com/tags/apm">apm</a>
-				<!--	
-					<a href="/blog/tags/apm">apm</a>
-					-->
-				</div>
-				<div class="tag">
-
-					<a href="http://blog.aaapei.com/tags/applink">applink</a>
-				<!--	
-					<a href="/blog/tags/applink">applink</a>
-					-->
-				</div>
-				<div class="tag">
-
-					<a href="http://blog.aaapei.com/tags/bitmapxing-neng-you-hua">bitmap，性能优化</a>
-				<!--	
-					<a href="/blog/tags/bitmap，性能优化">bitmap，性能优化</a>
-					-->
-				</div>
-				<div class="tag">
-
-					<a href="http://blog.aaapei.com/tags/dalvik">dalvik</a>
-				<!--	
-					<a href="/blog/tags/dalvik">dalvik</a>
-					-->
-				</div>
-				<div class="tag">
-
-					<a href="http://blog.aaapei.com/tags/httpdns">httpdns</a>
-				<!--	
-					<a href="/blog/tags/httpdns">httpdns</a>
-					-->
-				</div>
-				<div class="tag">
-
-					<a href="http://blog.aaapei.com/tags/jni">jni</a>
-				<!--	
-					<a href="/blog/tags/jni">jni</a>
-					-->
-				</div>
-				<div class="tag">
-
-					<a href="http://blog.aaapei.com/tags/listviewxing-neng-you-hua">listview，性能优化</a>
-				<!--	
-					<a href="/blog/tags/listview，性能优化">listview，性能优化</a>
-					-->
-				</div>
-				<div class="tag">
-
-					<a href="http://blog.aaapei.com/tags/lua">lua</a>
-				<!--	
-					<a href="/blog/tags/lua">lua</a>
-					-->
-				</div>
-				<div class="tag">
-
-					<a href="http://blog.aaapei.com/tags/luajava">luajava</a>
-				<!--	
-					<a href="/blog/tags/luajava">luajava</a>
-					-->
-				</div>
-				<div class="tag">
-
-					<a href="http://blog.aaapei.com/tags/multidex">multidex</a>
-				<!--	
-					<a href="/blog/tags/multidex">multidex</a>
-					-->
-				</div>
-				<div class="tag">
-
-					<a href="http://blog.aaapei.com/tags/wei-xin">微信</a>
-				<!--	
-					<a href="/blog/tags/微信">微信</a>
-					-->
-				</div>
-				<div class="tag">
-
-					<a href="http://blog.aaapei.com/tags/yi-bu">异步</a>
-				<!--	
-					<a href="/blog/tags/异步">异步</a>
-					-->
-				</div>
-				<div class="tag">
-
-					<a href="http://blog.aaapei.com/tags/yu-ming">域名</a>
-				<!--	
-					<a href="/blog/tags/域名">域名</a>
-					-->
-				</div>
-		</section>
 					</div>
 				</div>
 				<footer id="footer" class="inner">

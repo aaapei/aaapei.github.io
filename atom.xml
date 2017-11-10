@@ -1,5 +1,72 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>I'm aaapei</title><link href="http://blog.aaapei.com/" rel="alternate"></link><link href="http://blog.aaapei.com/atom.xml" rel="self"></link><id>http://blog.aaapei.com/</id><updated>2017-01-17T14:26:00+08:00</updated><entry><title>也谈MultiDex的优化</title><link href="http://blog.aaapei.com/article/2017/01/ye-tan-multidexde-you-hua" rel="alternate"></link><published>2017-01-17T14:26:00+08:00</published><updated>2017-01-17T14:26:00+08:00</updated><author><name>郑文</name></author><id>tag:blog.aaapei.com,2017-01-17:/article/2017/01/ye-tan-multidexde-you-hua</id><summary type="html">&lt;p&gt;旧文一篇，看到移动开发前线推送了&lt;a href="https://zhuanlan.zhihu.com/p/24305296"&gt;MultiDex工作原理分析和优化方案&lt;/a&gt;，也将我们的MultiDex启动优化思路分享给社区&lt;/p&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>I'm aaapei</title><link href="http://blog.aaapei.com/" rel="alternate"></link><link href="http://blog.aaapei.com/atom.xml" rel="self"></link><id>http://blog.aaapei.com/</id><updated>2017-11-05T11:28:00+08:00</updated><entry><title>Android接入httpdns的另一种思路</title><link href="http://blog.aaapei.com/article/2017/11/androidjie-ru-httpdnsde-ling-yi-chong-si-lu" rel="alternate"></link><published>2017-11-05T11:28:00+08:00</published><updated>2017-11-05T11:28:00+08:00</updated><author><name>郑文</name></author><id>tag:blog.aaapei.com,2017-11-05:/article/2017/11/androidjie-ru-httpdnsde-ling-yi-chong-si-lu</id><summary type="html">&lt;h3&gt;前言&lt;/h3&gt;
+&lt;p&gt;httpdns是基于Http协议的域名解析服务，用于替代基于UDP协议向运营商Local DNS发起解析请求的传统方式，目标是解决域名劫持和跨网访问等问题。&lt;/p&gt;
+&lt;h3&gt;httpdns的接入&lt;/h3&gt;
+&lt;p&gt;传统的使用Local DNS的方式，我们只需要在url中指定hostname；网络库帮我们做了域名解析、ttl缓存管理，我们不需要关心底层的流程。&lt;/p&gt;
+&lt;p&gt;但当使用httpdns，就需要我们自己向httpdns发起http请求，获取到域名对应的ip。一般商业的httpdns sdk都会提供域名解析成ip的方法，一般的开发者接入httpdns还是需要做以下工作：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;从URL中提取hostname，通过httpdns sdk获取到对应的IP&lt;/li&gt;
+&lt;li&gt;将URL中的hostname替换成IP&lt;/li&gt;
+&lt;li&gt;设置请求Header的Host字段&lt;/li&gt;
+&lt;li&gt;如果请求的是HTTPS，修改证书的域名验证策略&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;android端有三个网络基础库，具体的接入方式会有差异：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;apache httpclient&lt;/li&gt;
+&lt;li&gt;http urlconnection&lt;/li&gt;
+&lt;li&gt;okhttp&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;对于最后一个okhttp，由于它本身提供的设置外部dns的api，接入最简单，只需要简单的实现okhttp提供的&lt;em&gt;lookup&lt;/em&gt;方法即可；但针对apache和urlconnection，就只能采取显式将url中的hostname替换成ip的方式了，然后添加Host头和HTTPS证书验证策略。但由于apache httpclient和urlconnection在设计之初，就没有考虑外部设置dns的策略，进行相关的接入时，总有各种异常case需要处理，比如apache http client在实现上，使用的是url中的ip信息作为cookie存储管理的key …&lt;/p&gt;</summary><content type="html">&lt;h3&gt;前言&lt;/h3&gt;
+&lt;p&gt;httpdns是基于Http协议的域名解析服务，用于替代基于UDP协议向运营商Local DNS发起解析请求的传统方式，目标是解决域名劫持和跨网访问等问题。&lt;/p&gt;
+&lt;h3&gt;httpdns的接入&lt;/h3&gt;
+&lt;p&gt;传统的使用Local DNS的方式，我们只需要在url中指定hostname；网络库帮我们做了域名解析、ttl缓存管理，我们不需要关心底层的流程。&lt;/p&gt;
+&lt;p&gt;但当使用httpdns，就需要我们自己向httpdns发起http请求，获取到域名对应的ip。一般商业的httpdns sdk都会提供域名解析成ip的方法，一般的开发者接入httpdns还是需要做以下工作：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;从URL中提取hostname，通过httpdns sdk获取到对应的IP&lt;/li&gt;
+&lt;li&gt;将URL中的hostname替换成IP&lt;/li&gt;
+&lt;li&gt;设置请求Header的Host字段&lt;/li&gt;
+&lt;li&gt;如果请求的是HTTPS，修改证书的域名验证策略&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;android端有三个网络基础库，具体的接入方式会有差异：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;apache httpclient&lt;/li&gt;
+&lt;li&gt;http urlconnection&lt;/li&gt;
+&lt;li&gt;okhttp&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;对于最后一个okhttp，由于它本身提供的设置外部dns的api，接入最简单，只需要简单的实现okhttp提供的&lt;em&gt;lookup&lt;/em&gt;方法即可；但针对apache和urlconnection，就只能采取显式将url中的hostname替换成ip的方式了，然后添加Host头和HTTPS证书验证策略。但由于apache httpclient和urlconnection在设计之初，就没有考虑外部设置dns的策略，进行相关的接入时，总有各种异常case需要处理，比如apache http client在实现上，使用的是url中的ip信息作为cookie存储管理的key，而非请求头的host。
+更具体的讨论可以参考&lt;a href="https://help.aliyun.com/document_detail/30140.html?spm=5176.7758308.2.4.MJ84VT"&gt;阿里云httpdns&lt;/a&gt;。&lt;/p&gt;
+&lt;p&gt;总之，现有的解法都不能完美的覆盖掉所有场景。如果想使用httpdns，那么建议开发者抛弃掉apache或urlconnection，引入okhttp这样的第三方网络库实现。&lt;/p&gt;
+&lt;p&gt;但的确会有那么一小撮仍在使用apache或者urlconnection的app，在不对现有网络库进行改造的情况下，有办法实现httpdns的低成本接入吗&lt;/p&gt;
+&lt;h3&gt;NETD的设计&lt;/h3&gt;
+&lt;p&gt;我们先看下android的Netd的设计，&lt;/p&gt;
+&lt;p&gt;&lt;img alt="" src="http://www.laiwangyo.com/2016/11/25/Android%20Netd%E5%A4%84%E7%90%86%E6%B5%81%E7%A8%8B%E5%88%86%E6%9E%90/netd%E6%B5%81%E7%A8%8B.png"&gt;
+在android 4.3之后，DNS解析都向Netd代理的方式来管理，所有进程的dns解析都通过IPC向Netd进行来进行。
+受限于权限问题，我们没法对Netd做修改，但也正因为Netd这个设计，我们对当前进程的dns解析结果的改动并不会影响设备上其他应用的dns解析。&lt;/p&gt;
+&lt;p&gt;顺着apache client/urlconnetion/okhttp的源码往下翻，我们会发现无论何种网络库，最终都需要使用libcore提供&lt;em&gt;InetAddress.getByName()&lt;/em&gt; API来进行DNS解析，并最终调用android native层提供的DNS解析C函数。以android5.0为分界，出现了两个分支：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;android 5.0以下系统将使用中的&lt;em&gt;getaddrinfo&lt;/em&gt;；&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;int getaddrinfo( const char *hostname, const char *service, const struct addrinfo *hints, struct addrinfo **result )
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;android5.0及以上系统中android_getaddrinfoforget，相关的签名如下:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;int android_getaddrinfoforget(const char *hostname, const char *service, const struct addrinfo *hints, struct addrinfo **result );
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;这两个函数的参数完全一致，都通过hostname参数来指定查询的域名， result参数来返回域名对应的IP列表。他们都会编译进libjavacore.so这个动态链接库。&lt;/p&gt;
+&lt;p&gt;相关的源码调用关系有些长，总之得出一个结论：所有网络库的dns解析流程入口都是同一个。&lt;/p&gt;
+&lt;h3&gt;hook实现&lt;/h3&gt;
+&lt;p&gt;既然入口是同一个，我们可以针对这个入口做一些hook的事情。&lt;br&gt;
+如果围绕java层的&lt;em&gt;InetAddress.getByName()&lt;/em&gt;找方案，由于它是普通的静态方法，插件化常见的代理方案都将失效；从虚拟机这层hook，比如说Andfix，又会有遇到虚拟机兼容以及方案过重的问题。&lt;/p&gt;
+&lt;p&gt;而从native层想办法成本则小了点。比如使用&lt;a href="http://gslab.qq.com/article-162-1.html"&gt;ptrace注入&lt;/a&gt;，又比如&lt;a href="http://gslab.qq.com/article-163-1.html"&gt;elfhook&lt;/a&gt;。&lt;/p&gt;
+&lt;p&gt;具体的流程是，在android 应用刚启动时，我们可以从libjavacore.so中，分别找到&lt;em&gt;getaddrinfo&lt;/em&gt;和&lt;em&gt;android_getaddrinfoforget&lt;/em&gt;两个函数的指针地址，将其指向我们自定义的&lt;em&gt;get_httpdns_addrinfo&lt;/em&gt;。在&lt;em&gt;get_httpdns_addrinfo&lt;/em&gt;函数内部，我们调用httpdns的域名解析，将ip填充到struct addrinfo **result结构体中。&lt;/p&gt;
+&lt;p&gt;利用这种方式，上层网络库是无感知的，仍然按照他本身InetAddress.getByName的逻辑获取域名解析结果，cookie、sni的问题也仍然按照网络库原始的策略管理，从而实现httpdns的无缝接入。&lt;/p&gt;</content><category term="httpdns"></category></entry><entry><title>也谈MultiDex的优化</title><link href="http://blog.aaapei.com/article/2017/01/ye-tan-multidexde-you-hua" rel="alternate"></link><published>2017-01-17T14:26:00+08:00</published><updated>2017-01-17T14:26:00+08:00</updated><author><name>郑文</name></author><id>tag:blog.aaapei.com,2017-01-17:/article/2017/01/ye-tan-multidexde-you-hua</id><summary type="html">&lt;p&gt;旧文一篇，看到移动开发前线推送了&lt;a href="https://zhuanlan.zhihu.com/p/24305296"&gt;MultiDex工作原理分析和优化方案&lt;/a&gt;，也将我们的MultiDex启动优化思路分享给社区&lt;/p&gt;
 &lt;h3&gt;MultiDex存在的问题&lt;/h3&gt;
 &lt;p&gt;我们经常说的MultiDex，可以分成运行时和编译时两个部分：&lt;/p&gt;
 &lt;ul&gt;

@@ -1,5 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
-<rss version="2.0"><channel><title>I'm aaapei</title><link>http://blog.aaapei.com/</link><description></description><lastBuildDate>Tue, 17 Jan 2017 14:26:00 +0800</lastBuildDate><item><title>也谈MultiDex的优化</title><link>http://blog.aaapei.com/article/2017/01/ye-tan-multidexde-you-hua</link><description>&lt;p&gt;旧文一篇，看到移动开发前线推送了&lt;a href="https://zhuanlan.zhihu.com/p/24305296"&gt;MultiDex工作原理分析和优化方案&lt;/a&gt;，也将我们的MultiDex启动优化思路分享给社区&lt;/p&gt;
+<rss version="2.0"><channel><title>I'm aaapei</title><link>http://blog.aaapei.com/</link><description></description><lastBuildDate>Sun, 05 Nov 2017 11:28:00 +0800</lastBuildDate><item><title>Android接入httpdns的另一种思路</title><link>http://blog.aaapei.com/article/2017/11/androidjie-ru-httpdnsde-ling-yi-chong-si-lu</link><description>&lt;h3&gt;前言&lt;/h3&gt;
+&lt;p&gt;httpdns是基于Http协议的域名解析服务，用于替代基于UDP协议向运营商Local DNS发起解析请求的传统方式，目标是解决域名劫持和跨网访问等问题。&lt;/p&gt;
+&lt;h3&gt;httpdns的接入&lt;/h3&gt;
+&lt;p&gt;传统的使用Local DNS的方式，我们只需要在url中指定hostname；网络库帮我们做了域名解析、ttl缓存管理，我们不需要关心底层的流程。&lt;/p&gt;
+&lt;p&gt;但当使用httpdns，就需要我们自己向httpdns发起http请求，获取到域名对应的ip。一般商业的httpdns sdk都会提供域名解析成ip的方法，一般的开发者接入httpdns还是需要做以下工作：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;从URL中提取hostname，通过httpdns sdk获取到对应的IP&lt;/li&gt;
+&lt;li&gt;将URL中的hostname替换成IP&lt;/li&gt;
+&lt;li&gt;设置请求Header的Host字段&lt;/li&gt;
+&lt;li&gt;如果请求的是HTTPS，修改证书的域名验证策略&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;android端有三个网络基础库，具体的接入方式会有差异：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;apache httpclient&lt;/li&gt;
+&lt;li&gt;http urlconnection&lt;/li&gt;
+&lt;li&gt;okhttp&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;对于最后一个okhttp，由于它本身提供的设置外部dns的api，接入最简单，只需要简单的实现okhttp提供的&lt;em&gt;lookup&lt;/em&gt;方法即可；但针对apache和urlconnection，就只能采取显式将url中的hostname替换成ip的方式了，然后添加Host头和HTTPS证书验证策略。但由于apache httpclient和urlconnection在设计之初，就没有考虑外部设置dns的策略，进行相关的接入时，总有各种异常case需要处理，比如apache http client在实现上，使用的是url中的ip信息作为cookie存储管理的key …&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">郑文</dc:creator><pubDate>Sun, 05 Nov 2017 11:28:00 +0800</pubDate><guid isPermaLink="false">tag:blog.aaapei.com,2017-11-05:/article/2017/11/androidjie-ru-httpdnsde-ling-yi-chong-si-lu</guid><category>httpdns</category></item><item><title>也谈MultiDex的优化</title><link>http://blog.aaapei.com/article/2017/01/ye-tan-multidexde-you-hua</link><description>&lt;p&gt;旧文一篇，看到移动开发前线推送了&lt;a href="https://zhuanlan.zhihu.com/p/24305296"&gt;MultiDex工作原理分析和优化方案&lt;/a&gt;，也将我们的MultiDex启动优化思路分享给社区&lt;/p&gt;
 &lt;h3&gt;MultiDex存在的问题&lt;/h3&gt;
 &lt;p&gt;我们经常说的MultiDex，可以分成运行时和编译时两个部分：&lt;/p&gt;
 &lt;ul&gt;

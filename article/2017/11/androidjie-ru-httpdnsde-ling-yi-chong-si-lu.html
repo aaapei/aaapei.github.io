@@ -1,0 +1,165 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>I'm aaapei</title>
+        <meta name="author" content="aaapei">
+
+        <!-- http://t.co/dKP3o1e -->
+        <meta name="HandheldFriendly" content="True">
+        <meta name="MobileOptimized" content="320">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <!-- Open Graph tags -->
+
+
+                <meta property="og:type" content="article"/>
+                <meta property="og:title" content="Android接入httpdns的另一种思路"/>
+                <meta property="og:url" content="http://blog.aaapei.com/article/2017/11/androidjie-ru-httpdnsde-ling-yi-chong-si-lu"/>
+                <meta property="og:description" content="前言 httpdns是基于Http协议的域名解析服务，用于替代基于UDP协议向运营商Local DNS发起解析请求的传统方式，目标是解决域名劫持和跨网访问等问题。 httpdns的接入 传统的使用Local DNS的方式，我们只需要在url中指定hostname；网络库帮我们做了域名解析、ttl缓存管理，我们不需要关心底层的流程。 但当使用httpdns，就需要我们自己向httpdns发起http请求，获取到域名对应的ip。一般商业的httpdns sdk都会提供域名解析成ip的方法，一般的开发者接入httpdns还是需要做以下工作： 从URL中提取hostname，通过httpdns sdk获取到对应的IP 将URL中的hostname替换成IP 设置请求Header的Host字段 如果请求的是HTTPS，修改证书的域名验证策略 android端有三个网络基础库，具体的接入方式会有差异： apache httpclient http urlconnection okhttp 对于最后一个okhttp，由于它本身提供的设置外部dns的api，接入最简单，只需要简单的实现okhttp提供的lookup方法即可；但针对apache和urlconnection，就只能采取显式将url中的hostname替换成ip的方式了，然后添加Host头和HTTPS证书验证策略。但由于apache httpclient和urlconnection在设计之初，就没有考虑外部设置dns的策略，进行相关的接入时，总有各种异常case需要处理，比如apache http client在实现上，使用的是url中的ip信息作为cookie存储管理的key …"/>
+                <meta name="description" content="前言 httpdns是基于Http协议的域名解析服务，用于替代基于UDP协议向运营商Local DNS发起解析请求的传统方式，目标是解决域名劫持和跨网访问等问题。 httpdns的接入 传统的使用Local DNS的方式，我们只需要在url中指定hostname；网络库帮我们做了域名解析、ttl缓存管理，我们不需要关心底层的流程。 但当使用httpdns，就需要我们自己向httpdns发起http请求，获取到域名对应的ip。一般商业的httpdns sdk都会提供域名解析成ip的方法，一般的开发者接入httpdns还是需要做以下工作： 从URL中提取hostname，通过httpdns sdk获取到对应的IP 将URL中的hostname替换成IP 设置请求Header的Host字段 如果请求的是HTTPS，修改证书的域名验证策略 android端有三个网络基础库，具体的接入方式会有差异： apache httpclient http urlconnection okhttp 对于最后一个okhttp，由于它本身提供的设置外部dns的api，接入最简单，只需要简单的实现okhttp提供的lookup方法即可；但针对apache和urlconnection，就只能采取显式将url中的hostname替换成ip的方式了，然后添加Host头和HTTPS证书验证策略。但由于apache httpclient和urlconnection在设计之初，就没有考虑外部设置dns的策略，进行相关的接入时，总有各种异常case需要处理，比如apache http client在实现上，使用的是url中的ip信息作为cookie存储管理的key …">
+
+
+
+
+
+        <link rel="canonical" href="">
+        <link href="http://blog.aaapei.com/favicon.png" rel="shortcut icon">
+        <link href="http://blog.aaapei.com/theme/css/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+        <link href="http://blog.aaapei.com/theme/css/pygments.css" media="screen, projection" rel="stylesheet" type="text/css">
+
+        <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+<!--
+		<link href="//fonts.googleapis.com/css?family=Open+Sans:400italic,400,700" rel='stylesheet' type='text/css'>
+        <link href="//fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel='stylesheet' type='text/css'>
+        <link href="//fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel='stylesheet' type='text/css'>
+		-->
+        <script src="//lib.sinaapp.com/js/jquery/1.7.2/jquery.min.js"></script>
+        <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+
+    </head>
+<body>
+	<script type="text/javascript">
+		var _bdhmProtocol = (("https:" == document.location.protocol) ? " https://" : " http://");
+		document.write(unescape("%3Cscript src='" + _bdhmProtocol + "hm.baidu.com/h.js%3F42905fb57b3457075b7322a0893c5395' type='text/javascript'%3E%3C/script%3E"));
+	</script>
+		<div class="container">
+			<div class="left-col">
+				<div class="intrude-less">
+				<header id="header" class="inner">
+	<div class="profilepic">
+		<img src="http://nos.netease.com/knowledge/85c5dfab-ec44-4818-a018-1fc31e8baa4f" alt="Profile Picture" style="width: 160px;" />
+	</div>
+
+<hgroup>
+	<br/>
+	<h1><a href="http://blog.aaapei.com/">I'm aaapei</a></h1>
+    <h3>少年去游荡</h3>
+</hgroup>
+<nav id="main-nav">
+
+<ul class="main-navigation">
+	        <li><a href="http://blog.aaapei.com/.">首页</a></li>
+	        <li><a href="http://blog.aaapei.com/categories.html">分类</a></li>
+	        <li><a href="http://blog.aaapei.com/pages/sui-sui-nian">碎碎念</a></li>
+</ul></nav>
+
+<nav id="sub-nav">
+	<div class="social">
+			<a class="email" href="mailto:aaapei@gmail.com" title="Email">Email</a>
+		<a class="weibo" href="http://weibo.com/a2pei" title="Weibo">Weibo</a>
+			<a class="rss" href="http://blog.aaapei.com/rss.xml" title="RSS">ATOM</a>
+	</div>
+<section id="about-me">
+  <h2>关于我</h2>
+  <p>生活@hangzhou. 工作@netease.<br/> 移动端码农. 正在减肥的胖子. 食肉. <br/>想养喵但老婆不让</p>
+</section>
+</nav>				</header>
+				</div>
+			</div>
+			<div class="mid-col">
+				<div class="mid-col-container">
+					<div id="content" class="inner">
+
+        <section id="content" class="body">
+            <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
+<div class="meta">
+    <div class="date">
+        <time datetime="2017-11-05T11:28:00.000000+0800" itemprop="datePublished">2017-11-05</time>
+    </div>
+    <div class="tags">
+        <a href="http://blog.aaapei.com/tags/httpdns">httpdns</a>     </div>
+</div>                <h1 class="title" itemprop="name"><a href="http://blog.aaapei.com/article/2017/11/androidjie-ru-httpdnsde-ling-yi-chong-si-lu" itemprop="url">Android接入httpdns的另一种思路</a></h1>
+                <div class="entry-content" itemprop="articleBody">
+                    <h3>前言</h3>
+<p>httpdns是基于Http协议的域名解析服务，用于替代基于UDP协议向运营商Local DNS发起解析请求的传统方式，目标是解决域名劫持和跨网访问等问题。</p>
+<h3>httpdns的接入</h3>
+<p>传统的使用Local DNS的方式，我们只需要在url中指定hostname；网络库帮我们做了域名解析、ttl缓存管理，我们不需要关心底层的流程。</p>
+<p>但当使用httpdns，就需要我们自己向httpdns发起http请求，获取到域名对应的ip。一般商业的httpdns sdk都会提供域名解析成ip的方法，一般的开发者接入httpdns还是需要做以下工作：</p>
+<ol>
+<li>从URL中提取hostname，通过httpdns sdk获取到对应的IP</li>
+<li>将URL中的hostname替换成IP</li>
+<li>设置请求Header的Host字段</li>
+<li>如果请求的是HTTPS，修改证书的域名验证策略</li>
+</ol>
+<p>android端有三个网络基础库，具体的接入方式会有差异：</p>
+<ul>
+<li>apache httpclient</li>
+<li>http urlconnection</li>
+<li>okhttp</li>
+</ul>
+<p>对于最后一个okhttp，由于它本身提供的设置外部dns的api，接入最简单，只需要简单的实现okhttp提供的<em>lookup</em>方法即可；但针对apache和urlconnection，就只能采取显式将url中的hostname替换成ip的方式了，然后添加Host头和HTTPS证书验证策略。但由于apache httpclient和urlconnection在设计之初，就没有考虑外部设置dns的策略，进行相关的接入时，总有各种异常case需要处理，比如apache http client在实现上，使用的是url中的ip信息作为cookie存储管理的key，而非请求头的host。
+更具体的讨论可以参考<a href="https://help.aliyun.com/document_detail/30140.html?spm=5176.7758308.2.4.MJ84VT">阿里云httpdns</a>。</p>
+<p>总之，现有的解法都不能完美的覆盖掉所有场景。如果想使用httpdns，那么建议开发者抛弃掉apache或urlconnection，引入okhttp这样的第三方网络库实现。</p>
+<p>但的确会有那么一小撮仍在使用apache或者urlconnection的app，在不对现有网络库进行改造的情况下，有办法实现httpdns的低成本接入吗</p>
+<h3>NETD的设计</h3>
+<p>我们先看下android的Netd的设计，</p>
+<p><img alt="" src="http://www.laiwangyo.com/2016/11/25/Android%20Netd%E5%A4%84%E7%90%86%E6%B5%81%E7%A8%8B%E5%88%86%E6%9E%90/netd%E6%B5%81%E7%A8%8B.png">
+在android 4.3之后，DNS解析都向Netd代理的方式来管理，所有进程的dns解析都通过IPC向Netd进行来进行。
+受限于权限问题，我们没法对Netd做修改，但也正因为Netd这个设计，我们对当前进程的dns解析结果的改动并不会影响设备上其他应用的dns解析。</p>
+<p>顺着apache client/urlconnetion/okhttp的源码往下翻，我们会发现无论何种网络库，最终都需要使用libcore提供<em>InetAddress.getByName()</em> API来进行DNS解析，并最终调用android native层提供的DNS解析C函数。以android5.0为分界，出现了两个分支：</p>
+<ul>
+<li>
+<p>android 5.0以下系统将使用中的<em>getaddrinfo</em>；</p>
+<div class="highlight"><pre><span></span>int getaddrinfo( const char *hostname, const char *service, const struct addrinfo *hints, struct addrinfo **result )
+</pre></div>
+
+
+</li>
+<li>
+<p>android5.0及以上系统中android_getaddrinfoforget，相关的签名如下:</p>
+<div class="highlight"><pre><span></span>int android_getaddrinfoforget(const char *hostname, const char *service, const struct addrinfo *hints, struct addrinfo **result );
+</pre></div>
+
+
+</li>
+</ul>
+<p>这两个函数的参数完全一致，都通过hostname参数来指定查询的域名， result参数来返回域名对应的IP列表。他们都会编译进libjavacore.so这个动态链接库。</p>
+<p>相关的源码调用关系有些长，总之得出一个结论：所有网络库的dns解析流程入口都是同一个。</p>
+<h3>hook实现</h3>
+<p>既然入口是同一个，我们可以针对这个入口做一些hook的事情。<br>
+如果围绕java层的<em>InetAddress.getByName()</em>找方案，由于它是普通的静态方法，插件化常见的代理方案都将失效；从虚拟机这层hook，比如说Andfix，又会有遇到虚拟机兼容以及方案过重的问题。</p>
+<p>而从native层想办法成本则小了点。比如使用<a href="http://gslab.qq.com/article-162-1.html">ptrace注入</a>，又比如<a href="http://gslab.qq.com/article-163-1.html">elfhook</a>。</p>
+<p>具体的流程是，在android 应用刚启动时，我们可以从libjavacore.so中，分别找到<em>getaddrinfo</em>和<em>android_getaddrinfoforget</em>两个函数的指针地址，将其指向我们自定义的<em>get_httpdns_addrinfo</em>。在<em>get_httpdns_addrinfo</em>函数内部，我们调用httpdns的域名解析，将ip填充到struct addrinfo **result结构体中。</p>
+<p>利用这种方式，上层网络库是无感知的，仍然按照他本身InetAddress.getByName的逻辑获取域名解析结果，cookie、sni的问题也仍然按照网络库原始的策略管理，从而实现httpdns的无缝接入。</p>
+                </div>
+            </article>
+                <section id="comment">
+                    <h1 class="title">Comments</h1>
+                    <div class="ds-thread" data-thread-key="article/2017/11/androidjie-ru-httpdnsde-ling-yi-chong-si-lu" data-title="{ article.title }" data-url="article/2017/11/androidjie-ru-httpdnsde-ling-yi-chong-si-lu"></div>
+                    <!-- UY BEGIN -->
+                    <div id="uyan_frame"></div>
+                    <script type="text/javascript" src="http://v2.uyan.cc/code/uyan.js?uid=2112360"></script>
+                    <!-- UY END -->
+                </section>
+
+        </section>
+
+					</div>
+				</div>
+				<footer id="footer" class="inner">
+<p>Copyright &copy; 2013 - aaapei - <span class="credit">Powered by <a href="http://getpelican.com">Pelican</a></span></p>				</footer>
+			</div>
+		</div>
+	</body>
+</html>
